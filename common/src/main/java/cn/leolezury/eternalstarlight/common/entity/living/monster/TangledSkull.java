@@ -1,0 +1,402 @@
+package cn.leolezury.eternalstarlight.common.entity.living.monster;
+
+import cn.leolezury.eternalstarlight.common.config.ESConfig;
+import cn.leolezury.eternalstarlight.common.network.ParticlePacket;
+import cn.leolezury.eternalstarlight.common.particle.RingExplosionParticleOptions;
+import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
+import cn.leolezury.eternalstarlight.common.registry.ESCriteriaTriggers;
+import cn.leolezury.eternalstarlight.common.registry.ESParticles;
+import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
+import cn.leolezury.eternalstarlight.common.util.ESMathUtil;
+import cn.leolezury.eternalstarlight.common.util.ESTags;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.BodyRotationControl;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
+public class TangledSkull extends Monster {
+	private static final String TAG_SHOT = "shot";
+	private static final String TAG_SHOT_FROM_MONSTROSITY = "shot_from_monstrosity";
+	private static final String TAG_SHOT_MOVEMENT_X = "shot_movement_x";
+	private static final String TAG_SHOT_MOVEMENT_Y = "shot_movement_y";
+	private static final String TAG_SHOT_MOVEMENT_Z = "shot_movement_z";
+
+	public int skullDeathTime;
+	public final List<Vec3> trailPositions = new ArrayList<>();
+
+	protected static final EntityDataAccessor<Boolean> CHARGING = SynchedEntityData.defineId(TangledSkull.class, EntityDataSerializers.BOOLEAN);
+
+	public boolean isCharging() {
+		return this.getEntityData().get(CHARGING);
+	}
+
+	public void setCharging(boolean charging) {
+		this.getEntityData().set(CHARGING, charging);
+	}
+
+	protected static final EntityDataAccessor<Boolean> SHOT = SynchedEntityData.defineId(TangledSkull.class, EntityDataSerializers.BOOLEAN);
+
+	public boolean isShot() {
+		return this.getEntityData().get(SHOT);
+	}
+
+	public void setShot(boolean shot) {
+		this.getEntityData().set(SHOT, shot);
+	}
+
+	protected static final EntityDataAccessor<Boolean> SHOT_FROM_MONSTROSITY = SynchedEntityData.defineId(TangledSkull.class, EntityDataSerializers.BOOLEAN);
+
+	public boolean isShotFromMonstrosity() {
+		return this.getEntityData().get(SHOT_FROM_MONSTROSITY);
+	}
+
+	public void setShotFromMonstrosity(boolean shotFromMonstrosity) {
+		this.getEntityData().set(SHOT_FROM_MONSTROSITY, shotFromMonstrosity);
+	}
+
+	protected static final EntityDataAccessor<Vector3f> SHOT_MOVEMENT = SynchedEntityData.defineId(TangledSkull.class, EntityDataSerializers.VECTOR3);
+
+	public Vec3 getShotMovement() {
+		return new Vec3(this.getEntityData().get(SHOT_MOVEMENT));
+	}
+
+	public void setShotMovement(Vec3 shotMovement) {
+		this.getEntityData().set(SHOT_MOVEMENT, shotMovement.toVector3f());
+	}
+
+	public TangledSkull(EntityType<? extends TangledSkull> entityType, Level level) {
+		super(entityType, level);
+		this.moveControl = new TangledSkullMoveControl(this);
+	}
+
+	@Override
+	protected BodyRotationControl createBodyControl() {
+		return new TangledSkullRotationControl(this);
+	}
+
+	@Override
+	protected void registerGoals() {
+		this.goalSelector.addGoal(0, new FloatGoal(this));
+		this.goalSelector.addGoal(1, new TangledSkullChargeAttackGoal());
+		this.goalSelector.addGoal(2, new TangledSkullRandomMoveGoal());
+		this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 3.0F, 1.0F));
+		this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Mob.class, 8.0F));
+		this.targetSelector.addGoal(0, new HurtByTargetGoal(this).setAlertOthers());
+		this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
+	}
+
+	private class TangledSkullChargeAttackGoal extends Goal {
+		public TangledSkullChargeAttackGoal() {
+			this.setFlags(EnumSet.of(Flag.MOVE));
+		}
+
+		@Override
+		public boolean canUse() {
+			LivingEntity livingEntity = TangledSkull.this.getTarget();
+			if (livingEntity != null && livingEntity.isAlive() && !TangledSkull.this.getMoveControl().hasWanted() && TangledSkull.this.random.nextInt(reducedTickDelay(7)) == 0) {
+				return TangledSkull.this.distanceToSqr(livingEntity) > 4.0;
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		public boolean canContinueToUse() {
+			return TangledSkull.this.getMoveControl().hasWanted() && TangledSkull.this.isCharging() && TangledSkull.this.getTarget() != null && TangledSkull.this.getTarget().isAlive();
+		}
+
+		@Override
+		public void start() {
+			LivingEntity livingEntity = TangledSkull.this.getTarget();
+			if (livingEntity != null) {
+				Vec3 vec3 = livingEntity.getEyePosition();
+				TangledSkull.this.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 1.0);
+			}
+
+			TangledSkull.this.setCharging(true);
+		}
+
+		@Override
+		public void stop() {
+			TangledSkull.this.setCharging(false);
+		}
+
+		@Override
+		public boolean requiresUpdateEveryTick() {
+			return true;
+		}
+
+		@Override
+		public void tick() {
+			LivingEntity livingEntity = TangledSkull.this.getTarget();
+			if (livingEntity != null) {
+				if (TangledSkull.this.getBoundingBox().intersects(livingEntity.getBoundingBox())) {
+					TangledSkull.this.doHurtTarget(livingEntity);
+					TangledSkull.this.setCharging(false);
+				} else {
+					double d = TangledSkull.this.distanceToSqr(livingEntity);
+					if (d < 9.0) {
+						Vec3 vec3 = livingEntity.getEyePosition();
+						TangledSkull.this.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 1.0);
+					}
+				}
+
+			}
+		}
+	}
+
+	private class TangledSkullRandomMoveGoal extends Goal {
+		public TangledSkullRandomMoveGoal() {
+			this.setFlags(EnumSet.of(Flag.MOVE));
+		}
+
+		@Override
+		public boolean canUse() {
+			return !TangledSkull.this.getMoveControl().hasWanted() && TangledSkull.this.random.nextInt(reducedTickDelay(7)) == 0;
+		}
+
+		@Override
+		public boolean canContinueToUse() {
+			return false;
+		}
+
+		@Override
+		public void tick() {
+			BlockPos blockPos = TangledSkull.this.blockPosition();
+
+			for (int i = 0; i < 3; ++i) {
+				BlockPos blockPos2 = blockPos.offset(TangledSkull.this.random.nextInt(15) - 7, TangledSkull.this.random.nextInt(11) - 5, TangledSkull.this.random.nextInt(15) - 7);
+				if (TangledSkull.this.level().isEmptyBlock(blockPos2)) {
+					TangledSkull.this.moveControl.setWantedPosition((double) blockPos2.getX() + 0.5, (double) blockPos2.getY() + 0.5, (double) blockPos2.getZ() + 0.5, 0.25);
+					if (TangledSkull.this.getTarget() == null) {
+						TangledSkull.this.getLookControl().setLookAt((double) blockPos2.getX() + 0.5, (double) blockPos2.getY() + 0.5, (double) blockPos2.getZ() + 0.5, 180.0F, 20.0F);
+					}
+					break;
+				}
+			}
+
+		}
+	}
+
+	public static AttributeSupplier.Builder createAttributes() {
+		return Monster.createMonsterAttributes()
+			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.tangledSkull.maxHealth())
+			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.tangledSkull.armor())
+			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.tangledSkull.attackDamage())
+			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.tangledSkull.followRange());
+	}
+
+	@Override
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(CHARGING, false)
+			.define(SHOT, false)
+			.define(SHOT_FROM_MONSTROSITY, false)
+			.define(SHOT_MOVEMENT, Vec3.ZERO.toVector3f());
+	}
+
+	@Override
+	public void tick() {
+		this.noPhysics = true;
+		super.tick();
+		this.noPhysics = false;
+		this.setNoGravity(true);
+		if (!level().isClientSide) {
+			if (isShotFromMonstrosity() && tickCount == 30) {
+				playSound(ESSoundEvents.TANGLED_SKULL_ROAR.get(), 5, 1);
+			}
+			if (isShot()) {
+				setDeltaMovement(getShotMovement());
+				HitResult result = ProjectileUtil.getHitResultOnMoveVector(this, entity -> true);
+				if (isShotFromMonstrosity() && result.getType() == HitResult.Type.ENTITY && ((EntityHitResult) result).getEntity() instanceof LivingEntity living && !isAlliedTo(living)) {
+					living.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 60));
+					living.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60));
+					living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60));
+					living.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 60));
+				}
+				boolean ally = isShotFromMonstrosity() && result.getType() == HitResult.Type.ENTITY && isAlliedTo(((EntityHitResult) result).getEntity());
+				if (result.getType() != HitResult.Type.MISS && !ally) {
+					this.level().explode(this, this.getX(), this.getY(), this.getZ(), 1, Level.ExplosionInteraction.NONE);
+					if (isShotFromMonstrosity() && level() instanceof ServerLevel serverLevel) {
+						ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(RingExplosionParticleOptions.SOUL, getX(), getY(), getZ(), 0, 0.2, 0));
+					}
+					discard();
+				}
+			}
+		} else {
+			if (!isShotFromMonstrosity()) {
+				level().addParticle(ESParticles.SOUL_TRAIL.get(), xo, yo + getBbHeight() / 2, zo, 0, 0, 0);
+			}
+		}
+	}
+
+	@Override
+	protected void tickDeath() {
+		setDeltaMovement(Vec3.ZERO);
+		++this.skullDeathTime;
+		if (this.skullDeathTime >= 80 && !this.level().isClientSide() && !this.isRemoved()) {
+			this.level().explode(this, this.getX(), this.getY(), this.getZ(), 1, Level.ExplosionInteraction.NONE);
+			this.level().broadcastEntityEvent(this, (byte) 60);
+			this.remove(RemovalReason.KILLED);
+		}
+	}
+
+	@Override
+	public void die(DamageSource source) {
+		super.die(source);
+		if (!this.level().isClientSide() && source.getEntity() instanceof TangledSkull killer && killer.getKillCredit() instanceof ServerPlayer player) {
+			ESCriteriaTriggers.CHAIN_TANGLED_SKULL_EXPLOSION.get().trigger(player);
+		}
+	}
+
+	@Nullable
+	@Override
+	public LivingEntity getTarget() {
+		return isShot() ? null : super.getTarget();
+	}
+
+	@Override
+	public void setDeltaMovement(Vec3 vec3) {
+		if (isShot()) {
+			super.setDeltaMovement(isShotFromMonstrosity() && tickCount < 30 ? Vec3.ZERO : getShotMovement());
+		} else {
+			super.setDeltaMovement(vec3);
+		}
+	}
+
+	@Override
+	public boolean hurt(DamageSource source, float amount) {
+		if (isShot() && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+			return false;
+		}
+		return super.hurt(source, amount);
+	}
+
+	@Override
+	public boolean isAlliedTo(Entity entity) {
+		return super.isAlliedTo(entity) || entity.getType().is(ESTags.EntityTypes.LUNAR_MONSTROSITY_ALLIES);
+	}
+
+	@Override
+	public void addAdditionalSaveData(CompoundTag compoundTag) {
+		super.addAdditionalSaveData(compoundTag);
+		compoundTag.putBoolean(TAG_SHOT, isShot());
+		compoundTag.putBoolean(TAG_SHOT_FROM_MONSTROSITY, isShotFromMonstrosity());
+		if (isShot()) {
+			compoundTag.putDouble(TAG_SHOT_MOVEMENT_X, getShotMovement().x);
+			compoundTag.putDouble(TAG_SHOT_MOVEMENT_Y, getShotMovement().y);
+			compoundTag.putDouble(TAG_SHOT_MOVEMENT_Z, getShotMovement().z);
+		}
+	}
+
+	@Override
+	public void readAdditionalSaveData(CompoundTag compoundTag) {
+		super.readAdditionalSaveData(compoundTag);
+		if (compoundTag.contains(TAG_SHOT, CompoundTag.TAG_BYTE)) {
+			setShot(compoundTag.getBoolean(TAG_SHOT));
+		}
+		if (compoundTag.contains(TAG_SHOT_FROM_MONSTROSITY, CompoundTag.TAG_BYTE)) {
+			setShotFromMonstrosity(compoundTag.getBoolean(TAG_SHOT_FROM_MONSTROSITY));
+		}
+		if (compoundTag.contains(TAG_SHOT_MOVEMENT_X, CompoundTag.TAG_ANY_NUMERIC) && compoundTag.contains(TAG_SHOT_MOVEMENT_Y, CompoundTag.TAG_ANY_NUMERIC) && compoundTag.contains(TAG_SHOT_MOVEMENT_Z, CompoundTag.TAG_ANY_NUMERIC)) {
+			setShotMovement(new Vec3(compoundTag.getDouble(TAG_SHOT_MOVEMENT_X), compoundTag.getDouble(TAG_SHOT_MOVEMENT_Y), compoundTag.getDouble(TAG_SHOT_MOVEMENT_Z)));
+		}
+	}
+
+	@Nullable
+	@Override
+	protected SoundEvent getAmbientSound() {
+		return ESSoundEvents.TANGLED_SKULL_AMBIENT.get();
+	}
+
+	@Override
+	protected SoundEvent getHurtSound(DamageSource damageSource) {
+		return SoundEvents.SKELETON_HURT;
+	}
+
+	private class TangledSkullMoveControl extends MoveControl {
+		public TangledSkullMoveControl(final TangledSkull skull) {
+			super(skull);
+		}
+
+		@Override
+		public void tick() {
+			if (this.operation == Operation.MOVE_TO) {
+				Vec3 vec3 = new Vec3(this.wantedX - TangledSkull.this.getX(), this.wantedY - TangledSkull.this.getY(), this.wantedZ - TangledSkull.this.getZ());
+				double d = vec3.length();
+				if (d < TangledSkull.this.getBoundingBox().getSize()) {
+					this.operation = Operation.WAIT;
+					TangledSkull.this.setDeltaMovement(TangledSkull.this.getDeltaMovement().scale(0.5));
+				} else {
+					TangledSkull.this.setDeltaMovement(TangledSkull.this.getDeltaMovement().add(vec3.scale(this.speedModifier * 0.05 / d)));
+					if (TangledSkull.this.getTarget() == null) {
+						Vec3 vec32 = TangledSkull.this.getDeltaMovement();
+						TangledSkull.this.setYRot(-((float) Mth.atan2(vec32.x, vec32.z)) * Mth.RAD_TO_DEG);
+					} else {
+						double e = TangledSkull.this.getTarget().getX() - TangledSkull.this.getX();
+						double f = TangledSkull.this.getTarget().getZ() - TangledSkull.this.getZ();
+						TangledSkull.this.setYRot(-((float) Mth.atan2(e, f)) * Mth.RAD_TO_DEG);
+					}
+					TangledSkull.this.yBodyRot = TangledSkull.this.getYRot();
+				}
+			}
+		}
+	}
+
+	private class TangledSkullRotationControl extends BodyRotationControl {
+		public TangledSkullRotationControl(final TangledSkull skull) {
+			super(skull);
+		}
+
+		@Override
+		public void clientTick() {
+			if (TangledSkull.this.isShot()) {
+				Vec3 movement = TangledSkull.this.getShotMovement();
+				float pitch = ESMathUtil.positionToPitch(movement);
+				float yaw = ESMathUtil.positionToYaw(movement);
+				TangledSkull.this.setYRot(yaw - 90);
+				TangledSkull.this.yHeadRot = yaw - 90;
+				TangledSkull.this.yBodyRot = yaw - 90;
+				TangledSkull.this.setXRot(-pitch);
+			} else {
+				super.clientTick();
+			}
+		}
+	}
+}
