@@ -10,7 +10,6 @@ import net.minecraft.client.resources.model.BakedModel;
 @AutoService(ESClientPlatform.class)
 public class ESForgeClientPlatform implements ESClientPlatform {
 
-
 	@Override
 	public BakedModel getGlowingBakedModel(BakedModel origin) {
 		return new ForgeGlowingBakedModel(origin);

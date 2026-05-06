@@ -10,6 +10,7 @@ import cn.leolezury.eternalstarlight.common.item.combat.CrescentSpearItem;
 import cn.leolezury.eternalstarlight.common.item.combat.HammerItem;
 import cn.leolezury.eternalstarlight.common.item.combat.PetalScytheItem;
 import cn.leolezury.eternalstarlight.common.item.combat.ScytheItem;
+import cn.leolezury.eternalstarlight.common.network.ESPacket;
 import cn.leolezury.eternalstarlight.common.platform.registry.RegistrationProvider;
 import cn.leolezury.eternalstarlight.common.resource.gatekeeper.TheGatekeeperNameManager;
 import com.mojang.datafixers.util.Pair;
@@ -20,10 +21,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -48,10 +45,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.function.*;
@@ -122,7 +117,7 @@ public interface ESPlatform {
 	}
 
 	default ArmorItem createStarlitDiamondArmor(Holder<ArmorMaterial> material, ArmorItem.Type type, Item.Properties properties) {
-		return new ArmorItem(material, type, properties);
+		return new ArmorItem(material.value(), type, properties);
 	}
 
 	default UnrealiumArmorItem createUnrealiumArmor(Holder<ArmorMaterial> material, ArmorItem.Type type, Item.Properties properties) {
@@ -217,18 +212,16 @@ public interface ESPlatform {
 	}
 
 	// networking
-	void sendToClient(ServerPlayer player, CustomPacketPayload packet);
+	void sendToClient(ServerPlayer player, ESPacket packet);
+	void sendToTrackingClientsImpl(ServerLevel level, Entity entity, ESPacket packet);
 
-	default void sendToAllClients(ServerLevel level, CustomPacketPayload packet) {
+	default void sendToAllClients(ServerLevel level, ESPacket packet) {
 		for (ServerPlayer player : level.players()) {
 			sendToClient(player, packet);
 		}
 	}
 
-	default void sendToTrackingClients(ServerLevel level, Entity entity, CustomPacketPayload packet) {
-		level.getChunkSource().broadcast(entity, new ClientboundCustomPayloadPacket(packet));
-		if (entity instanceof ServerPlayer player) {
-			sendToClient(player, packet);
-		}
+	default void sendToTrackingClients(ServerLevel level, Entity entity, ESPacket packet) {
+		sendToTrackingClientsImpl(level, entity, packet);
 	}
 }

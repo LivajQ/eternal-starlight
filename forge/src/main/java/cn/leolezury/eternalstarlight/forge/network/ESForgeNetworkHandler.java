@@ -3,7 +3,10 @@ package cn.leolezury.eternalstarlight.forge.network;
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.network.ESPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -38,5 +41,9 @@ public class ESForgeNetworkHandler {
 
 	public static void sendToClient(ServerPlayer player, ESPacket packet) {
 		CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new ForgePayloadPacket(packet));
+	}
+
+	public static void sendToTracking(ServerLevel level, Entity entity, ESPacket packet) {
+		level.getChunkSource().broadcast(entity, CHANNEL.toVanillaPacket(new ForgePayloadPacket(packet), NetworkDirection.PLAY_TO_CLIENT));
 	}
 }

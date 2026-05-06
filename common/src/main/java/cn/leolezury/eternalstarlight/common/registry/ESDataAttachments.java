@@ -213,9 +213,7 @@ public class ESDataAttachments {
 				return list;
 			});
 
-
-
-	private static <T> EntityDataAttachment<T> register(EntityDataAttachment<T> attachment) {
+	public static <T> EntityDataAttachment<T> register(EntityDataAttachment<T> attachment) {
 		ATTACHMENTS.add(attachment);
 		return attachment;
 	}
@@ -278,7 +276,6 @@ public class ESDataAttachments {
 			FriendlyByteBuf::writeItem,
 			FriendlyByteBuf::readItem);
 	}
-
 
 	public static List<EntityDataAttachment<?>> getAttachments() {
 		return Collections.unmodifiableList(ATTACHMENTS);

@@ -1,5 +1,6 @@
 package cn.leolezury.eternalstarlight.common.network;
 
+import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.platform.EntityDataAttachment;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import io.netty.buffer.Unpooled;
@@ -10,7 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public class SyncAttachmentsPacket {
+public class SyncAttachmentsPacket implements ESPacket {
 	private final int entityId;
 	private final ResourceLocation attachmentId;
 	private final byte[] data;
@@ -43,6 +44,7 @@ public class SyncAttachmentsPacket {
 		return new SyncAttachmentsPacket(entityId, attachmentId, data);
 	}
 
+	@Override
 	public void write(FriendlyByteBuf buf) {
 		buf.writeInt(entityId);
 		buf.writeResourceLocation(attachmentId);
@@ -50,6 +52,7 @@ public class SyncAttachmentsPacket {
 		buf.writeByteArray(data);
 	}
 
+	@Override
 	public void handle(Player player) {
 		Level level = player.level();
 		Entity entity = level.getEntity(entityId);
@@ -70,5 +73,10 @@ public class SyncAttachmentsPacket {
 		} else {
 			attachment.setData(entity, value);
 		}
+	}
+
+	@Override
+	public ResourceLocation id() {
+		return EternalStarlight.id("sync_attachments");
 	}
 }
