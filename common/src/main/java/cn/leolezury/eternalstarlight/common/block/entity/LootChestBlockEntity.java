@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block.entity;
 
-import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.network.ParticlePacket;
 import cn.leolezury.eternalstarlight.common.particle.ExplosionShockParticleOptions;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
@@ -8,13 +7,10 @@ import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.*;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -55,7 +51,7 @@ public class LootChestBlockEntity extends BlockEntity {
 	private static final String TAG_FLASH_COLOR = "flash_color";
 	private static final String TAG_RARE_FLASH_COLOR = "rare_flash_color";
 
-	private ResourceKey<LootTable> lootTable;
+	private ResourceLocation lootTable;
 	private final List<ItemStack> itemsToEject = new ArrayList<>();
 	private boolean quickEjection = false;
 	private final List<UUID> rewardTargets = new ArrayList<>();
@@ -69,7 +65,7 @@ public class LootChestBlockEntity extends BlockEntity {
 	public int flashStartTickCount = Integer.MIN_VALUE;
 	public boolean rareFlash = false;
 
-	public void setLootTable(ResourceKey<LootTable> lootTable) {
+	public void setLootTable(ResourceLocation lootTable) {
 		this.lootTable = lootTable;
 		setChanged();
 	}
@@ -92,7 +88,7 @@ public class LootChestBlockEntity extends BlockEntity {
 			itemsToEject.clear();
 			ServerLevel serverLevel = player.serverLevel();
 			MinecraftServer server = serverLevel.getServer();
-			LootTable table = server.reloadableRegistries().getLootTable(lootTable);
+			LootTable table = server.getLootData().getLootTable(this.lootTable);
 			LootParams.Builder paramBuilder = new LootParams.Builder(serverLevel);
 			LootParams params = paramBuilder.create(LootContextParamSets.EMPTY);
 			itemsToEject.addAll(table.getRandomItems(params));
@@ -266,70 +262,81 @@ public class LootChestBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-		return saveWithFullMetadata(provider);
+	public CompoundTag getUpdateTag() {
+		return saveWithFullMetadata();
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.loadAdditional(compoundTag, provider);
-		if (compoundTag.contains(TAG_LOOT_TABLE, CompoundTag.TAG_STRING)) {
-			setLootTable(ResourceKey.create(Registries.LOOT_TABLE, ResourceLocation.parse(compoundTag.getString(TAG_LOOT_TABLE))));
+	public void load(CompoundTag tag) {
+		super.load(tag);
+
+		if (tag.contains(TAG_LOOT_TABLE, Tag.TAG_STRING)) {
+			this.lootTable = new ResourceLocation(tag.getString(TAG_LOOT_TABLE));
 		}
-		if (compoundTag.contains(TAG_ITEMS_TO_EJECT)) {
-			ItemStack.OPTIONAL_CODEC.listOf().parse(provider.createSerializationContext(NbtOps.INSTANCE), compoundTag.get(TAG_ITEMS_TO_EJECT)).resultOrPartial((string) -> EternalStarlight.LOGGER.error("Failed to parse Loot Chest items: '{}'", string)).ifPresent(this.itemsToEject::addAll);
-		}
-		quickEjection = compoundTag.getBoolean(TAG_QUICK_EJECTION);
-		if (compoundTag.contains(TAG_REWARD_TARGETS, CompoundTag.TAG_LIST)) {
-			ListTag listTag = compoundTag.getList(TAG_REWARD_TARGETS, CompoundTag.TAG_INT_ARRAY);
-			for (Tag tag : listTag) {
-				if (tag != null && tag.getType() == IntArrayTag.TYPE && ((IntArrayTag) tag).getAsIntArray().length == 4) {
-					this.rewardTargets.add(NbtUtils.loadUUID(tag));
-				}
+
+		if (tag.contains(TAG_ITEMS_TO_EJECT, Tag.TAG_LIST)) {
+			ListTag list = tag.getList(TAG_ITEMS_TO_EJECT, Tag.TAG_COMPOUND);
+			this.itemsToEject.clear();
+			for (Tag t : list) {
+				this.itemsToEject.add(ItemStack.of((CompoundTag) t));
 			}
 		}
-		if (compoundTag.contains(TAG_CURRENT_REWARD_TARGET)) {
-			currentRewardTarget = compoundTag.getUUID(TAG_CURRENT_REWARD_TARGET);
+
+		this.quickEjection = tag.getBoolean(TAG_QUICK_EJECTION);
+
+		if (tag.contains(TAG_REWARD_TARGETS, Tag.TAG_LIST)) {
+			ListTag list = tag.getList(TAG_REWARD_TARGETS, Tag.TAG_INT_ARRAY);
+			this.rewardTargets.clear();
+			for (Tag t : list) {
+				this.rewardTargets.add(NbtUtils.loadUUID(t));
+			}
 		}
-		cooldown = compoundTag.getInt(TAG_COOLDOWN);
-		ejectionTicks = compoundTag.getInt(TAG_EJECTION_TICKS);
-		if (compoundTag.contains(TAG_COLOR, CompoundTag.TAG_INT)) {
-			color = compoundTag.getInt(TAG_COLOR);
+
+		if (tag.contains(TAG_CURRENT_REWARD_TARGET)) {
+			this.currentRewardTarget = tag.getUUID(TAG_CURRENT_REWARD_TARGET);
 		}
-		if (compoundTag.contains(TAG_OUTLINE_COLOR, CompoundTag.TAG_INT)) {
-			outlineColor = compoundTag.getInt(TAG_OUTLINE_COLOR);
-		}
-		if (compoundTag.contains(TAG_FLASH_COLOR, CompoundTag.TAG_INT)) {
-			flashColor = compoundTag.getInt(TAG_FLASH_COLOR);
-		}
-		if (compoundTag.contains(TAG_RARE_FLASH_COLOR, CompoundTag.TAG_INT)) {
-			rareFlashColor = compoundTag.getInt(TAG_RARE_FLASH_COLOR);
-		}
+
+		this.cooldown = tag.getInt(TAG_COOLDOWN);
+		this.ejectionTicks = tag.getInt(TAG_EJECTION_TICKS);
+
+		if (tag.contains(TAG_COLOR)) this.color = tag.getInt(TAG_COLOR);
+		if (tag.contains(TAG_OUTLINE_COLOR)) this.outlineColor = tag.getInt(TAG_OUTLINE_COLOR);
+		if (tag.contains(TAG_FLASH_COLOR)) this.flashColor = tag.getInt(TAG_FLASH_COLOR);
+		if (tag.contains(TAG_RARE_FLASH_COLOR)) this.rareFlashColor = tag.getInt(TAG_RARE_FLASH_COLOR);
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.saveAdditional(compoundTag, provider);
-		if (lootTable != null) {
-			compoundTag.putString(TAG_LOOT_TABLE, lootTable.location().toString());
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
+
+		if (this.lootTable != null) {
+			tag.putString(TAG_LOOT_TABLE, this.lootTable.toString());
 		}
-		compoundTag.put(TAG_ITEMS_TO_EJECT, ItemStack.OPTIONAL_CODEC.listOf().encodeStart(provider.createSerializationContext(NbtOps.INSTANCE), this.itemsToEject).getOrThrow());
-		compoundTag.putBoolean(TAG_QUICK_EJECTION, quickEjection);
-		ListTag listTag = new ListTag();
-		for (UUID uuid : this.rewardTargets) {
-			if (uuid != null) {
-				listTag.add(NbtUtils.createUUID(uuid));
-			}
+
+		ListTag itemsList = new ListTag();
+		for (ItemStack stack : this.itemsToEject) {
+			itemsList.add(stack.save(new CompoundTag()));
 		}
-		compoundTag.put(TAG_REWARD_TARGETS, listTag);
-		if (currentRewardTarget != null) {
-			compoundTag.putUUID(TAG_CURRENT_REWARD_TARGET, currentRewardTarget);
+		tag.put(TAG_ITEMS_TO_EJECT, itemsList);
+
+		tag.putBoolean(TAG_QUICK_EJECTION, this.quickEjection);
+
+		ListTag uuidList = new ListTag();
+		for (UUID id : this.rewardTargets) {
+			uuidList.add(NbtUtils.createUUID(id));
 		}
-		compoundTag.putInt(TAG_COOLDOWN, cooldown);
-		compoundTag.putInt(TAG_EJECTION_TICKS, ejectionTicks);
-		compoundTag.putInt(TAG_COLOR, color);
-		compoundTag.putInt(TAG_OUTLINE_COLOR, outlineColor);
-		compoundTag.putInt(TAG_FLASH_COLOR, flashColor);
-		compoundTag.putInt(TAG_RARE_FLASH_COLOR, rareFlashColor);
+		tag.put(TAG_REWARD_TARGETS, uuidList);
+
+		if (this.currentRewardTarget != null) {
+			tag.putUUID(TAG_CURRENT_REWARD_TARGET, this.currentRewardTarget);
+		}
+
+		tag.putInt(TAG_COOLDOWN, this.cooldown);
+		tag.putInt(TAG_EJECTION_TICKS, this.ejectionTicks);
+		tag.putInt(TAG_COLOR, this.color);
+		tag.putInt(TAG_OUTLINE_COLOR, this.outlineColor);
+		tag.putInt(TAG_FLASH_COLOR, this.flashColor);
+		tag.putInt(TAG_RARE_FLASH_COLOR, this.rareFlashColor);
 	}
+
 }

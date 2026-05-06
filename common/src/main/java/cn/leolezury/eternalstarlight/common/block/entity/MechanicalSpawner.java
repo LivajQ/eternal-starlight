@@ -19,19 +19,14 @@ import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.SpawnData;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -76,7 +71,7 @@ public abstract class MechanicalSpawner {
 	}
 
 	private static boolean inLineOfSight(Level level, Vec3 block, Vec3 target) {
-		BlockHitResult blockHitResult = level.clip(new ClipContext(target, block, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, CollisionContext.empty()));
+		BlockHitResult blockHitResult = level.clip(new ClipContext(target, block, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, null));
 		return blockHitResult.getBlockPos().equals(BlockPos.containing(block)) || blockHitResult.getType() == HitResult.Type.MISS;
 	}
 
@@ -135,7 +130,14 @@ public abstract class MechanicalSpawner {
 					double z = posSize >= 3
 						? posTag.getDouble(2)
 						: pos.getZ() + (random.nextDouble() - random.nextDouble()) * this.spawnRange + 0.5;
-					if (serverLevel.noCollision(type.get().getSpawnAABB(x, y, z)) && inLineOfSight(serverLevel, pos.getCenter(), new Vec3(x, y, z))) {
+
+					EntityType<?> entityType = type.get();
+
+					AABB box = entityType.getDimensions()
+						.makeBoundingBox(x, y, z);
+
+					if (serverLevel.noCollision(box)
+						&& inLineOfSight(serverLevel, pos.getCenter(), new Vec3(x, y, z))) {
 						BlockPos spawnPos = BlockPos.containing(x, y, z);
 						if (spawnData.getCustomSpawnRules().isPresent()) {
 							if (!type.get().getCategory().isFriendly() && serverLevel.getDifficulty() == Difficulty.PEACEFUL) {
@@ -143,10 +145,15 @@ public abstract class MechanicalSpawner {
 							}
 
 							SpawnData.CustomSpawnRules rules = spawnData.getCustomSpawnRules().get();
-							if (!rules.isValidPosition(spawnPos, serverLevel)) {
+							int blockLight = serverLevel.getBrightness(LightLayer.BLOCK, spawnPos);
+							int skyLight   = serverLevel.getBrightness(LightLayer.SKY,   spawnPos);
+
+							if (!rules.blockLightLimit().isValueInRange(blockLight)
+								|| !rules.skyLightLimit().isValueInRange(skyLight)) {
 								continue;
 							}
-						} else if (!SpawnPlacements.checkSpawnRules(type.get(), serverLevel, MobSpawnType.TRIAL_SPAWNER, spawnPos, serverLevel.getRandom())) {
+
+						} else if (!SpawnPlacements.checkSpawnRules(type.get(), serverLevel, MobSpawnType.SPAWNER, spawnPos, serverLevel.getRandom())) {
 							continue;
 						}
 
@@ -159,7 +166,12 @@ public abstract class MechanicalSpawner {
 							return;
 						}
 
-						int entitiesCount = serverLevel.getEntities(EntityTypeTest.forExactClass(entity.getClass()), new AABB(pos.getX(), pos.getY(), pos.getZ(), (pos.getX() + 1), (pos.getY() + 1), (pos.getZ() + 1)).inflate(this.spawnRange), EntitySelector.NO_SPECTATORS).size();
+						int entitiesCount = serverLevel.getEntitiesOfClass(
+							entity.getClass(),
+							new AABB(pos).inflate(this.spawnRange),
+							EntitySelector.NO_SPECTATORS
+						).size();
+
 						if (entitiesCount >= this.maxNearbyEntities) {
 							this.delay(serverLevel, pos);
 							return;
@@ -173,10 +185,10 @@ public abstract class MechanicalSpawner {
 
 							boolean shouldFinalize = spawnData.getEntityToSpawn().size() == 1 && spawnData.getEntityToSpawn().contains("id", CompoundTag.TAG_STRING);
 							if (shouldFinalize) {
-								mob.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.TRIAL_SPAWNER, null);
+								mob.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.SPAWNER, null, null);
 							}
 
-							spawnData.getEquipment().ifPresent(mob::equip);
+							//spawnData.getEquipment().ifPresent(mob::equip);
 						}
 
 						if (!serverLevel.tryAddFreshEntityWithPassengers(entity)) {
@@ -213,7 +225,7 @@ public abstract class MechanicalSpawner {
 		}
 		BlockState state = level.getBlockState(pos);
 		this.spawnDelay *= state.hasProperty(MechanicalSpawnerBlock.POWER) ? (16 - state.getValue(MechanicalSpawnerBlock.POWER)) : 1;
-		this.spawnPotentials.getRandom(random).ifPresent(wrapper -> this.setNextSpawnData(level, pos, wrapper.data()));
+		this.spawnPotentials.getRandom(random).ifPresent(wrapper -> this.setNextSpawnData(level, pos, wrapper.getData()));
 		this.broadcastEvent(level, pos, EVENT_SPAWN);
 	}
 
@@ -279,10 +291,14 @@ public abstract class MechanicalSpawner {
 				TAG_SPAWN_DATA,
 				SpawnData.CODEC
 					.encodeStart(NbtOps.INSTANCE, this.nextSpawnData)
-					.getOrThrow(s -> new IllegalStateException("Invalid SpawnData: " + s))
+					.getOrThrow(false, msg -> {
+						throw new IllegalStateException("Invalid SpawnData: " + msg);
+					})
 			);
 		}
-		tag.put(TAG_SPAWN_POTENTIALS, SpawnData.LIST_CODEC.encodeStart(NbtOps.INSTANCE, this.spawnPotentials).getOrThrow());
+		tag.put(TAG_SPAWN_POTENTIALS, SpawnData.LIST_CODEC
+			.encodeStart(NbtOps.INSTANCE, this.spawnPotentials)
+			.getOrThrow(false, EternalStarlight.LOGGER::error));
 		return tag;
 	}
 
@@ -315,7 +331,7 @@ public abstract class MechanicalSpawner {
 
 	private SpawnData getOrCreateNextSpawnData(@Nullable Level level, RandomSource random, BlockPos pos) {
 		if (this.nextSpawnData == null) {
-			this.setNextSpawnData(level, pos, this.spawnPotentials.getRandom(random).map(WeightedEntry.Wrapper::data).orElseGet(SpawnData::new));
+			this.setNextSpawnData(level, pos, this.spawnPotentials.getRandom(random).map(WeightedEntry.Wrapper::getData).orElseGet(SpawnData::new));
 		}
 		return this.nextSpawnData;
 	}

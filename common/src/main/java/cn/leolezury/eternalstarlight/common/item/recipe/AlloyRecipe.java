@@ -4,24 +4,25 @@ import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.registry.ESRecipeSerializers;
 import cn.leolezury.eternalstarlight.common.registry.ESRecipes;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
-public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> ingredients, int burnTime) implements Recipe<CraftingInput> {
+public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> ingredients, int burnTime) implements Recipe<Container> {
+
 	@Override
 	public RecipeSerializer<?> getSerializer() {
 		return ESRecipeSerializers.ALLOY.get();
@@ -47,8 +48,13 @@ public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> i
 	}
 
 	@Override
-	public ItemStack getResultItem(HolderLookup.Provider provider) {
-		return this.results.getFirst().item();
+	public ResourceLocation getId() {
+		return ESRecipes.ALLOY.getId();
+	}
+
+	@Override
+	public ItemStack getResultItem(RegistryAccess registryAccess) {
+		return results.getFirst().item();
 	}
 
 	@Override
@@ -57,35 +63,37 @@ public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> i
 	}
 
 	@Override
-	public boolean matches(CraftingInput craftingInput, Level level) {
-		if (craftingInput.ingredientCount() != this.ingredients.size()) {
-			return false;
-		} else {
-			return craftingInput.size() == 1 && this.ingredients.size() == 1 ? this.ingredients.getFirst().test(craftingInput.getItem(0)) : craftingInput.stackedContents().canCraft(this, null);
+	public boolean matches(Container container, Level level) {
+		StackedContents contents = new StackedContents();
+		int count = 0;
+
+		for (int i = 0; i < container.getContainerSize(); ++i) {
+			ItemStack stack = container.getItem(i);
+			if (!stack.isEmpty()) {
+				++count;
+				contents.accountStack(stack, 1);
+			}
 		}
+
+		return count == this.ingredients.size() && contents.canCraft(this, null);
 	}
 
 	@Override
-	public ItemStack assemble(CraftingInput craftingInput, HolderLookup.Provider provider) {
+	public ItemStack assemble(Container container, RegistryAccess access) {
 		return this.results.getFirst().item().copy();
 	}
 
 	@Override
-	public boolean canCraftInDimensions(int i, int j) {
-		return i * j >= this.ingredients.size();
+	public boolean canCraftInDimensions(int width, int height) {
+		return width * height >= this.ingredients.size();
+	}
+
+	@Override
+	public boolean isSpecial() {
+		return true;
 	}
 
 	public record Result(ItemStack item, IntProvider amount) {
-		public static final Codec<Result> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
-			ItemStack.STRICT_SINGLE_ITEM_CODEC.fieldOf("item").forGetter(Result::item),
-			IntProvider.NON_NEGATIVE_CODEC.fieldOf("amount").forGetter(Result::amount)
-		).apply(instance, Result::new));
-
-		public static final StreamCodec<? super RegistryFriendlyByteBuf, Result> STREAM_CODEC = StreamCodec.composite(
-			ItemStack.STREAM_CODEC, Result::item,
-			ByteBufCodecs.fromCodec(IntProvider.NON_NEGATIVE_CODEC), Result::amount,
-			Result::new
-		);
 
 		public ItemStack getResultItem(RandomSource random) {
 			return item().copyWithCount(amount().sample(random));
@@ -97,58 +105,71 @@ public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> i
 	}
 
 	public static class Serializer implements RecipeSerializer<AlloyRecipe> {
-		private static final MapCodec<AlloyRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
-			Result.CODEC.listOf().fieldOf("results").flatXmap((list) -> {
-				Result[] items = list.stream().filter((stack) -> !stack.item().isEmpty()).toArray(Result[]::new);
-				if (items.length == 0) {
-					return DataResult.error(() -> "No result for alloy recipe");
-				} else {
-					return items.length > 3 ? DataResult.error(() -> "Too many results for alloy recipe") : DataResult.success(NonNullList.of(new Result(ItemStack.EMPTY, ConstantInt.of(0)), items));
-				}
-			}, DataResult::success).forGetter(AlloyRecipe::results),
-			Ingredient.CODEC_NONEMPTY.listOf().fieldOf("ingredients").flatXmap((list) -> {
-				Ingredient[] ingredients = list.stream().filter((ingredient) -> !ingredient.isEmpty()).toArray(Ingredient[]::new);
-				if (ingredients.length == 0) {
-					return DataResult.error(() -> "No ingredient for alloy recipe");
-				} else {
-					return ingredients.length > 9 ? DataResult.error(() -> "Too many ingredients for alloy recipe") : DataResult.success(NonNullList.of(Ingredient.EMPTY, ingredients));
-				}
-			}, DataResult::success).forGetter(AlloyRecipe::ingredients),
-			Codec.INT.fieldOf("burn_time").forGetter(AlloyRecipe::burnTime)
-		).apply(instance, AlloyRecipe::new));
-		public static final StreamCodec<RegistryFriendlyByteBuf, AlloyRecipe> STREAM_CODEC = StreamCodec.of(Serializer::toNetwork, Serializer::fromNetwork);
 
 		@Override
-		public MapCodec<AlloyRecipe> codec() {
-			return CODEC;
-		}
+		public AlloyRecipe fromJson(ResourceLocation id, JsonObject json) {
+			JsonArray resultsArray = GsonHelper.getAsJsonArray(json, "results");
+			NonNullList<Result> results = NonNullList.create();
+			for (JsonElement elem : resultsArray) {
+				JsonObject obj = elem.getAsJsonObject();
+				ItemStack stack = net.minecraft.world.item.crafting.ShapedRecipe.itemStackFromJson(
+					GsonHelper.getAsJsonObject(obj, "item")
+				);
+				int min = GsonHelper.getAsInt(obj, "amount_min", 1);
+				int max = GsonHelper.getAsInt(obj, "amount_max", min);
+				results.add(new Result(stack, min == max ? ConstantInt.of(min) : net.minecraft.util.valueproviders.UniformInt.of(min, max)));
+			}
 
-		@Override
-		public StreamCodec<RegistryFriendlyByteBuf, AlloyRecipe> streamCodec() {
-			return STREAM_CODEC;
-		}
+			JsonArray ingredientsArray = GsonHelper.getAsJsonArray(json, "ingredients");
+			NonNullList<Ingredient> ingredients = NonNullList.create();
+			for (JsonElement elem : ingredientsArray) {
+				ingredients.add(Ingredient.fromJson(elem));
+			}
 
-		private static AlloyRecipe fromNetwork(RegistryFriendlyByteBuf byteBuf) {
-			int resultSize = byteBuf.readVarInt();
-			NonNullList<Result> results = NonNullList.withSize(resultSize, new Result(ItemStack.EMPTY, ConstantInt.of(1)));
-			results.replaceAll(result -> Result.STREAM_CODEC.decode(byteBuf));
-			int ingredientSize = byteBuf.readVarInt();
-			NonNullList<Ingredient> ingredients = NonNullList.withSize(ingredientSize, Ingredient.EMPTY);
-			ingredients.replaceAll(ingredient -> Ingredient.CONTENTS_STREAM_CODEC.decode(byteBuf));
-			int burnTime = byteBuf.readInt();
+			int burnTime = GsonHelper.getAsInt(json, "burn_time");
+
 			return new AlloyRecipe(results, ingredients, burnTime);
 		}
 
-		private static void toNetwork(RegistryFriendlyByteBuf byteBuf, AlloyRecipe alloyRecipe) {
-			byteBuf.writeVarInt(alloyRecipe.results.size());
-			for (Result result : alloyRecipe.results) {
-				Result.STREAM_CODEC.encode(byteBuf, result);
+		@Override
+		public AlloyRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
+			int resultSize = buf.readVarInt();
+			NonNullList<Result> results = NonNullList.withSize(resultSize, new Result(ItemStack.EMPTY, ConstantInt.of(1)));
+			for (int i = 0; i < resultSize; i++) {
+				ItemStack item = buf.readItem();
+				int min = buf.readVarInt();
+				int max = buf.readVarInt();
+				IntProvider amount = (min == max) ? ConstantInt.of(min) : net.minecraft.util.valueproviders.UniformInt.of(min, max);
+				results.set(i, new Result(item, amount));
 			}
-			byteBuf.writeVarInt(alloyRecipe.ingredients.size());
-			for (Ingredient ingredient : alloyRecipe.ingredients) {
-				Ingredient.CONTENTS_STREAM_CODEC.encode(byteBuf, ingredient);
+
+			int ingredientSize = buf.readVarInt();
+			NonNullList<Ingredient> ingredients = NonNullList.withSize(ingredientSize, Ingredient.EMPTY);
+			for (int i = 0; i < ingredientSize; i++) {
+				ingredients.set(i, Ingredient.fromNetwork(buf));
 			}
-			byteBuf.writeInt(alloyRecipe.burnTime);
+
+			int burnTime = buf.readInt();
+			return new AlloyRecipe(results, ingredients, burnTime);
+		}
+
+		@Override
+		public void toNetwork(FriendlyByteBuf buf, AlloyRecipe recipe) {
+			buf.writeVarInt(recipe.results.size());
+			for (Result result : recipe.results) {
+				buf.writeItem(result.item());
+				int min = result.amount().getMinValue();
+				int max = result.amount().getMaxValue();
+				buf.writeVarInt(min);
+				buf.writeVarInt(max);
+			}
+
+			buf.writeVarInt(recipe.ingredients.size());
+			for (Ingredient ingredient : recipe.ingredients) {
+				ingredient.toNetwork(buf);
+			}
+
+			buf.writeInt(recipe.burnTime);
 		}
 	}
 }

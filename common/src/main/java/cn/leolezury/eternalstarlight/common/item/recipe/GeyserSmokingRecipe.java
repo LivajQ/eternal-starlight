@@ -3,41 +3,45 @@ package cn.leolezury.eternalstarlight.common.item.recipe;
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.registry.ESRecipeSerializers;
 import cn.leolezury.eternalstarlight.common.registry.ESRecipes;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
+import com.google.gson.JsonObject;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 
-public record GeyserSmokingRecipe(Item input, int inputCount, ItemStack output) implements Recipe<SingleRecipeInput> {
+public record GeyserSmokingRecipe(Item input, int inputCount, ItemStack output) implements Recipe<Container> {
+
 	@Override
-	public boolean matches(SingleRecipeInput container, Level level) {
-		return container.getItem(0).is(input()) && container.getItem(0).getCount() >= inputCount();
+	public boolean matches(Container container, Level level) {
+		return container.getItem(0).is(input) && container.getItem(0).getCount() >= inputCount;
 	}
 
 	@Override
-	public ItemStack assemble(SingleRecipeInput container, HolderLookup.Provider provider) {
-		return output().copy();
-	}
-
-	@Override
-	public boolean canCraftInDimensions(int i, int j) {
+	public boolean canCraftInDimensions(int width, int height) {
 		return true;
 	}
 
 	@Override
-	public ItemStack getResultItem(HolderLookup.Provider provider) {
-		return output();
+	public ItemStack assemble(Container container, RegistryAccess registryAccess) {
+		return output.copy();
+	}
+
+	@Override
+	public ItemStack getResultItem(RegistryAccess registryAccess) {
+		return output;
+	}
+
+	@Override
+	public ResourceLocation getId() {
+		return ESRecipes.GEYSER_SMOKING.getId();
 	}
 
 	@Override
@@ -60,35 +64,28 @@ public record GeyserSmokingRecipe(Item input, int inputCount, ItemStack output) 
 	}
 
 	public static class Serializer implements RecipeSerializer<GeyserSmokingRecipe> {
-		private static final MapCodec<GeyserSmokingRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-			BuiltInRegistries.ITEM.byNameCodec().fieldOf("input").forGetter(GeyserSmokingRecipe::input),
-			Codec.INT.fieldOf("input_count").forGetter(GeyserSmokingRecipe::inputCount),
-			ItemStack.OPTIONAL_CODEC.fieldOf("output").forGetter(GeyserSmokingRecipe::output)
-		).apply(instance, GeyserSmokingRecipe::new));
 
 		@Override
-		public MapCodec<GeyserSmokingRecipe> codec() {
-			return CODEC;
+		public GeyserSmokingRecipe fromJson(ResourceLocation id, JsonObject json) {
+			Item input = BuiltInRegistries.ITEM.get(new ResourceLocation(json.get("input").getAsString()));
+			int inputCount = json.get("input_count").getAsInt();
+			ItemStack output = ShapedRecipe.itemStackFromJson(json.getAsJsonObject("output"));
+			return new GeyserSmokingRecipe(input, inputCount, output);
 		}
 
 		@Override
-		public StreamCodec<RegistryFriendlyByteBuf, GeyserSmokingRecipe> streamCodec() {
-			return new StreamCodec<>() {
-				@Override
-				public GeyserSmokingRecipe decode(RegistryFriendlyByteBuf friendlyByteBuf) {
-					Item input = friendlyByteBuf.readById(BuiltInRegistries.ITEM::byId);
-					int inputCount = friendlyByteBuf.readInt();
-					ItemStack output = ItemStack.STREAM_CODEC.decode(friendlyByteBuf);
-					return new GeyserSmokingRecipe(input, inputCount, output);
-				}
+		public GeyserSmokingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
+			Item input = buf.readById(BuiltInRegistries.ITEM);
+			int inputCount = buf.readInt();
+			ItemStack output = buf.readItem();
+			return new GeyserSmokingRecipe(input, inputCount, output);
+		}
 
-				@Override
-				public void encode(RegistryFriendlyByteBuf friendlyByteBuf, GeyserSmokingRecipe recipe) {
-					friendlyByteBuf.writeById(BuiltInRegistries.ITEM::getId, recipe.input());
-					friendlyByteBuf.writeInt(recipe.inputCount());
-					ItemStack.STREAM_CODEC.encode(friendlyByteBuf, recipe.output());
-				}
-			};
+		@Override
+		public void toNetwork(FriendlyByteBuf buf, GeyserSmokingRecipe recipe) {
+			buf.writeId(BuiltInRegistries.ITEM, recipe.input());
+			buf.writeInt(recipe.inputCount());
+			buf.writeItem(recipe.output());
 		}
 	}
 }

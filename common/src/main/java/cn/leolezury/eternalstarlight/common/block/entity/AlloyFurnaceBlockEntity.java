@@ -12,7 +12,6 @@ import cn.leolezury.eternalstarlight.common.registry.ESParticles;
 import cn.leolezury.eternalstarlight.common.registry.ESRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -23,14 +22,15 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -124,7 +124,7 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 		}
 	};
 
-	private final RecipeManager.CachedCheck<CraftingInput, AlloyRecipe> quickCheck;
+	private final RecipeManager.CachedCheck<Container, AlloyRecipe> quickCheck;
 
 	private NonNullList<ItemStack> items = NonNullList.withSize(14, ItemStack.EMPTY);
 	private int litTicks, totalLitTicks, burnTicks, totalBurnTicks, overheatTicks, coolingTicks, totalCoolingTicks, coolingEfficiency;
@@ -159,6 +159,7 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 			boolean oldCooling = entity.coolingTicks > 0;
 			boolean oldShowOverheatAnimation = entity.overheatTicks >= getOverheatAnimationThreshold();
 			boolean changed = false;
+
 			if (entity.litTicks > 0) {
 				entity.litTicks--;
 			}
@@ -172,8 +173,11 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 				entity.totalCoolingTicks = 0;
 				entity.coolingEfficiency = 0;
 			}
+
 			List<ItemStack> ingredients = entity.getIngredientItems();
-			RecipeHolder<AlloyRecipe> recipeHolder = entity.quickCheck.getRecipeFor(CraftingInput.of(3, 3, ingredients), level).orElse(null);
+			SimpleContainer recipeContainer = new SimpleContainer(ingredients.toArray(new ItemStack[0]));
+			AlloyRecipe recipe = entity.quickCheck.getRecipeFor(recipeContainer, level).orElse(null);
+
 			if (entity.canBurn() && entity.litTicks <= 0) {
 				ItemStack fuel = entity.getItem(AlloyFurnaceMenu.FUEL_SLOT);
 				if (!fuel.isEmpty() && isFuel(fuel)) {
@@ -183,9 +187,11 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 					fuel.shrink(1);
 					if (ESPlatform.INSTANCE.hasCraftingRemainingItem(originalFuel)) {
 						ESPlatform.INSTANCE.getCraftingRemainingItem(originalFuel).ifPresent(remaining -> {
-							if (fuel.isEmpty() || ItemStack.isSameItemSameComponents(fuel, remaining)) {
+							if (fuel.isEmpty() || ItemStack.isSameItemSameTags(fuel, remaining)) {
 								int remainingCount = (fuel.getCount() + remaining.getCount()) - remaining.getMaxStackSize();
-								entity.setItem(AlloyFurnaceMenu.FUEL_SLOT, remaining.copyWithCount(Math.min(fuel.getCount() + remaining.getCount(), remaining.getMaxStackSize())));
+								entity.setItem(AlloyFurnaceMenu.FUEL_SLOT, remaining.copyWithCount(
+									Math.min(fuel.getCount() + remaining.getCount(), remaining.getMaxStackSize())
+								));
 								if (remainingCount > 0) {
 									Block.popResource(level, pos, remaining.copyWithCount(remainingCount));
 								}
@@ -197,6 +203,7 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 					changed = true;
 				}
 			}
+
 			if (entity.overheatTicks > 0 && entity.coolingTicks <= 0) {
 				ItemStack coolingItem = entity.getItem(AlloyFurnaceMenu.COOLING_SLOT);
 				if (!coolingItem.isEmpty() && isCoolingItem(coolingItem)) {
@@ -206,9 +213,11 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 					coolingItem.shrink(1);
 					if (ESPlatform.INSTANCE.hasCraftingRemainingItem(coolingItem)) {
 						ESPlatform.INSTANCE.getCraftingRemainingItem(coolingItem).ifPresent(remaining -> {
-							if (coolingItem.isEmpty() || ItemStack.isSameItemSameComponents(coolingItem, remaining)) {
+							if (coolingItem.isEmpty() || ItemStack.isSameItemSameTags(coolingItem, remaining)) {
 								int remainingCount = (coolingItem.getCount() + remaining.getCount()) - remaining.getMaxStackSize();
-								entity.setItem(AlloyFurnaceMenu.COOLING_SLOT, remaining.copyWithCount(Math.min(coolingItem.getCount() + remaining.getCount(), remaining.getMaxStackSize())));
+								entity.setItem(AlloyFurnaceMenu.COOLING_SLOT, remaining.copyWithCount(
+									Math.min(coolingItem.getCount() + remaining.getCount(), remaining.getMaxStackSize())
+								));
 								if (remainingCount > 0) {
 									Block.popResource(level, pos, remaining.copyWithCount(remainingCount));
 								}
@@ -220,17 +229,19 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 					changed = true;
 				}
 			}
+
 			entity.burnTicks += (entity.litTicks > 0 && entity.canBurn()) ? 1 : -1;
 			entity.burnTicks = Mth.clamp(entity.burnTicks, 0, entity.totalBurnTicks);
-			if (entity.litTicks > 0 && (entity.coolingTicks <= 0 || entity.litTicks % entity.coolingEfficiency == 0)) {
+
+			if (entity.litTicks > 0 && (entity.coolingTicks <= 0 || (entity.coolingEfficiency > 0 && entity.litTicks % entity.coolingEfficiency == 0))) {
 				entity.overheatTicks += 1;
 			}
 			if (entity.litTicks <= 0) {
 				entity.overheatTicks -= (1 + (entity.coolingTicks > 0 ? entity.coolingEfficiency : 0));
 			}
 			entity.overheatTicks = Mth.clamp(entity.overheatTicks, 0, getTotalOverheatTicks());
-			if (entity.canBurn() && entity.burnTicks == entity.totalBurnTicks && recipeHolder != null) {
-				AlloyRecipe recipe = recipeHolder.value();
+
+			if (entity.canBurn() && entity.burnTicks == entity.totalBurnTicks && recipe != null) {
 				for (int i = 0; i < Math.min(recipe.results().size(), 3); i++) {
 					AlloyRecipe.Result result = recipe.results().get(i);
 					ItemStack stack = result.getResultItem(level.getRandom());
@@ -238,55 +249,84 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 						break;
 					} else {
 						ItemStack existingResult = entity.getItem(AlloyFurnaceMenu.RESULT_SLOT_START + i);
-						entity.setItem(AlloyFurnaceMenu.RESULT_SLOT_START + i, stack.copyWithCount(stack.getCount() + existingResult.getCount()));
+						entity.setItem(
+							AlloyFurnaceMenu.RESULT_SLOT_START + i,
+							stack.copyWithCount(stack.getCount() + existingResult.getCount())
+						);
 					}
 				}
-				CraftingInput.Positioned craftingInput = CraftingInput.ofPositioned(3, 3, ingredients);
-				NonNullList<ItemStack> remaining = recipeHolder.value().getRemainingItems(craftingInput.input());
-				for (int y = 0; y < craftingInput.input().height(); y++) {
-					for (int x = 0; x < craftingInput.input().width(); x++) {
-						int index = (x + craftingInput.left()) + (y + craftingInput.top()) * 3;
-						ItemStack craftItem = entity.getItem(AlloyFurnaceMenu.INGREDIENT_SLOT_START + index);
-						ItemStack remainingItem = remaining.get(x + y * craftingInput.input().width());
-						if (!craftItem.isEmpty()) {
-							craftItem.shrink(1);
-							entity.setItem(AlloyFurnaceMenu.INGREDIENT_SLOT_START + index, craftItem);
-						}
-						if (!remainingItem.isEmpty()) {
-							if (craftItem.isEmpty() || ItemStack.isSameItemSameComponents(craftItem, remainingItem)) {
-								int remainingCount = (craftItem.getCount() + remainingItem.getCount()) - remainingItem.getMaxStackSize();
-								entity.setItem(AlloyFurnaceMenu.INGREDIENT_SLOT_START + index, remainingItem.copyWithCount(Math.min(craftItem.getCount() + remainingItem.getCount(), remainingItem.getMaxStackSize())));
-								if (remainingCount > 0) {
-									Block.popResource(level, pos, remainingItem.copyWithCount(remainingCount));
-								}
-							} else {
-								Block.popResource(level, pos, remainingItem.copy());
+
+				NonNullList<ItemStack> remaining = recipe.getRemainingItems(recipeContainer);
+				for (int i = 0; i < remaining.size(); i++) {
+					int slot = AlloyFurnaceMenu.INGREDIENT_SLOT_START + i;
+
+					ItemStack craftItem = entity.getItem(slot);
+					ItemStack remainingItem = remaining.get(i);
+
+					if (!craftItem.isEmpty()) {
+						craftItem.shrink(1);
+						entity.setItem(slot, craftItem);
+					}
+
+					if (!remainingItem.isEmpty()) {
+						if (craftItem.isEmpty() || ItemStack.isSameItemSameTags(craftItem, remainingItem)) {
+							int remainingCount = (craftItem.getCount() + remainingItem.getCount()) - remainingItem.getMaxStackSize();
+							entity.setItem(slot, remainingItem.copyWithCount(
+								Math.min(craftItem.getCount() + remainingItem.getCount(), remainingItem.getMaxStackSize())
+							));
+							if (remainingCount > 0) {
+								Block.popResource(level, pos, remainingItem.copyWithCount(remainingCount));
 							}
+						} else {
+							Block.popResource(level, pos, remainingItem.copy());
 						}
 					}
 				}
+
 				entity.burnTicks = 0;
 				changed = true;
 			}
-			if ((entity.litTicks > 0) != oldLit || (entity.coolingTicks > 0) != oldCooling || (entity.overheatTicks >= getOverheatAnimationThreshold()) != oldShowOverheatAnimation) {
+
+			if ((entity.litTicks > 0) != oldLit
+				|| (entity.coolingTicks > 0) != oldCooling
+				|| (entity.overheatTicks >= getOverheatAnimationThreshold()) != oldShowOverheatAnimation) {
 				level.sendBlockUpdated(pos, state, state, 3);
 				changed = true;
 			}
+
 			if (changed) {
 				entity.setChanged();
 			}
+
 			entity.checkStructureTicks++;
 			if (entity.checkStructureTicks > 20 && state.getBlock() instanceof AlloyFurnaceBlock block) {
 				block.checkStructure(level, pos);
 				entity.checkStructureTicks = 0;
 			}
+
 			if (entity.overheatTicks >= getTotalOverheatTicks()) {
 				level.destroyBlock(pos, false);
 				if (level instanceof ServerLevel serverLevel) {
-					serverLevel.sendParticles(ESExplosionParticleOptions.LAVA, pos.getX() + level.getRandom().nextFloat(), pos.getY() + level.getRandom().nextFloat() + 1.5, pos.getZ() + level.getRandom().nextFloat(), 20, 1.5, 1.5, 1.5, 0);
-					serverLevel.sendParticles(ESParticles.SMOKE_TRAIL.get(), pos.getX() + level.getRandom().nextFloat(), pos.getY() + level.getRandom().nextFloat(), pos.getZ() + level.getRandom().nextFloat(), 20, 0, 0, 0, 0.5);
+					serverLevel.sendParticles(ESExplosionParticleOptions.LAVA,
+						pos.getX() + level.getRandom().nextFloat(),
+						pos.getY() + level.getRandom().nextFloat() + 1.5,
+						pos.getZ() + level.getRandom().nextFloat(),
+						20, 1.5, 1.5, 1.5, 0);
+					serverLevel.sendParticles(ESParticles.SMOKE_TRAIL.get(),
+						pos.getX() + level.getRandom().nextFloat(),
+						pos.getY() + level.getRandom().nextFloat(),
+						pos.getZ() + level.getRandom().nextFloat(),
+						20, 0, 0, 0, 0.5);
 				}
-				level.explode(null, null, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, ESConfig.INSTANCE.itemsConfig.alloyFurnace.explosionRadius(), true, Level.ExplosionInteraction.BLOCK, ESExplosionParticleOptions.LAVA, ESExplosionParticleOptions.LAVA, SoundEvents.GENERIC_EXPLODE);
+				level.explode(
+					null,
+					pos.getX() + 0.5,
+					pos.getY() + 0.5,
+					pos.getZ() + 0.5,
+					ESConfig.INSTANCE.itemsConfig.alloyFurnace.explosionRadius(),
+					Level.ExplosionInteraction.BLOCK
+				);
+
 			}
 		} else {
 			entity.oldClientOverheatAmplitude = entity.clientOverheatAmplitude;
@@ -295,7 +335,8 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 			entity.oldClientAnimationTicks = entity.clientAnimationTicks;
 			entity.clientAnimationTicks++;
 			if (level.getRandom().nextDouble() < 0.1) {
-				level.playLocalSound(pos.getX() + 0.5, pos.getY(), pos.getX() + 0.5, SoundEvents.FURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 1.0F, 1.0F, false);
+				level.playLocalSound(pos.getX() + 0.5, pos.getY(), pos.getX() + 0.5,
+					SoundEvents.FURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 1.0F, 1.0F, false);
 			}
 		}
 	}
@@ -308,27 +349,37 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 		if (level == null) {
 			return false;
 		}
-		Optional<RecipeHolder<AlloyRecipe>> recipeHolder = quickCheck.getRecipeFor(CraftingInput.of(3, 3, getIngredientItems()), level);
-		if (getIngredientItems().stream().anyMatch(stack -> !stack.isEmpty()) && recipeHolder.isPresent()) {
-			AlloyRecipe recipe = recipeHolder.get().value();
-			for (int i = 0; i < Math.min(recipe.results().size(), 3); i++) {
-				AlloyRecipe.Result result = recipe.results().get(i);
-				ItemStack stack = result.getMaxResultItem();
-				if (stack.isEmpty()) {
-					return false;
-				} else {
-					ItemStack existingResult = getItem(AlloyFurnaceMenu.RESULT_SLOT_START + i);
-					if (!existingResult.isEmpty() && !ItemStack.isSameItemSameComponents(existingResult, stack)) {
-						return false;
-					} else if (existingResult.getCount() + stack.getCount() > stack.getMaxStackSize()) {
-						return false;
-					}
-				}
-			}
-			return true;
-		} else {
+
+		List<ItemStack> ingredients = getIngredientItems();
+		SimpleContainer container = new SimpleContainer(ingredients.toArray(new ItemStack[0]));
+
+		Optional<AlloyRecipe> opt = quickCheck.getRecipeFor(container, level);
+		if (ingredients.stream().noneMatch(stack -> !stack.isEmpty()) || opt.isEmpty()) {
 			return false;
 		}
+
+		AlloyRecipe recipe = opt.get();
+
+		for (int i = 0; i < Math.min(recipe.results().size(), 3); i++) {
+			AlloyRecipe.Result result = recipe.results().get(i);
+			ItemStack stack = result.getMaxResultItem();
+
+			if (stack.isEmpty()) {
+				return false;
+			}
+
+			ItemStack existing = getItem(AlloyFurnaceMenu.RESULT_SLOT_START + i);
+
+			if (!existing.isEmpty() && !ItemStack.isSameItemSameTags(existing, stack)) {
+				return false;
+			}
+
+			if (existing.getCount() + stack.getCount() > stack.getMaxStackSize()) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public static boolean isFuel(ItemStack stack) {
@@ -342,15 +393,36 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 	@Override
 	public void setItem(int index, ItemStack stack) {
 		ItemStack original = this.items.get(index);
-		boolean unchanged = !stack.isEmpty() && ItemStack.isSameItemSameComponents(original, stack);
-		if (level != null && index >= AlloyFurnaceMenu.INGREDIENT_SLOT_START && index < AlloyFurnaceMenu.INGREDIENT_SLOT_END && !unchanged) {
-			List<ItemStack> ingredients = getItems().subList(AlloyFurnaceMenu.INGREDIENT_SLOT_START, AlloyFurnaceMenu.INGREDIENT_SLOT_END);
+
+		boolean unchanged = !stack.isEmpty() && ItemStack.isSameItemSameTags(original, stack);
+
+		if (level != null &&
+			index >= AlloyFurnaceMenu.INGREDIENT_SLOT_START &&
+			index < AlloyFurnaceMenu.INGREDIENT_SLOT_END &&
+			!unchanged) {
+
+			List<ItemStack> ingredients = getItems().subList(
+				AlloyFurnaceMenu.INGREDIENT_SLOT_START,
+				AlloyFurnaceMenu.INGREDIENT_SLOT_END
+			);
+
 			ingredients.set(index - AlloyFurnaceMenu.INGREDIENT_SLOT_START, stack);
-			this.quickCheck.getRecipeFor(CraftingInput.of(3, 3, ingredients), level).ifPresentOrElse(holder -> this.totalBurnTicks = holder.value().burnTime(), () -> this.totalBurnTicks = 0);
+
+			SimpleContainer container = new SimpleContainer(ingredients.toArray(new ItemStack[0]));
+
+			this.quickCheck.getRecipeFor(container, level)
+				.ifPresentOrElse(
+					recipe -> this.totalBurnTicks = recipe.burnTime(),
+					() -> this.totalBurnTicks = 0
+				);
+
 			this.burnTicks = 0;
 			this.setChanged();
 		}
-		super.setItem(index, stack);
+
+		this.items.set(index, stack);
+
+		this.setChanged();
 	}
 
 	@Override
@@ -370,31 +442,81 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.loadAdditional(compoundTag, provider);
-		ContainerHelper.loadAllItems(compoundTag, this.items, provider);
-		this.litTicks = compoundTag.getShort(TAG_LIT_TICKS);
-		this.totalLitTicks = compoundTag.getShort(TAG_TOTAL_LIT_TICKS);
-		this.burnTicks = compoundTag.getShort(TAG_BURN_TICKS);
-		this.totalBurnTicks = compoundTag.getShort(TAG_TOTAL_BURN_TICKS);
-		this.overheatTicks = compoundTag.getShort(TAG_OVERHEAT_TICKS);
-		this.coolingTicks = compoundTag.getShort(TAG_COOLING_TICKS);
-		this.totalCoolingTicks = compoundTag.getShort(TAG_TOTAL_COOLING_TICKS);
-		this.coolingEfficiency = compoundTag.getShort(TAG_COOLING_EFFICIENCY);
+	public boolean isEmpty() {
+		for (ItemStack stack : items) {
+			if (!stack.isEmpty()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.saveAdditional(compoundTag, provider);
-		ContainerHelper.saveAllItems(compoundTag, this.items, provider);
-		compoundTag.putShort(TAG_LIT_TICKS, (short) this.litTicks);
-		compoundTag.putShort(TAG_TOTAL_LIT_TICKS, (short) this.totalLitTicks);
-		compoundTag.putShort(TAG_BURN_TICKS, (short) this.burnTicks);
-		compoundTag.putShort(TAG_TOTAL_BURN_TICKS, (short) this.totalBurnTicks);
-		compoundTag.putShort(TAG_OVERHEAT_TICKS, (short) this.overheatTicks);
-		compoundTag.putShort(TAG_COOLING_TICKS, (short) this.coolingTicks);
-		compoundTag.putShort(TAG_TOTAL_COOLING_TICKS, (short) this.totalCoolingTicks);
-		compoundTag.putShort(TAG_COOLING_EFFICIENCY, (short) this.coolingEfficiency);
+	public ItemStack getItem(int index) {
+		return items.get(index);
+	}
+
+	@Override
+	public ItemStack removeItem(int index, int count) {
+		ItemStack result = ContainerHelper.removeItem(items, index, count);
+		if (!result.isEmpty()) {
+			setChanged();
+		}
+		return result;
+	}
+
+	@Override
+	public ItemStack removeItemNoUpdate(int index) {
+		return ContainerHelper.takeItem(items, index);
+	}
+
+	@Override
+	public boolean stillValid(Player player) {
+		if (this.level == null || this.level.getBlockEntity(this.worldPosition) != this) {
+			return false;
+		}
+		return player.distanceToSqr(
+			this.worldPosition.getX() + 0.5,
+			this.worldPosition.getY() + 0.5,
+			this.worldPosition.getZ() + 0.5
+		) <= 64.0;
+	}
+
+	@Override
+	public void clearContent() {
+		items.clear();
+	}
+
+	@Override
+	public void load(CompoundTag tag) {
+		super.load(tag);
+
+		ContainerHelper.loadAllItems(tag, this.items);
+
+		this.litTicks = tag.getShort(TAG_LIT_TICKS);
+		this.totalLitTicks = tag.getShort(TAG_TOTAL_LIT_TICKS);
+		this.burnTicks = tag.getShort(TAG_BURN_TICKS);
+		this.totalBurnTicks = tag.getShort(TAG_TOTAL_BURN_TICKS);
+		this.overheatTicks = tag.getShort(TAG_OVERHEAT_TICKS);
+		this.coolingTicks = tag.getShort(TAG_COOLING_TICKS);
+		this.totalCoolingTicks = tag.getShort(TAG_TOTAL_COOLING_TICKS);
+		this.coolingEfficiency = tag.getShort(TAG_COOLING_EFFICIENCY);
+	}
+
+	@Override
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
+
+		ContainerHelper.saveAllItems(tag, this.items);
+
+		tag.putShort(TAG_LIT_TICKS, (short) this.litTicks);
+		tag.putShort(TAG_TOTAL_LIT_TICKS, (short) this.totalLitTicks);
+		tag.putShort(TAG_BURN_TICKS, (short) this.burnTicks);
+		tag.putShort(TAG_TOTAL_BURN_TICKS, (short) this.totalBurnTicks);
+		tag.putShort(TAG_OVERHEAT_TICKS, (short) this.overheatTicks);
+		tag.putShort(TAG_COOLING_TICKS, (short) this.coolingTicks);
+		tag.putShort(TAG_TOTAL_COOLING_TICKS, (short) this.totalCoolingTicks);
+		tag.putShort(TAG_COOLING_EFFICIENCY, (short) this.coolingEfficiency);
 	}
 
 	@Nullable
@@ -404,8 +526,8 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 	}
 
 	@Override
-	public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-		return saveCustomOnly(provider);
+	public CompoundTag getUpdateTag() {
+		return this.saveWithFullMetadata();
 	}
 
 	@Override
@@ -413,12 +535,10 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 		return Component.translatable("container." + EternalStarlight.ID + ".alloy_furnace");
 	}
 
-	@Override
 	protected NonNullList<ItemStack> getItems() {
 		return items;
 	}
 
-	@Override
 	protected void setItems(NonNullList<ItemStack> items) {
 		this.items = items;
 	}
@@ -445,14 +565,18 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 	public boolean canPlaceItemThroughFace(int index, ItemStack stack, @Nullable Direction direction) {
 		if (index == AlloyFurnaceMenu.FUEL_SLOT || index == AlloyFurnaceMenu.COOLING_SLOT || level == null) {
 			return canPlaceItem(index, stack);
-		} else {
-			Optional<RecipeHolder<AlloyRecipe>> recipeHolder = quickCheck.getRecipeFor(CraftingInput.of(3, 3, getIngredientItems()), level);
-			if (recipeHolder.isPresent()) {
-				return !getItem(index).isEmpty() && canPlaceItem(index, stack);
-			} else {
-				return canPlaceItem(index, stack);
-			}
 		}
+
+		List<ItemStack> ingredients = getIngredientItems();
+		SimpleContainer container = new SimpleContainer(ingredients.toArray(new ItemStack[0]));
+
+		Optional<AlloyRecipe> recipe = quickCheck.getRecipeFor(container, level);
+
+		if (recipe.isPresent()) {
+			return !getItem(index).isEmpty() && canPlaceItem(index, stack);
+		}
+
+		return canPlaceItem(index, stack);
 	}
 
 	@Override

@@ -37,10 +37,10 @@ public class GolemSteelJetBlockEntity extends BlockEntity {
 					for (Entity entity : level.getEntitiesOfClass(Entity.class, box)) {
 						if (level instanceof ServerLevel serverLevel) {
 							Vec3 particlePos = pos.getCenter().add(direction.getStepX() * 0.5, direction.getStepY() * 0.5, direction.getStepZ() * 0.5);
-							RandomSource random = entity.getRandom();
+							RandomSource random = level.getRandom();
 							for (int i = 0; i < 15; i++) {
 								double speed = 0.2 + random.nextFloat() / 1.5;
-								ParticlePacket packet = new ParticlePacket(ParticleTypes.WHITE_SMOKE, particlePos.x, particlePos.y, particlePos.z, direction.getStepX() * speed, direction.getStepY() * speed, direction.getStepZ() * speed);
+								ParticlePacket packet = new ParticlePacket(ParticleTypes.SMOKE, particlePos.x, particlePos.y, particlePos.z, direction.getStepX() * speed, direction.getStepY() * speed, direction.getStepZ() * speed);
 								ESPlatform.INSTANCE.sendToAllClients(serverLevel, packet);
 							}
 						}
@@ -48,8 +48,12 @@ public class GolemSteelJetBlockEntity extends BlockEntity {
 						double push = Math.sqrt(state.getValue(WeatheringGolemSteelJetBlock.POWER) * 0.21) * (state.getBlock() instanceof WeatheringGolemSteel weathering && weathering.isOxidized() ? 0.9 : 1);
 						entity.addDeltaMovement(new Vec3(direction.step()).scale(push));
 						if (entity instanceof Player player) {
+
+							/*
+							something something impulse not existing
 							player.currentImpulseImpactPos = pos.getCenter().add(direction.getStepX() * 0.5, direction.getStepY() * 0.5, direction.getStepZ() * 0.5);
 							player.setIgnoreFallDamageFromCurrentImpulse(true);
+							 */
 						}
 						success = true;
 					}

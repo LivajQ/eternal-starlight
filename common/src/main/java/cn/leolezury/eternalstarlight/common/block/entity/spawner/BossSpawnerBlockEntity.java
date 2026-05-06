@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block.entity.spawner;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
@@ -65,7 +64,7 @@ public abstract class BossSpawnerBlockEntity<T extends Mob> extends BlockEntity 
 			return false;
 		}
 		mob.moveTo(getBlockPos(), accessor.getLevel().getRandom().nextFloat() * 360.0F, 0.0F);
-		mob.finalizeSpawn(accessor, accessor.getCurrentDifficultyAt(getBlockPos()), MobSpawnType.SPAWNER, null);
+		mob.finalizeSpawn(accessor, accessor.getCurrentDifficultyAt(getBlockPos()), MobSpawnType.SPAWNER, null, null);
 		initializeBoss(mob);
 		return accessor.addFreshEntity(mob);
 	}
@@ -89,14 +88,15 @@ public abstract class BossSpawnerBlockEntity<T extends Mob> extends BlockEntity 
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.saveAdditional(compoundTag, provider);
-		compoundTag.putInt(TAG_SPAWN_COOLDOWN, spawnCooldown);
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
+		tag.putInt(TAG_SPAWN_COOLDOWN, spawnCooldown);
 	}
 
 	@Override
-	protected void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.loadAdditional(compoundTag, provider);
-		spawnCooldown = compoundTag.getInt(TAG_SPAWN_COOLDOWN);
+	public void load(CompoundTag tag) {
+		super.load(tag);
+		spawnCooldown = tag.getInt(TAG_SPAWN_COOLDOWN);
 	}
+
 }

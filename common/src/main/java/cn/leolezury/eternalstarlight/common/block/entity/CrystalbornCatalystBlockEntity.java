@@ -12,16 +12,17 @@ import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
@@ -101,7 +102,7 @@ public class CrystalbornCatalystBlockEntity extends BaseContainerBlockEntity {
 				} else {
 					entity.charge--;
 				}
-				entity.charge = Math.clamp(entity.charge, 0, 30);
+				entity.charge = Mth.clamp(entity.charge, 0, 30);
 				if (entity.charge == 30) {
 					entity.items.getFirst().shrink(1);
 					entity.energyLeft += ESConfig.INSTANCE.itemsConfig.crystalbornCatalyst.energyPerShard();
@@ -141,7 +142,8 @@ public class CrystalbornCatalystBlockEntity extends BaseContainerBlockEntity {
 	}
 
 	private static boolean canMergeItems(ItemStack stack1, ItemStack stack2) {
-		return stack1.getCount() <= stack1.getMaxStackSize() && ItemStack.isSameItemSameComponents(stack1, stack2);
+		return stack1.getCount() <= stack1.getMaxStackSize()
+			&& ItemStack.isSameItemSameTags(stack1, stack2);
 	}
 
 	public static boolean isFuel(ItemStack stack) {
@@ -159,6 +161,58 @@ public class CrystalbornCatalystBlockEntity extends BaseContainerBlockEntity {
 	@Override
 	public int getContainerSize() {
 		return 15;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		for (ItemStack stack : items) {
+			if (!stack.isEmpty()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public ItemStack getItem(int index) {
+		return items.get(index);
+	}
+
+	@Override
+	public ItemStack removeItem(int index, int count) {
+		ItemStack result = ContainerHelper.removeItem(items, index, count);
+		if (!result.isEmpty()) {
+			setChanged();
+		}
+		return result;
+	}
+
+	@Override
+	public ItemStack removeItemNoUpdate(int index) {
+		return ContainerHelper.takeItem(items, index);
+	}
+
+	@Override
+	public void setItem(int index, ItemStack stack) {
+		items.set(index, stack);
+		setChanged();
+	}
+
+	@Override
+	public boolean stillValid(Player player) {
+		if (this.level == null || this.level.getBlockEntity(this.worldPosition) != this) {
+			return false;
+		}
+		return player.distanceToSqr(
+			this.worldPosition.getX() + 0.5,
+			this.worldPosition.getY() + 0.5,
+			this.worldPosition.getZ() + 0.5
+		) <= 64.0;
+	}
+
+	@Override
+	public void clearContent() {
+		items.clear();
 	}
 
 	private static class Cursor {
@@ -230,25 +284,33 @@ public class CrystalbornCatalystBlockEntity extends BaseContainerBlockEntity {
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.loadAdditional(compoundTag, provider);
-		int count = compoundTag.getInt(TAG_CURSOR_COUNT);
+	public void load(CompoundTag tag) {
+		super.load(tag);
+
+		this.cursors.clear();
+		int count = tag.getInt(TAG_CURSOR_COUNT);
 		for (int i = 0; i < count; i++) {
-			this.cursors.add(Cursor.fromTag(compoundTag.getCompound(TAG_CURSOR + i)));
+			this.cursors.add(Cursor.fromTag(tag.getCompound(TAG_CURSOR + i)));
 		}
-		this.energyLeft = compoundTag.getInt(TAG_ENERGY_LEFT);
-		ContainerHelper.loadAllItems(compoundTag, this.items, provider);
+
+		this.energyLeft = tag.getInt(TAG_ENERGY_LEFT);
+
+		this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+		ContainerHelper.loadAllItems(tag, this.items);
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.saveAdditional(compoundTag, provider);
-		compoundTag.putInt(TAG_CURSOR_COUNT, cursors.size());
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
+
+		tag.putInt(TAG_CURSOR_COUNT, cursors.size());
 		for (int i = 0; i < cursors.size(); i++) {
-			compoundTag.put(TAG_CURSOR + i, cursors.get(i).toTag());
+			tag.put(TAG_CURSOR + i, cursors.get(i).toTag());
 		}
-		compoundTag.putInt(TAG_ENERGY_LEFT, this.energyLeft);
-		ContainerHelper.saveAllItems(compoundTag, this.items, provider);
+
+		tag.putInt(TAG_ENERGY_LEFT, this.energyLeft);
+
+		ContainerHelper.saveAllItems(tag, this.items);
 	}
 
 	@Override
@@ -256,12 +318,10 @@ public class CrystalbornCatalystBlockEntity extends BaseContainerBlockEntity {
 		return Component.translatable("container." + EternalStarlight.ID + ".crystalborn_catalyst");
 	}
 
-	@Override
 	protected NonNullList<ItemStack> getItems() {
 		return items;
 	}
 
-	@Override
 	protected void setItems(NonNullList<ItemStack> items) {
 		this.items = items;
 	}

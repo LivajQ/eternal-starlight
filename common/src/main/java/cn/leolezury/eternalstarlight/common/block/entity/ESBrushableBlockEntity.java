@@ -11,10 +11,12 @@ public class ESBrushableBlockEntity extends BrushableBlockEntity {
 		super(blockPos, blockState);
 	}
 
+	/*
 	@Override
 	public boolean isValidBlockState(BlockState blockState) {
 		return this.getType().isValid(blockState);
 	}
+	 */
 
 	@Override
 	public BlockEntityType<?> getType() {

@@ -3,20 +3,16 @@ package cn.leolezury.eternalstarlight.common.block.entity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.SpawnData;
-import net.minecraft.world.level.Spawner;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class FlareSpawnerBlockEntity extends BlockEntity implements Spawner {
+public class FlareSpawnerBlockEntity extends BlockEntity {
 	private final FlareSpawner spawner = new FlareSpawner() {
 		@Override
 		public void broadcastEvent(Level level, BlockPos pos, int id) {
@@ -38,16 +34,17 @@ public class FlareSpawnerBlockEntity extends BlockEntity implements Spawner {
 	}
 
 	@Override
-	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-		super.loadAdditional(tag, registries);
+	public void load(CompoundTag tag) {
+		super.load(tag);
 		this.spawner.load(this.level, this.worldPosition, tag);
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-		super.saveAdditional(tag, registries);
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
 		this.spawner.save(tag);
 	}
+
 
 	public static void clientTick(Level level, BlockPos pos, BlockState state, FlareSpawnerBlockEntity blockEntity) {
 		blockEntity.spawner.clientTick(level, pos);
@@ -65,8 +62,8 @@ public class FlareSpawnerBlockEntity extends BlockEntity implements Spawner {
 	}
 
 	@Override
-	public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-		CompoundTag tag = this.saveCustomOnly(registries);
+	public CompoundTag getUpdateTag() {
+		CompoundTag tag = this.saveWithFullMetadata();
 		tag.remove(FlareSpawner.TAG_SPAWN_POTENTIALS);
 		return tag;
 	}
@@ -84,11 +81,13 @@ public class FlareSpawnerBlockEntity extends BlockEntity implements Spawner {
 		return true;
 	}
 
+	/*
 	@Override
 	public void setEntityId(EntityType<?> type, RandomSource random) {
 		this.spawner.setEntityId(type, this.level, random, this.worldPosition);
 		this.setChanged();
 	}
+	 */
 
 	public FlareSpawner getSpawner() {
 		return this.spawner;

@@ -23,6 +23,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -216,8 +217,9 @@ public class ESBoss extends Monster implements MultiBehaviorUser {
 		return ESSoundEvents.MUSIC_BOSS_GATEKEEPER.get();
 	}
 
-	public ResourceKey<LootTable> getBossLootTable() {
-		return ResourceKey.create(Registries.LOOT_TABLE, BuiltInRegistries.ENTITY_TYPE.getKey(getType()).withPrefix("bosses/"));
+	public ResourceLocation getBossLootTable() {
+		ResourceLocation base = BuiltInRegistries.ENTITY_TYPE.getKey(getType());
+		return new ResourceLocation(base.getNamespace(), "bosses/" + base.getPath());
 	}
 
 	public ItemStack getBossLootBag() {

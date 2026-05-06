@@ -21,10 +21,12 @@ public class TorreyaCampfireBlockEntity extends CampfireBlockEntity {
 		super(blockPos, blockState);
 	}
 
+	/*
 	@Override
 	public boolean isValidBlockState(BlockState blockState) {
 		return this.getType().isValid(blockState);
 	}
+	 */
 
 	public static void serverTick(Level level, BlockPos blockPos, BlockState blockState, CampfireBlockEntity campfireBlockEntity) {
 		if (blockState.getValue(BlockStateProperties.LIT)) {
@@ -37,8 +39,8 @@ public class TorreyaCampfireBlockEntity extends CampfireBlockEntity {
 			}
 			if (blockState.getValue(TorreyaCampfireBlock.STARFIRE)) {
 				for (LivingEntity living : level.getEntitiesOfClass(LivingEntity.class, box)) {
-					if (living instanceof Enemy && !living.hasEffect(ESMobEffects.STARFIRE.asHolder())) {
-						living.addEffect(new MobEffectInstance(ESMobEffects.STARFIRE.asHolder(), 100));
+					if (living instanceof Enemy && !living.hasEffect(ESMobEffects.STARFIRE.get())) {
+						living.addEffect(new MobEffectInstance(ESMobEffects.STARFIRE.get(), 100));
 					}
 				}
 			}

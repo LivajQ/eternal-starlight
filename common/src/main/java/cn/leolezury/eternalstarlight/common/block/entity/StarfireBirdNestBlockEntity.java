@@ -1,27 +1,22 @@
 package cn.leolezury.eternalstarlight.common.block.entity;
 
-import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.block.StarfireBirdNestBlock;
 import cn.leolezury.eternalstarlight.common.entity.living.animal.StarfireBird;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
 import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -32,9 +27,7 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.Nullable;
@@ -267,30 +260,54 @@ public class StarfireBirdNestBlockEntity extends SimpleContainerBlockEntity {
 	}
 
 	@Override
-	protected void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.loadAdditional(compoundTag, provider);
+	public void load(CompoundTag tag) {
+		super.load(tag);
+
 		this.stored.clear();
-		if (compoundTag.contains(TAG_BIRDS)) {
-			Occupant.LIST_CODEC.parse(NbtOps.INSTANCE, compoundTag.get(TAG_BIRDS)).resultOrPartial((string) -> EternalStarlight.LOGGER.error("Failed to parse Starfire Birds: '{}'", string)).ifPresent((list) -> list.forEach(this::storeBird));
+		if (tag.contains(TAG_BIRDS)) {
+			ListTag list = tag.getList(TAG_BIRDS, CompoundTag.TAG_COMPOUND);
+			for (int i = 0; i < list.size(); i++) {
+				CompoundTag birdTag = list.getCompound(i);
+				Occupant occupant = Occupant.CODEC.parse(NbtOps.INSTANCE, birdTag)
+					.result()
+					.orElse(null);
+				if (occupant != null) {
+					this.storeBird(occupant);
+				}
+			}
 		}
+
 		this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-		ContainerHelper.loadAllItems(compoundTag, this.items, provider);
-		if (compoundTag.hasUUID(TAG_LAST_SEED_PLAYER)) {
-			lastSeedPlayer = compoundTag.getUUID(TAG_LAST_SEED_PLAYER);
+		ContainerHelper.loadAllItems(tag, this.items);
+
+		if (tag.hasUUID(TAG_LAST_SEED_PLAYER)) {
+			this.lastSeedPlayer = tag.getUUID(TAG_LAST_SEED_PLAYER);
 		}
-		hatchTicks = compoundTag.getInt(TAG_HATCH_TICKS);
-		setChanged();
+
+		this.hatchTicks = tag.getInt(TAG_HATCH_TICKS);
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.saveAdditional(compoundTag, provider);
-		compoundTag.put(TAG_BIRDS, Occupant.LIST_CODEC.encodeStart(NbtOps.INSTANCE, this.getBirds()).getOrThrow());
-		ContainerHelper.saveAllItems(compoundTag, this.items, provider);
-		if (lastSeedPlayer != null) {
-			compoundTag.putUUID(TAG_LAST_SEED_PLAYER, lastSeedPlayer);
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
+
+		ListTag list = new ListTag();
+		for (Occupant occ : this.getBirds()) {
+			Tag encoded = Occupant.CODEC.encodeStart(NbtOps.INSTANCE, occ)
+				.result()
+				.orElse(new CompoundTag());
+			list.add(encoded);
 		}
-		compoundTag.putInt(TAG_HATCH_TICKS, hatchTicks);
+
+		tag.put(TAG_BIRDS, list);
+
+		ContainerHelper.saveAllItems(tag, this.items);
+
+		if (this.lastSeedPlayer != null) {
+			tag.putUUID(TAG_LAST_SEED_PLAYER, this.lastSeedPlayer);
+		}
+
+		tag.putInt(TAG_HATCH_TICKS, this.hatchTicks);
 	}
 
 	@Override
@@ -305,10 +322,11 @@ public class StarfireBirdNestBlockEntity extends SimpleContainerBlockEntity {
 	}
 
 	@Override
-	public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-		return saveWithFullMetadata(provider);
+	public CompoundTag getUpdateTag() {
+		return saveWithFullMetadata();
 	}
 
+	/*
 	@Override
 	protected void applyImplicitComponents(BlockEntity.DataComponentInput input) {
 		super.applyImplicitComponents(input);
@@ -329,6 +347,7 @@ public class StarfireBirdNestBlockEntity extends SimpleContainerBlockEntity {
 		super.removeComponentsFromTag(compoundTag);
 		compoundTag.remove(TAG_BIRDS);
 	}
+	 */
 
 	private List<Occupant> getBirds() {
 		return this.stored.stream().map(BirdData::toOccupant).toList();
@@ -388,45 +407,50 @@ public class StarfireBirdNestBlockEntity extends SimpleContainerBlockEntity {
 		}
 	}
 
-	public record Occupant(CustomData entityData, int ticksInNest, int minTicksInNest) {
-		public static final Codec<Occupant> CODEC = RecordCodecBuilder.create((instance) -> instance.group(CustomData.CODEC.optionalFieldOf("entity_data", CustomData.EMPTY).forGetter(Occupant::entityData), Codec.INT.fieldOf("ticks_in_nest").forGetter(Occupant::ticksInNest), Codec.INT.fieldOf("min_ticks_in_nest").forGetter(Occupant::minTicksInNest)).apply(instance, Occupant::new));
+	public record Occupant(CompoundTag entityData, int ticksInNest, int minTicksInNest) {
+
+		public static final Codec<Occupant> CODEC = RecordCodecBuilder.create(instance ->
+			instance.group(
+				CompoundTag.CODEC.optionalFieldOf("entity_data", new CompoundTag()).forGetter(Occupant::entityData),
+				Codec.INT.fieldOf("ticks_in_nest").forGetter(Occupant::ticksInNest),
+				Codec.INT.fieldOf("min_ticks_in_nest").forGetter(Occupant::minTicksInNest)
+			).apply(instance, Occupant::new)
+		);
+
 		public static final Codec<List<Occupant>> LIST_CODEC = CODEC.listOf();
-		public static final StreamCodec<ByteBuf, Occupant> STREAM_CODEC = StreamCodec.composite(CustomData.STREAM_CODEC, Occupant::entityData, ByteBufCodecs.VAR_INT, Occupant::ticksInNest, ByteBufCodecs.VAR_INT, Occupant::minTicksInNest, Occupant::new);
 
 		public static Occupant of(Entity entity, int minTicksInNest) {
-			CompoundTag compoundTag = new CompoundTag();
-			entity.save(compoundTag);
-			IGNORED_BIRD_TAGS.forEach(compoundTag::remove);
-			return new Occupant(CustomData.of(compoundTag), 0, minTicksInNest);
+			CompoundTag tag = new CompoundTag();
+			entity.save(tag);
+			StarfireBirdNestBlockEntity.IGNORED_BIRD_TAGS.forEach(tag::remove);
+			return new Occupant(tag, 0, minTicksInNest);
 		}
 
 		public static Occupant create(RandomSource random, int ticksInNest) {
-			CompoundTag compoundTag = new CompoundTag();
-			compoundTag.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(ESEntities.STARFIRE_BIRD.get()).toString());
+			CompoundTag tag = new CompoundTag();
+			tag.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(ESEntities.STARFIRE_BIRD.get()).toString());
 			if (random.nextInt(20) == 0) {
-				compoundTag.putBoolean(StarfireBird.TAG_SPECIAL_VARIANT, true);
+				tag.putBoolean(StarfireBird.TAG_SPECIAL_VARIANT, true);
 			}
-			return new Occupant(CustomData.of(compoundTag), ticksInNest, 600);
+			return new Occupant(tag, ticksInNest, 600);
 		}
 
 		@Nullable
-		public Entity createEntity(Level level, BlockPos blockPos, boolean setData) {
-			CompoundTag compoundTag = this.entityData.copyTag();
-			IGNORED_BIRD_TAGS.forEach(compoundTag::remove);
-			Entity entity = EntityType.loadEntityRecursive(compoundTag, level, e -> e);
+		public Entity createEntity(Level level, BlockPos pos, boolean setData) {
+			CompoundTag tag = this.entityData.copy();
+			StarfireBirdNestBlockEntity.IGNORED_BIRD_TAGS.forEach(tag::remove);
+
+			Entity entity = EntityType.loadEntityRecursive(tag, level, e -> e);
 			if (entity != null) {
 				entity.setNoGravity(true);
 				if (entity instanceof StarfireBird bird) {
-					bird.setNestPos(blockPos);
+					bird.setNestPos(pos);
 					if (setData) {
 						setBirdReleaseData(this.ticksInNest, bird);
 					}
 				}
-
-				return entity;
-			} else {
-				return null;
 			}
+			return entity;
 		}
 
 		private static void setBirdReleaseData(int ticksInNest, StarfireBird bird) {
@@ -439,4 +463,5 @@ public class StarfireBirdNestBlockEntity extends SimpleContainerBlockEntity {
 			bird.setInLoveTime(Math.max(0, bird.getInLoveTime() - ticksInNest));
 		}
 	}
+
 }

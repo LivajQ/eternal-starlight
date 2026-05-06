@@ -41,13 +41,10 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.*;
 
 @AutoService(ESPlatform.class)
 public class ESForgePlatform implements ESPlatform {
-	public static final List<Registry<?>> NEW_REGISTRIES = new ArrayList<>();
 
 	@Override
 	public Loader getLoader() {
@@ -188,7 +185,6 @@ public class ESForgePlatform implements ESPlatform {
 			}
 		);
 	}
-
 
 	@Override
 	public void sendToClient(ServerPlayer player, ESPacket packet) {

@@ -7,12 +7,9 @@ import cn.leolezury.eternalstarlight.common.particle.ExplosionShockParticleOptio
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.random.SimpleWeightedRandomList;
@@ -20,19 +17,14 @@ import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.SpawnData;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -88,7 +80,7 @@ public abstract class FlareSpawner {
 	}
 
 	private static boolean inLineOfSight(Level level, Vec3 block, Vec3 target) {
-		BlockHitResult blockHitResult = level.clip(new ClipContext(target, block, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, CollisionContext.empty()));
+		BlockHitResult blockHitResult = level.clip(new ClipContext(target, block, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, null));
 		return blockHitResult.getBlockPos().equals(BlockPos.containing(block)) || blockHitResult.getType() == HitResult.Type.MISS;
 	}
 
@@ -189,7 +181,7 @@ public abstract class FlareSpawner {
 					double z = posSize >= 3
 						? posTag.getDouble(2)
 						: pos.getZ() + (random.nextDouble() - random.nextDouble()) * this.spawnRange + 0.5;
-					if (serverLevel.noCollision(type.get().getSpawnAABB(x, y, z)) && inLineOfSight(serverLevel, pos.getCenter(), new Vec3(x, y, z))) {
+					if (serverLevel.noCollision(type.get().getDimensions().makeBoundingBox(x, y, z)) && inLineOfSight(serverLevel, pos.getCenter(), new Vec3(x, y, z))) {
 						BlockPos spawnPos = BlockPos.containing(x, y, z);
 						if (spawnData.getCustomSpawnRules().isPresent()) {
 							if (!type.get().getCategory().isFriendly() && serverLevel.getDifficulty() == Difficulty.PEACEFUL) {
@@ -197,10 +189,15 @@ public abstract class FlareSpawner {
 							}
 
 							SpawnData.CustomSpawnRules rules = spawnData.getCustomSpawnRules().get();
-							if (!rules.isValidPosition(spawnPos, serverLevel)) {
+							int blockLight = serverLevel.getBrightness(LightLayer.BLOCK, spawnPos);
+							int skyLight   = serverLevel.getBrightness(LightLayer.SKY,   spawnPos);
+
+							if (!rules.blockLightLimit().isValueInRange(blockLight)
+								|| !rules.skyLightLimit().isValueInRange(skyLight)) {
 								continue;
 							}
-						} else if (!SpawnPlacements.checkSpawnRules(type.get(), serverLevel, MobSpawnType.TRIAL_SPAWNER, spawnPos, serverLevel.getRandom())) {
+							//was TRIAL_SPAWNER in case it proves relevant
+						} else if (!SpawnPlacements.checkSpawnRules(type.get(), serverLevel, MobSpawnType.SPAWNER, spawnPos, serverLevel.getRandom())) {
 							continue;
 						}
 
@@ -213,7 +210,18 @@ public abstract class FlareSpawner {
 							return;
 						}
 
-						int entitiesCount = serverLevel.getEntities(EntityTypeTest.forExactClass(entity.getClass()), new AABB(pos.getX(), pos.getY(), pos.getZ(), (pos.getX() + 1), (pos.getY() + 1), (pos.getZ() + 1)).inflate(this.spawnRange), EntitySelector.NO_SPECTATORS).size();
+						AABB box = new AABB(
+							pos.getX(), pos.getY(), pos.getZ(),
+							pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1
+						).inflate(this.spawnRange);
+
+						int entitiesCount = serverLevel.getEntitiesOfClass(
+							entity.getClass(),
+							box,
+							EntitySelector.NO_SPECTATORS
+						).size();
+
+
 						if (entitiesCount >= this.maxNearbyEntities) {
 							this.delay(serverLevel, pos);
 							return;
@@ -227,10 +235,10 @@ public abstract class FlareSpawner {
 
 							boolean shouldFinalize = spawnData.getEntityToSpawn().size() == 1 && spawnData.getEntityToSpawn().contains("id", CompoundTag.TAG_STRING);
 							if (shouldFinalize) {
-								mob.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.TRIAL_SPAWNER, null);
+								mob.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.SPAWNER, null, null);
 							}
 
-							spawnData.getEquipment().ifPresent(mob::equip);
+							//spawnData.getEquipment().ifPresent(mob::equip);
 						}
 
 						if (!serverLevel.tryAddFreshEntityWithPassengers(entity)) {
@@ -267,7 +275,7 @@ public abstract class FlareSpawner {
 		} else {
 			this.spawnDelay = this.minSpawnDelay + random.nextInt(this.maxSpawnDelay - this.minSpawnDelay);
 		}
-		this.spawnPotentials.getRandom(random).ifPresent(wrapper -> this.setNextSpawnData(level, pos, wrapper.data()));
+		this.spawnPotentials.getRandom(random).ifPresent(wrapper -> this.setNextSpawnData(level, pos, wrapper.getData()));
 		this.broadcastEvent(level, pos, EVENT_SPAWN);
 	}
 
@@ -275,63 +283,62 @@ public abstract class FlareSpawner {
 		this.spawnDelay = tag.getShort(TAG_SPAWN_DELAY);
 		this.spawnedCount = tag.getShort(TAG_SPAWNED_COUNT);
 		this.cooldown = tag.getInt(TAG_COOLDOWN);
-		boolean hasSpawnData = tag.contains(TAG_SPAWN_DATA, CompoundTag.TAG_COMPOUND);
-		if (hasSpawnData) {
+
+		if (tag.contains(TAG_SPAWN_DATA, CompoundTag.TAG_COMPOUND)) {
 			SpawnData data = SpawnData.CODEC
 				.parse(NbtOps.INSTANCE, tag.getCompound(TAG_SPAWN_DATA))
 				.resultOrPartial(s -> EternalStarlight.LOGGER.warn("Invalid SpawnData: {}", s))
 				.orElseGet(SpawnData::new);
+
 			this.setNextSpawnData(level, pos, data);
 		}
 
-		boolean hasSpawnPotentials = tag.contains(TAG_SPAWN_POTENTIALS, CompoundTag.TAG_LIST);
-		if (hasSpawnPotentials) {
+		if (tag.contains(TAG_SPAWN_POTENTIALS, CompoundTag.TAG_LIST)) {
 			ListTag list = tag.getList(TAG_SPAWN_POTENTIALS, CompoundTag.TAG_COMPOUND);
+
 			this.spawnPotentials = SpawnData.LIST_CODEC
 				.parse(NbtOps.INSTANCE, list)
 				.resultOrPartial(s -> EternalStarlight.LOGGER.warn("Invalid SpawnPotentials list: {}", s))
 				.orElseGet(SimpleWeightedRandomList::empty);
 		} else {
-			this.spawnPotentials = SimpleWeightedRandomList.single(this.nextSpawnData != null ? this.nextSpawnData : new SpawnData());
+			this.spawnPotentials = SimpleWeightedRandomList.single(
+				this.nextSpawnData != null ? this.nextSpawnData : new SpawnData()
+			);
 		}
 
 		if (tag.contains(TAG_MIN_SPAWN_DELAY, CompoundTag.TAG_ANY_NUMERIC)) {
 			this.minSpawnDelay = tag.getShort(TAG_MIN_SPAWN_DELAY);
 		}
-
 		if (tag.contains(TAG_MAX_SPAWN_DELAY, CompoundTag.TAG_ANY_NUMERIC)) {
 			this.maxSpawnDelay = tag.getShort(TAG_MAX_SPAWN_DELAY);
 		}
-
 		if (tag.contains(TAG_SPAWN_COUNT, CompoundTag.TAG_ANY_NUMERIC)) {
 			this.spawnCount = tag.getShort(TAG_SPAWN_COUNT);
 		}
-
 		if (tag.contains(TAG_TOTAL_SPAWN_COUNT, CompoundTag.TAG_ANY_NUMERIC)) {
 			this.totalSpawnCount = tag.getShort(TAG_TOTAL_SPAWN_COUNT);
 		}
-
 		if (tag.contains(TAG_MAX_NEARBY_ENTITIES, CompoundTag.TAG_ANY_NUMERIC)) {
 			this.maxNearbyEntities = tag.getShort(TAG_MAX_NEARBY_ENTITIES);
 		}
-
 		if (tag.contains(TAG_REQUIRED_PLAYER_RANGE, CompoundTag.TAG_ANY_NUMERIC)) {
 			this.requiredPlayerRange = tag.getShort(TAG_REQUIRED_PLAYER_RANGE);
 		}
-
 		if (tag.contains(TAG_ACTIVATION_PLAYER_RANGE, CompoundTag.TAG_ANY_NUMERIC)) {
 			this.activationPlayerRange = tag.getShort(TAG_ACTIVATION_PLAYER_RANGE);
 		}
-
 		if (tag.contains(TAG_SPAWN_RANGE, CompoundTag.TAG_ANY_NUMERIC)) {
 			this.spawnRange = tag.getShort(TAG_SPAWN_RANGE);
 		}
 
-		if (tag.contains(TAG_TRACKED_MOBS)) {
+		//UUID list (manual since 1.20.1 has no CODEC_SET)
+		if (tag.contains(TAG_TRACKED_MOBS, Tag.TAG_LIST)) {
 			trackedMobs.clear();
-			UUIDUtil.CODEC_SET.parse(NbtOps.INSTANCE, tag.get(TAG_TRACKED_MOBS))
-				.resultOrPartial(s -> EternalStarlight.LOGGER.warn("Invalid tracked mobs list: {}", s))
-				.ifPresent(trackedMobs::addAll);
+			ListTag list = tag.getList(TAG_TRACKED_MOBS, Tag.TAG_INT_ARRAY);
+
+			for (Tag t : list) {
+				trackedMobs.add(NbtUtils.loadUUID(t));
+			}
 		}
 
 		this.displayEntity = null;
@@ -349,16 +356,31 @@ public abstract class FlareSpawner {
 		tag.putShort(TAG_REQUIRED_PLAYER_RANGE, (short) this.requiredPlayerRange);
 		tag.putShort(TAG_ACTIVATION_PLAYER_RANGE, (short) this.activationPlayerRange);
 		tag.putShort(TAG_SPAWN_RANGE, (short) this.spawnRange);
+
 		if (this.nextSpawnData != null) {
 			tag.put(
 				TAG_SPAWN_DATA,
 				SpawnData.CODEC
 					.encodeStart(NbtOps.INSTANCE, this.nextSpawnData)
-					.getOrThrow(s -> new IllegalStateException("Invalid SpawnData: " + s))
+					.getOrThrow(false, msg -> {
+						throw new IllegalStateException("Invalid SpawnData: " + msg);
+					})
 			);
 		}
-		tag.put(TAG_SPAWN_POTENTIALS, SpawnData.LIST_CODEC.encodeStart(NbtOps.INSTANCE, this.spawnPotentials).getOrThrow());
-		tag.put(TAG_TRACKED_MOBS, UUIDUtil.CODEC_SET.encodeStart(NbtOps.INSTANCE, this.trackedMobs).getOrThrow());
+
+		tag.put(
+			TAG_SPAWN_POTENTIALS,
+			SpawnData.LIST_CODEC
+				.encodeStart(NbtOps.INSTANCE, this.spawnPotentials)
+				.getOrThrow(false, EternalStarlight.LOGGER::error)
+		);
+
+		ListTag uuidList = new ListTag();
+		for (UUID id : trackedMobs) {
+			uuidList.add(NbtUtils.createUUID(id));
+		}
+		tag.put(TAG_TRACKED_MOBS, uuidList);
+
 		return tag;
 	}
 
@@ -391,7 +413,7 @@ public abstract class FlareSpawner {
 
 	private SpawnData getOrCreateNextSpawnData(@Nullable Level level, RandomSource random, BlockPos pos) {
 		if (this.nextSpawnData == null) {
-			this.setNextSpawnData(level, pos, this.spawnPotentials.getRandom(random).map(WeightedEntry.Wrapper::data).orElseGet(SpawnData::new));
+			this.setNextSpawnData(level, pos, this.spawnPotentials.getRandom(random).map(WeightedEntry.Wrapper::getData).orElseGet(SpawnData::new));
 		}
 		return this.nextSpawnData;
 	}

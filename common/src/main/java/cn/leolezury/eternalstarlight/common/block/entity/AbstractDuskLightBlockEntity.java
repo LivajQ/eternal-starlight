@@ -7,7 +7,6 @@ import it.unimi.dsi.fastutil.objects.Object2FloatArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -26,9 +25,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -64,22 +63,23 @@ public abstract class AbstractDuskLightBlockEntity extends BlockEntity implement
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.saveAdditional(compoundTag, provider);
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
 		for (Direction direction : Direction.values()) {
-			compoundTag.putFloat(TAG_LENGTH + "_" + direction.getName(), lengths.getOrDefault(direction, 0));
+			tag.putFloat(TAG_LENGTH + "_" + direction.getName(), lengths.getOrDefault(direction, 0));
 		}
-		compoundTag.putBoolean(TAG_LIT, lit);
+		tag.putBoolean(TAG_LIT, lit);
 	}
 
 	@Override
-	protected void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.loadAdditional(compoundTag, provider);
+	public void load(CompoundTag tag) {
+		super.load(tag);
 		for (Direction direction : Direction.values()) {
-			lengths.put(direction, compoundTag.getFloat(TAG_LENGTH + "_" + direction.getName()));
+			lengths.put(direction, tag.getFloat(TAG_LENGTH + "_" + direction.getName()));
 		}
-		lit = compoundTag.getBoolean(TAG_LIT);
+		lit = tag.getBoolean(TAG_LIT);
 	}
+
 
 	@Nullable
 	@Override
@@ -88,8 +88,8 @@ public abstract class AbstractDuskLightBlockEntity extends BlockEntity implement
 	}
 
 	@Override
-	public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-		return saveWithFullMetadata(provider);
+	public @NotNull CompoundTag getUpdateTag() {
+		return saveWithFullMetadata();
 	}
 
 	protected abstract boolean isFaceActivated(BlockState state, Direction direction);
@@ -136,7 +136,7 @@ public abstract class AbstractDuskLightBlockEntity extends BlockEntity implement
 					if (entity.isFaceActivated(state, direction)) {
 						Vec3 fromPos = pos.getCenter().add(new Vec3(direction.getStepX(), direction.getStepY(), direction.getStepZ()).scale(0.51));
 						Vec3 toPos = fromPos.add(new Vec3(direction.getStepX(), direction.getStepY(), direction.getStepZ()).scale(MAX_LENGTH));
-						BlockHitResult result = level.clip(new ClipContext(fromPos, toPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()) {
+						BlockHitResult result = level.clip(new ClipContext(fromPos, toPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null) {
 							@Override
 							public VoxelShape getBlockShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos) {
 								return canPassThrough(blockState) ? Shapes.empty() : super.getBlockShape(blockState, blockGetter, blockPos);

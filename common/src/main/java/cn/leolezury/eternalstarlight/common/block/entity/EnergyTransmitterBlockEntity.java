@@ -6,7 +6,6 @@ import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
 import com.mojang.math.OctahedralGroup;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -106,21 +105,36 @@ public class EnergyTransmitterBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public void loadAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.loadAdditional(compoundTag, provider);
-		if (compoundTag.contains(TAG_INPUT_OFFSET)) {
-			Vec3i.CODEC.parse(NbtOps.INSTANCE, compoundTag.get(TAG_INPUT_OFFSET)).resultOrPartial(s -> EternalStarlight.LOGGER.warn("Failed to parse Energy Transmitter input offset: {}", s)).ifPresent(pos -> this.inputOffset = pos);
+	public void load(CompoundTag tag) {
+		super.load(tag);
+
+		if (tag.contains(TAG_INPUT_OFFSET)) {
+			Vec3i.CODEC.parse(NbtOps.INSTANCE, tag.get(TAG_INPUT_OFFSET))
+				.resultOrPartial(s -> EternalStarlight.LOGGER.warn("Failed to parse Energy Transmitter input offset: {}", s))
+				.ifPresent(pos -> this.inputOffset = pos);
 		}
-		if (compoundTag.contains(TAG_OUTPUT_OFFSET)) {
-			Vec3i.CODEC.parse(NbtOps.INSTANCE, compoundTag.get(TAG_OUTPUT_OFFSET)).resultOrPartial(s -> EternalStarlight.LOGGER.warn("Failed to parse Energy Transmitter output offset: {}", s)).ifPresent(pos -> this.outputOffset = pos);
+
+		if (tag.contains(TAG_OUTPUT_OFFSET)) {
+			Vec3i.CODEC.parse(NbtOps.INSTANCE, tag.get(TAG_OUTPUT_OFFSET))
+				.resultOrPartial(s -> EternalStarlight.LOGGER.warn("Failed to parse Energy Transmitter output offset: {}", s))
+				.ifPresent(pos -> this.outputOffset = pos);
 		}
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag compoundTag, HolderLookup.Provider provider) {
-		super.saveAdditional(compoundTag, provider);
-		compoundTag.put(TAG_INPUT_OFFSET, Vec3i.CODEC.encodeStart(NbtOps.INSTANCE, inputOffset).getOrThrow());
-		compoundTag.put(TAG_OUTPUT_OFFSET, Vec3i.CODEC.encodeStart(NbtOps.INSTANCE, outputOffset).getOrThrow());
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
+
+		tag.put(
+			TAG_INPUT_OFFSET,
+			Vec3i.CODEC.encodeStart(NbtOps.INSTANCE, inputOffset)
+				.getOrThrow(false, EternalStarlight.LOGGER::error)
+		);
+		tag.put(
+			TAG_OUTPUT_OFFSET,
+			Vec3i.CODEC.encodeStart(NbtOps.INSTANCE, outputOffset)
+				.getOrThrow(false, EternalStarlight.LOGGER::error)
+		);
 	}
 
 	@Nullable
@@ -130,7 +144,7 @@ public class EnergyTransmitterBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-		return saveWithFullMetadata(provider);
+	public CompoundTag getUpdateTag() {
+		return saveWithFullMetadata();
 	}
 }
