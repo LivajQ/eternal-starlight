@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -30,7 +29,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class IcicleBlock extends Block implements SimpleWaterloggedBlock {
-	public static final MapCodec<IcicleBlock> CODEC = simpleCodec(IcicleBlock::new);
 	public static final DirectionProperty TIP_DIRECTION = BlockStateProperties.VERTICAL_DIRECTION;
 	public static final EnumProperty<IcicleThickness> THICKNESS = EnumProperty.create("icicle_thickness", IcicleThickness.class);
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -45,17 +43,12 @@ public class IcicleBlock extends Block implements SimpleWaterloggedBlock {
 	}
 
 	@Override
-	protected MapCodec<IcicleBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
 	public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
 		return getSuitableState(defaultBlockState().setValue(TIP_DIRECTION, context.getNearestLookingVerticalDirection().getOpposite()), context.getLevel(), context.getClickedPos());
 	}
 
 	@Override
-	protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
 		if (state.getValue(WATERLOGGED)) {
 			level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
 		}
@@ -68,17 +61,17 @@ public class IcicleBlock extends Block implements SimpleWaterloggedBlock {
 	}
 
 	@Override
-	protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+	public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
 		if (getSuitableState(state, level, pos).isAir()) {
 			spawnFallingStalactite(state, level, pos);
 		}
 	}
 
 	@Override
-	protected void onProjectileHit(Level level, BlockState state, BlockHitResult hitResult, Projectile projectile) {
+	public void onProjectileHit(Level level, BlockState state, BlockHitResult hitResult, Projectile projectile) {
 		if (!level.isClientSide) {
 			BlockPos pos = hitResult.getBlockPos();
-			if (projectile.mayInteract(level, pos) && projectile.mayBreak(level) && projectile.getDeltaMovement().length() > 0.6) {
+			if (projectile.mayInteract(level, pos) && projectile.getDeltaMovement().length() > 0.6) {
 				level.destroyBlock(pos, true);
 			}
 		}
@@ -191,7 +184,7 @@ public class IcicleBlock extends Block implements SimpleWaterloggedBlock {
 	}
 
 	@Override
-	protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+	public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
 		Direction tipDir = state.getValue(TIP_DIRECTION);
 		BlockPos tipPos = findTip(state, level, pos);
 		if (tipPos == null) {
@@ -270,7 +263,7 @@ public class IcicleBlock extends Block implements SimpleWaterloggedBlock {
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+	public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
 		return blockState.getValue(THICKNESS) == IcicleThickness.TIP ? (blockState.getValue(TIP_DIRECTION) == Direction.UP ? TIP_SHAPE_UP : TIP_SHAPE_DOWN) : SHAPE;
 	}
 

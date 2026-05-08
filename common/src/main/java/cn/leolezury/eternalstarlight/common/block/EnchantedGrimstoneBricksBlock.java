@@ -2,9 +2,9 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.data.ESCrests;
 import cn.leolezury.eternalstarlight.common.entity.misc.CrestEntity;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -17,15 +17,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class EnchantedGrimstoneBricksBlock extends HorizontalDirectionalBlock {
-	public static final MapCodec<EnchantedGrimstoneBricksBlock> CODEC = simpleCodec(EnchantedGrimstoneBricksBlock::new);
 
 	public EnchantedGrimstoneBricksBlock(Properties properties) {
 		super(properties);
-	}
-
-	@Override
-	protected MapCodec<EnchantedGrimstoneBricksBlock> codec() {
-		return CODEC;
 	}
 
 	@Nullable
@@ -34,18 +28,20 @@ public class EnchantedGrimstoneBricksBlock extends HorizontalDirectionalBlock {
 	}
 
 	@Override
-	protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		player.displayClientMessage(Component.translatable("message.eternal_starlight.enchanted_grimstone_pre"), true);
 		player.displayClientMessage(Component.translatable("message.eternal_starlight.enchanted_grimstone_pre"), true);
 		return InteractionResult.sidedSuccess(level.isClientSide);
 	}
 
 	@Override
-	public BlockState playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
+	public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
 		player.displayClientMessage(Component.translatable("message.eternal_starlight.enchanted_grimstone_post"), true);
-		CrestEntity crest = new CrestEntity(level, blockPos.getX(), blockPos.getY(), blockPos.getZ(), ESCrests.BOULDERS_SHIELD);
+
+		CrestEntity crest = new CrestEntity(level, pos.getX(), pos.getY(), pos.getZ(), ESCrests.BOULDERS_SHIELD);
 		level.addFreshEntity(crest);
-		return super.playerWillDestroy(level, blockPos, blockState, player);
+
+		super.playerWillDestroy(level, pos, state, player);
 	}
 
 	@Override

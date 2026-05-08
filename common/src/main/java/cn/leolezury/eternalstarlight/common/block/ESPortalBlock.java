@@ -3,24 +3,19 @@ package cn.leolezury.eternalstarlight.common.block;
 import cn.leolezury.eternalstarlight.common.block.entity.ESPortalBlockEntity;
 import cn.leolezury.eternalstarlight.common.config.ESConfig;
 import cn.leolezury.eternalstarlight.common.data.ESDimensions;
-import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
-import cn.leolezury.eternalstarlight.common.world.ESTeleporter;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -32,7 +27,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.border.WorldBorder;
-import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
@@ -41,8 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class ESPortalBlock extends BaseEntityBlock implements Portal {
-	public static final MapCodec<ESPortalBlock> CODEC = simpleCodec(ESPortalBlock::new);
+public class ESPortalBlock extends BaseEntityBlock {
 	public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
 	public static final BooleanProperty CENTER = BooleanProperty.create("center");
 	public static final IntegerProperty SIZE = IntegerProperty.create("size", 0, 20);
@@ -52,11 +45,6 @@ public class ESPortalBlock extends BaseEntityBlock implements Portal {
 	public ESPortalBlock(Properties properties) {
 		super(properties);
 		registerDefaultState(stateDefinition.any().setValue(AXIS, Direction.Axis.X).setValue(CENTER, false).setValue(SIZE, 2));
-	}
-
-	@Override
-	protected MapCodec<ESPortalBlock> codec() {
-		return CODEC;
 	}
 
 	@Nullable
@@ -103,13 +91,32 @@ public class ESPortalBlock extends BaseEntityBlock implements Portal {
 
 	@Override
 	public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-		if (entity.canUsePortal(false)) {
-			entity.setAsInsidePortal(this, pos);
+		if (level.isClientSide) return;
+		if (!entity.canChangeDimensions()) return;
+		if (entity.isOnPortalCooldown()) return;
+
+		ServerLevel currentLevel = (ServerLevel) level;
+		MinecraftServer server = currentLevel.getServer();
+
+		ResourceKey<Level> destination =
+			currentLevel.dimension() == ESDimensions.STARLIGHT_KEY
+				? Level.OVERWORLD
+				: ESDimensions.STARLIGHT_KEY;
+
+		ServerLevel destinationLevel = server.getLevel(destination);
+
+		if (destinationLevel == null) {
+			return;
 		}
+
+		entity.setPortalCooldown();
+
+		//this is kinda cooked as in 1.20.1 we cannot pass ESTeleporter, but surely it's fine!
+		entity.changeDimension(destinationLevel);
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
 		return ItemStack.EMPTY;
 	}
 
@@ -190,29 +197,6 @@ public class ESPortalBlock extends BaseEntityBlock implements Portal {
 			level.setBlock(blockPos.offset(bottomPos), ESBlocks.STARLIGHT_PORTAL.get().defaultBlockState().setValue(AXIS, axis).setValue(CENTER, blockPos.offset(bottomPos).equals(center)).setValue(SIZE, size), 3);
 		}
 		return true;
-	}
-
-	@Nullable
-	@Override
-	public DimensionTransition getPortalDestination(ServerLevel serverLevel, Entity entity, BlockPos blockPos) {
-		Level entityLevel = entity.level();
-		MinecraftServer server = entityLevel.getServer();
-		ResourceKey<Level> destination = entity.level().dimension() == ESDimensions.STARLIGHT_KEY
-			? Level.OVERWORLD : ESDimensions.STARLIGHT_KEY;
-		if (server != null) {
-			ServerLevel destinationLevel = server.getLevel(destination);
-			if (destinationLevel != null) {
-				if (ESPlatform.INSTANCE.postTravelToDimensionEvent(entity, destination)) {
-					return ESTeleporter.getPortalInfo(entity, blockPos, destinationLevel);
-				}
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public int getPortalTransitionTime(ServerLevel level, Entity entity) {
-		return entity instanceof Player player ? player.getAbilities().invulnerable ? 1 : 80 : 0;
 	}
 
 	public static class Validator {

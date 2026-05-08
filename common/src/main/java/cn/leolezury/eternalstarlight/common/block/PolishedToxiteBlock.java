@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -11,7 +10,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 
 public class PolishedToxiteBlock extends Block {
-	public static final MapCodec<PolishedToxiteBlock> CODEC = simpleCodec(PolishedToxiteBlock::new);
 
 	public static final EnumProperty<Part> PART = EnumProperty.create("part", Part.class);
 
@@ -21,12 +19,7 @@ public class PolishedToxiteBlock extends Block {
 	}
 
 	@Override
-	protected MapCodec<PolishedToxiteBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
-	protected BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos2) {
+	public BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos2) {
 		boolean above = levelAccessor.getBlockState(blockPos.above()).is(this);
 		boolean below = levelAccessor.getBlockState(blockPos.below()).is(this);
 		if ((!above && !below)) {

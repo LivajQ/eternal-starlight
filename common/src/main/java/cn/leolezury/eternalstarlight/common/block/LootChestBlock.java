@@ -2,12 +2,12 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.block.entity.LootChestBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -28,7 +28,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class LootChestBlock extends BaseEntityBlock {
-	public static final MapCodec<LootChestBlock> CODEC = simpleCodec(LootChestBlock::new);
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
 	private static final VoxelShape SHAPE = Shapes.or(
@@ -53,30 +52,37 @@ public class LootChestBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected MapCodec<LootChestBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
 	@Nullable
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
 	}
 
 	@Override
-	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+
 		if (level.getBlockEntity(pos) instanceof LootChestBlockEntity blockEntity
 			&& player instanceof ServerPlayer serverPlayer
 			&& blockEntity.getRewardTargets().contains(serverPlayer.getUUID())
 			&& blockEntity.isFree()) {
+
 			blockEntity.rewardPlayer(serverPlayer, pos, this, player.isCrouching());
-			level.playSound(null, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 1.0F, 1.0F);
+			level.playSound(null,
+				pos.getX() + 0.5,
+				pos.getY(),
+				pos.getZ() + 0.5,
+				SoundEvents.CHEST_OPEN,
+				SoundSource.BLOCKS,
+				1.0F,
+				1.0F);
+
 			return InteractionResult.CONSUME;
 		}
+
 		if (level.isClientSide) {
 			return InteractionResult.SUCCESS;
 		}
-		return super.useWithoutItem(state, level, pos, player, hitResult);
+
+		return super.use(state, level, pos, player, hand, hit);
 	}
 
 	@Override
@@ -85,17 +91,17 @@ public class LootChestBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, Rotation rotation) {
+	public BlockState rotate(BlockState state, Rotation rotation) {
 		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, Mirror mirror) {
+	public BlockState mirror(BlockState state, Mirror mirror) {
 		return state.rotate(mirror.getRotation(state.getValue(FACING)));
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		if (level.getBlockEntity(pos) instanceof LootChestBlockEntity blockEntity && blockEntity.isEjecting()) {
 			return EJECTING_SHAPE;
 		}

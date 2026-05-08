@@ -5,7 +5,7 @@ import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -34,12 +34,18 @@ public class TorreyaCampfireBlock extends CampfireBlock {
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-		if (stack.is(ESItems.STARFIRE.get()) && !state.getValue(STARFIRE) && state.getValue(LIT)) {
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		ItemStack stack = player.getItemInHand(hand);
+
+		if (stack.is(ESItems.STARFIRE.get())
+			&& !state.getValue(STARFIRE)
+			&& state.getValue(LIT)) {
+
 			level.setBlockAndUpdate(pos, state.setValue(STARFIRE, true));
-			return ItemInteractionResult.sidedSuccess(level.isClientSide);
+			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
-		return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+
+		return InteractionResult.PASS;
 	}
 
 	@Nullable

@@ -3,7 +3,6 @@ package cn.leolezury.eternalstarlight.common.block;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -23,15 +22,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class NocturnalMilletBottomBlock extends CropBlock {
-	public static final MapCodec<NocturnalMilletBottomBlock> CODEC = simpleCodec(NocturnalMilletBottomBlock::new);
 	public static final BooleanProperty FORGOTTEN = NocturnalMilletTopBlock.FORGOTTEN;
 	public static final BooleanProperty WITHERED = NocturnalMilletTopBlock.WITHERED;
 	private static final VoxelShape[] SHAPE_BY_AGE = new VoxelShape[]{Block.box(3.0, 0.0, 3.0, 13.0, 9.0, 13.0), Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0)};
-
-	@Override
-	public MapCodec<NocturnalMilletBottomBlock> codec() {
-		return CODEC;
-	}
 
 	public NocturnalMilletBottomBlock(Properties properties) {
 		super(properties);
@@ -50,12 +43,12 @@ public class NocturnalMilletBottomBlock extends CropBlock {
 	}
 
 	@Override
-	protected boolean isRandomlyTicking(BlockState state) {
+	public boolean isRandomlyTicking(BlockState state) {
 		return !state.getValue(WITHERED);
 	}
 
 	@Override
-	protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+	public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
 		BlockPos abovePos = pos.above();
 		if (level.getRawBrightness(pos, 0) >= 7) {
 			int age = this.getAge(state);
@@ -112,8 +105,10 @@ public class NocturnalMilletBottomBlock extends CropBlock {
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
-		return state.getValue(WITHERED) || !state.getValue(FORGOTTEN) || super.isValidBonemealTarget(level, pos, state);
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
+		return state.getValue(WITHERED)
+			|| !state.getValue(FORGOTTEN)
+			|| super.isValidBonemealTarget(level, pos, state, isClientSide);
 	}
 
 	@Override
@@ -148,7 +143,7 @@ public class NocturnalMilletBottomBlock extends CropBlock {
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return SHAPE_BY_AGE[this.getAge(state) > 0 ? 1 : 0];
 	}
 }

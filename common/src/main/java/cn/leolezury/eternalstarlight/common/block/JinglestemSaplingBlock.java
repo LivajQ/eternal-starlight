@@ -2,7 +2,6 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.data.ESConfiguredFeatures;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -10,7 +9,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -35,19 +33,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class JinglestemSaplingBlock extends BushBlock implements BonemealableBlock, LiquidBlockContainer {
-	public static final MapCodec<JinglestemSaplingBlock> CODEC = simpleCodec(JinglestemSaplingBlock::new);
-
 	public static final IntegerProperty STAGE = BlockStateProperties.STAGE;
 	protected static final VoxelShape SHAPE = Block.box(5.0, 0.0, 5.0, 11.0, 12.0, 11.0);
 
 	public JinglestemSaplingBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.getStateDefinition().any().setValue(STAGE, 0));
-	}
-
-	@Override
-	public MapCodec<JinglestemSaplingBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -71,12 +62,12 @@ public class JinglestemSaplingBlock extends BushBlock implements BonemealableBlo
 	}
 
 	@Override
-	protected FluidState getFluidState(BlockState state) {
+	public FluidState getFluidState(BlockState state) {
 		return Fluids.WATER.getSource(false);
 	}
 
 	@Override
-	protected void randomTick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
+	public void randomTick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
 		if (serverLevel.getMaxLocalRawBrightness(blockPos.above()) >= 9 && randomSource.nextInt(7) == 0) {
 			this.advanceTree(serverLevel, blockPos, blockState, randomSource);
 		}
@@ -97,7 +88,7 @@ public class JinglestemSaplingBlock extends BushBlock implements BonemealableBlo
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
 		return true;
 	}
 
@@ -117,12 +108,12 @@ public class JinglestemSaplingBlock extends BushBlock implements BonemealableBlo
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return SHAPE;
 	}
 
 	@Override
-	public boolean canPlaceLiquid(@Nullable Player player, BlockGetter getter, BlockPos pos, BlockState state, Fluid fluid) {
+	public boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
 		return false;
 	}
 

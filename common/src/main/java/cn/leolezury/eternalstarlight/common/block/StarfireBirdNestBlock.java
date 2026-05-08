@@ -5,23 +5,20 @@ import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESCriteriaTriggers;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.BlockItemStateProperties;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -42,15 +39,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class StarfireBirdNestBlock extends BaseEntityBlock {
-	public static final MapCodec<StarfireBirdNestBlock> CODEC = simpleCodec(StarfireBirdNestBlock::new);
 	public static final VoxelShape SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 4.0D, 16.0D);
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final IntegerProperty EGGS = IntegerProperty.create("eggs", 0, 3);
-
-	@Override
-	protected MapCodec<? extends StarfireBirdNestBlock> codec() {
-		return CODEC;
-	}
 
 	public StarfireBirdNestBlock(Properties properties) {
 		super(properties);
@@ -66,46 +57,67 @@ public class StarfireBirdNestBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+	public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
 		return SHAPE;
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-		if (canAccessNestContent(state) && stack.is(ESTags.Items.STARFIRE_BIRD_FOOD) && level.getBlockEntity(pos) instanceof StarfireBirdNestBlockEntity nest && nest.getItems().stream().anyMatch(ItemStack::isEmpty)) {
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		ItemStack stack = player.getItemInHand(hand);
+
+		if (canAccessNestContent(state)
+			&& stack.is(ESTags.Items.STARFIRE_BIRD_FOOD)
+			&& level.getBlockEntity(pos) instanceof StarfireBirdNestBlockEntity nest
+			&& nest.getItems().stream().anyMatch(ItemStack::isEmpty)) {
+
 			if (!level.isClientSide && nest.addSeeds(stack.copyWithCount(1))) {
 				nest.setLastSeedPlayer(player);
+
 				if (player instanceof ServerPlayer serverPlayer) {
 					ESCriteriaTriggers.PUT_SEEDS_INTO_STARFIRE_BIRD_NEST.get().trigger(serverPlayer);
 				}
-				stack.consume(1, player);
+
+				stack.shrink(1);
 			}
-			return ItemInteractionResult.sidedSuccess(level.isClientSide);
+
+			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
-		if (canAccessNestContent(state) && state.getValue(EGGS) < 3 && stack.is(ESItems.STARFIRE_BIRD_EGG.get())) {
-			stack.consume(1, player);
+
+		if (canAccessNestContent(state)
+			&& state.getValue(EGGS) < 3
+			&& stack.is(ESItems.STARFIRE_BIRD_EGG.get())) {
+
+			stack.shrink(1);
 			level.setBlockAndUpdate(pos, state.setValue(EGGS, state.getValue(EGGS) + 1));
-			return ItemInteractionResult.sidedSuccess(level.isClientSide);
+			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
-		if (canAccessNestContent(state) && state.getValue(EGGS) > 0 && (stack.isEmpty() || (stack.is(ESItems.STARFIRE_BIRD_EGG.get()) && stack.getCount() < stack.getMaxStackSize()))) {
+
+		if (canAccessNestContent(state)
+			&& state.getValue(EGGS) > 0
+			&& (stack.isEmpty()
+			|| (stack.is(ESItems.STARFIRE_BIRD_EGG.get()) && stack.getCount() < stack.getMaxStackSize()))) {
+
 			if (stack.isEmpty()) {
 				player.setItemInHand(hand, ESItems.STARFIRE_BIRD_EGG.get().getDefaultInstance());
 			} else {
 				stack.grow(1);
 			}
+
 			level.setBlockAndUpdate(pos, state.setValue(EGGS, state.getValue(EGGS) - 1));
-			return ItemInteractionResult.sidedSuccess(level.isClientSide);
+			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
-		return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+
+		return InteractionResult.PASS;
 	}
 
 	@Override
 	public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
 		super.playerDestroy(level, player, pos, state, blockEntity, stack);
 		if (!level.isClientSide && blockEntity instanceof StarfireBirdNestBlockEntity nest) {
-			if (!EnchantmentHelper.hasTag(stack, ESTags.Enchantments.PREVENTS_STARFIRE_BIRD_SPAWNS_WHEN_MINING)) {
-				nest.releaseAllOccupants(state, true);
-			}
+			//TODO which enchant?
+			//if (EnchantmentHelper.getItemEnchantmentLevel(ESEnchantments.PREVENTS_STARFIRE_BIRD_SPAWNS_WHEN_MINING.get(), stack) == 0) {
+			//	nest.releaseAllOccupants(state, true);
+			//}
 		}
 	}
 
@@ -131,7 +143,7 @@ public class StarfireBirdNestBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected RenderShape getRenderShape(BlockState state) {
+	public RenderShape getRenderShape(BlockState state) {
 		return RenderShape.MODEL;
 	}
 
@@ -148,27 +160,53 @@ public class StarfireBirdNestBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public BlockState playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
-		if (!level.isClientSide && player.isCreative() && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
-			BlockEntity blockEntity = level.getBlockEntity(blockPos);
-			int eggs = blockState.getValue(EGGS);
-			if (blockEntity instanceof StarfireBirdNestBlockEntity nest) {
-				if (nest.getOccupantCount() > 0 || nest.getItems().stream().anyMatch(stack -> !stack.isEmpty()) || eggs > 0) {
+	public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+
+		if (!level.isClientSide
+			&& player.isCreative()
+			&& level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
+
+			BlockEntity be = level.getBlockEntity(pos);
+			int eggs = state.getValue(EGGS);
+
+			if (be instanceof StarfireBirdNestBlockEntity nest) {
+
+				boolean hasContents =
+					nest.getOccupantCount() > 0
+						|| nest.getItems().stream().anyMatch(s -> !s.isEmpty())
+						|| eggs > 0;
+
+				if (hasContents) {
+
 					ItemStack stack = new ItemStack(this);
-					stack.applyComponents(nest.collectComponents());
-					stack.set(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(EGGS, eggs));
-					ItemEntity itemEntity = new ItemEntity(level, blockPos.getX(), blockPos.getY(), blockPos.getZ(), stack);
-					itemEntity.setDefaultPickUpDelay();
-					level.addFreshEntity(itemEntity);
+
+					CompoundTag beTag = new CompoundTag();
+					nest.saveAdditional(beTag);
+					stack.getOrCreateTag().put("BlockEntityTag", beTag);
+
+					CompoundTag stateTag = new CompoundTag();
+					stateTag.putInt("EGGS", eggs);
+					stack.getOrCreateTag().put("BlockStateTag", stateTag);
+
+					ItemEntity item = new ItemEntity(
+						level,
+						pos.getX(),
+						pos.getY(),
+						pos.getZ(),
+						stack
+					);
+
+					item.setDefaultPickUpDelay();
+					level.addFreshEntity(item);
 				}
 			}
 		}
 
-		return super.playerWillDestroy(level, blockPos, blockState, player);
+		super.playerWillDestroy(level, pos, state, player);
 	}
 
 	@Override
-	protected List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
+	public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
 		Entity entity = builder.getOptionalParameter(LootContextParams.THIS_ENTITY);
 		if (!(entity instanceof Player)) {
 			BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
@@ -178,7 +216,7 @@ public class StarfireBirdNestBlock extends BaseEntityBlock {
 		}
 		BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
 		if (blockEntity instanceof StarfireBirdNestBlockEntity nest) {
-			builder = builder.withDynamicDrop(ResourceLocation.withDefaultNamespace("contents"), (consumer) -> {
+			builder = builder.withDynamicDrop(new ResourceLocation("minecraft", "contents"), consumer -> {
 				for (int i = 0; i < nest.getContainerSize(); ++i) {
 					consumer.accept(nest.getItem(i));
 				}
@@ -189,12 +227,12 @@ public class StarfireBirdNestBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected boolean hasAnalogOutputSignal(BlockState state) {
+	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 
 	@Override
-	protected int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
+	public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
 		return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(level.getBlockEntity(pos));
 	}
 

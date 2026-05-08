@@ -1,9 +1,9 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESCriteriaTriggers;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -17,7 +17,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
 public class EnergyBlock extends Block {
-	public static final MapCodec<EnergyBlock> CODEC = simpleCodec(EnergyBlock::new);
 	public static BooleanProperty LIT = BlockStateProperties.LIT;
 
 	public EnergyBlock(Properties properties) {
@@ -26,17 +25,12 @@ public class EnergyBlock extends Block {
 	}
 
 	@Override
-	protected MapCodec<EnergyBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(LIT);
 	}
 
 	@Override
-	protected void onProjectileHit(Level level, BlockState blockState, BlockHitResult blockHitResult, Projectile projectile) {
+	public void onProjectileHit(Level level, BlockState blockState, BlockHitResult blockHitResult, Projectile projectile) {
 		if (blockState.getValue(LIT) && blockHitResult.getType() != HitResult.Type.MISS) {
 			level.setBlockAndUpdate(blockHitResult.getBlockPos(), blockState.setValue(LIT, false));
 		}
@@ -46,14 +40,19 @@ public class EnergyBlock extends Block {
 	}
 
 	@Override
-	protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
-		if (blockState.getValue(LIT)) {
-			level.setBlockAndUpdate(blockPos, blockState.setValue(LIT, false));
-			if (player instanceof ServerPlayer serverPlayer) {
-				ESCriteriaTriggers.DEACTIVATE_ENERGY_BLOCK.get().trigger(serverPlayer);
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		if (state.getValue(LIT)) {
+			if (!level.isClientSide) {
+				level.setBlockAndUpdate(pos, state.setValue(LIT, false));
+
+				if (player instanceof ServerPlayer serverPlayer) {
+					ESCriteriaTriggers.DEACTIVATE_ENERGY_BLOCK.get().trigger(serverPlayer);
+				}
 			}
+
 			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
+
 		return InteractionResult.PASS;
 	}
 }

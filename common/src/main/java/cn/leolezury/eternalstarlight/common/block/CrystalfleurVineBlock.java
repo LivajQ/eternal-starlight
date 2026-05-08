@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -9,15 +8,9 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class CrystalfleurVineBlock extends SimpleMultifaceBlock {
-	public static final MapCodec<CrystalfleurVineBlock> CODEC = simpleCodec(CrystalfleurVineBlock::new);
 
 	public CrystalfleurVineBlock(Properties properties) {
 		super(properties);
-	}
-
-	@Override
-	protected MapCodec<CrystalfleurVineBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

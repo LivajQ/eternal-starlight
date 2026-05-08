@@ -29,7 +29,7 @@ public abstract class EtherFluid extends FlowingFluid {
 	public static final ResourceLocation ARMOR_MODIFIER_ID = EternalStarlight.id("armor.ether");
 
 	public static AttributeModifier armorModifier(float amount) {
-		return new AttributeModifier(ARMOR_MODIFIER_ID, amount, AttributeModifier.Operation.ADD_VALUE);
+		return new AttributeModifier(ARMOR_MODIFIER_ID.toString(), amount, AttributeModifier.Operation.ADDITION);
 	}
 
 	@Override

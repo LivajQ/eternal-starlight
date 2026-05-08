@@ -4,7 +4,6 @@ import cn.leolezury.eternalstarlight.common.entity.living.AethersentGolem;
 import cn.leolezury.eternalstarlight.common.entity.living.GrimstoneGolem;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.registry.ESEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Predicate;
 
 public class CarvedLunarisCactusFruitBlock extends HorizontalDirectionalBlock {
-	public static final MapCodec<CarvedLunarisCactusFruitBlock> CODEC = simpleCodec(CarvedLunarisCactusFruitBlock::new);
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	@Nullable
 	private BlockPattern snowGolemBase;
@@ -58,12 +56,7 @@ public class CarvedLunarisCactusFruitBlock extends HorizontalDirectionalBlock {
 	}
 
 	@Override
-	public MapCodec<? extends CarvedLunarisCactusFruitBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
-	protected void onPlace(BlockState blockState, Level level, BlockPos blockPos, BlockState blockState2, boolean bl) {
+	public void onPlace(BlockState blockState, Level level, BlockPos blockPos, BlockState blockState2, boolean bl) {
 		if (!blockState2.is(blockState.getBlock())) {
 			this.trySpawnGolem(level, blockPos);
 		}

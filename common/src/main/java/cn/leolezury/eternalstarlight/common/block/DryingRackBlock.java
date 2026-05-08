@@ -2,13 +2,12 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.block.entity.DryingRackBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +31,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class DryingRackBlock extends BaseEntityBlock {
-	public static final MapCodec<DryingRackBlock> CODEC = simpleCodec(DryingRackBlock::new);
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 	public static final BooleanProperty CAMPFIRE = BooleanProperty.create("campfire");
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -42,11 +40,6 @@ public class DryingRackBlock extends BaseEntityBlock {
 	public DryingRackBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.stateDefinition.any().setValue(LIT, false).setValue(CAMPFIRE, false).setValue(FACING, Direction.NORTH));
-	}
-
-	@Override
-	protected MapCodec<? extends BaseEntityBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -80,51 +73,66 @@ public class DryingRackBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		ItemStack stack = player.getItemInHand(hand);
+
 		if (level.getBlockEntity(pos) instanceof DryingRackBlockEntity entity) {
+
 			if (entity.getItem().isEmpty() && !stack.isEmpty() && entity.canBeDried(stack, state.getValue(LIT))) {
 				if (!level.isClientSide) {
 					entity.setItem(stack.copyWithCount(1));
-					stack.consume(1, player);
+					stack.shrink(1);
 				}
-				return ItemInteractionResult.sidedSuccess(level.isClientSide);
-			} else if (!entity.getItem().isEmpty() && (ItemStack.isSameItemSameComponents(entity.getItem(), stack) || stack.isEmpty())) {
-				int mergedCount = entity.getItem().getCount() + stack.getCount();
-				int maxSize = stack.getMaxStackSize();
+				return InteractionResult.sidedSuccess(level.isClientSide);
+			}
+
+			if (!entity.getItem().isEmpty() &&
+				(ItemStack.isSameItemSameTags(entity.getItem(), stack) || stack.isEmpty())) {
+
+				int merged = entity.getItem().getCount() + stack.getCount();
+				int max = entity.getItem().getMaxStackSize();
+
 				if (!level.isClientSide) {
-					player.setItemInHand(hand, entity.getItem().copyWithCount(Math.min(mergedCount, maxSize)));
-					if (mergedCount <= maxSize) {
+					player.setItemInHand(hand, entity.getItem().copyWithCount(Math.min(merged, max)));
+
+					if (merged <= max) {
 						entity.setItem(ItemStack.EMPTY);
 					} else {
-						entity.setItem(entity.getItem().copyWithCount(mergedCount - maxSize));
+						entity.setItem(entity.getItem().copyWithCount(merged - max));
 					}
 				}
-				if (stack.getCount() < maxSize) {
-					return ItemInteractionResult.sidedSuccess(level.isClientSide);
-				}
+
+				return InteractionResult.sidedSuccess(level.isClientSide);
 			}
 		}
-		return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+
+		return InteractionResult.PASS;
 	}
 
 	@Override
-	protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-		Containers.dropContentsOnDestroy(state, newState, level, pos);
+	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+		if (!state.is(newState.getBlock())) {
+			BlockEntity be = level.getBlockEntity(pos);
+			if (be instanceof DryingRackBlockEntity entity) {
+				Containers.dropContents(level, pos, entity);
+			}
+		}
 		super.onRemove(state, level, pos, newState, isMoving);
 	}
 
+
 	@Override
-	protected boolean hasAnalogOutputSignal(BlockState state) {
+	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 
 	@Override
-	protected int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
+	public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
 		return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(level.getBlockEntity(pos));
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+	public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
 		return blockState.getValue(FACING).getAxis() == Direction.Axis.X ? AXIS_X_SHAPE : AXIS_Z_SHAPE;
 	}
 
@@ -144,7 +152,7 @@ public class DryingRackBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected RenderShape getRenderShape(BlockState blockState) {
+	public RenderShape getRenderShape(BlockState blockState) {
 		return RenderShape.MODEL;
 	}
 

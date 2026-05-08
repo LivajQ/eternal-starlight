@@ -1,15 +1,14 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -22,19 +21,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public class RedVelvetumossBlock extends Block implements BonemealableBlock {
-	public static final MapCodec<RedVelvetumossBlock> CODEC = simpleCodec(RedVelvetumossBlock::new);
 
 	public RedVelvetumossBlock(Properties properties) {
 		super(properties);
 	}
 
 	@Override
-	public MapCodec<RedVelvetumossBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
-	protected void randomTick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
+	public void randomTick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
 		if (randomSource.nextInt(12) == 0 && Arrays.stream(Direction.values()).noneMatch(direction -> serverLevel.getBlockState(blockPos.relative(direction)).is(ESBlocks.RED_VELVETUMOSS_FLOWER.get()))) {
 			for (Direction direction : Direction.values()) {
 				BlockPos growPos = blockPos.relative(direction);
@@ -48,7 +41,7 @@ public class RedVelvetumossBlock extends Block implements BonemealableBlock {
 	@Override
 	public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
 		super.playerDestroy(level, player, blockPos, blockState, blockEntity, itemStack);
-		if (!EnchantmentHelper.hasTag(itemStack, EnchantmentTags.PREVENTS_ICE_MELTING)) {
+		if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FROST_WALKER, itemStack) == 0) {
 			if (level.dimensionType().ultraWarm()) {
 				level.removeBlock(blockPos, false);
 				return;
@@ -58,8 +51,11 @@ public class RedVelvetumossBlock extends Block implements BonemealableBlock {
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
-		return Arrays.stream(Direction.values()).anyMatch(direction -> levelReader.getBlockState(blockPos.relative(direction)).is(Blocks.WATER)) && Arrays.stream(Direction.values()).noneMatch(direction -> levelReader.getBlockState(blockPos.relative(direction)).is(ESBlocks.RED_VELVETUMOSS_FLOWER.get()));
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
+		return Arrays.stream(Direction.values())
+			.anyMatch(dir -> level.getBlockState(pos.relative(dir)).is(Blocks.WATER))
+			&& Arrays.stream(Direction.values())
+			.noneMatch(dir -> level.getBlockState(pos.relative(dir)).is(ESBlocks.RED_VELVETUMOSS_FLOWER.get()));
 	}
 
 	@Override

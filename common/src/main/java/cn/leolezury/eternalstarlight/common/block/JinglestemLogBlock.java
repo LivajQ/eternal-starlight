@@ -1,7 +1,7 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,24 +16,16 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class JinglestemLogBlock extends RotatedPillarBlock implements BonemealableBlock {
-	public static final MapCodec<JinglestemLogBlock> CODEC = simpleCodec(JinglestemLogBlock::new);
 
 	public JinglestemLogBlock(Properties properties) {
 		super(properties);
 	}
 
 	@Override
-	public MapCodec<JinglestemLogBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
-	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
 		for (Direction direction : Direction.values()) {
 			if (level.getBlockState(pos.relative(direction)).is(Blocks.WATER)) {
 				return true;
@@ -49,7 +41,7 @@ public class JinglestemLogBlock extends RotatedPillarBlock implements Bonemealab
 
 	@Override
 	public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
-		List<Direction> dirs = new ArrayList<>(Arrays.stream(Direction.values()).toList());
+		ObjectArrayList<Direction> dirs = new ObjectArrayList<>(List.of(Direction.values()));
 		Util.shuffle(dirs, random);
 		for (Direction direction : dirs) {
 			BlockPos placePos = pos.relative(direction);

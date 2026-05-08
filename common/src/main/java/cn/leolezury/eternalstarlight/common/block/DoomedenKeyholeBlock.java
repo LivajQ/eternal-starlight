@@ -1,13 +1,12 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.util.ESTags;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -26,17 +25,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public class DoomedenKeyholeBlock extends HorizontalAxisBlock {
-	public static final MapCodec<DoomedenKeyholeBlock> CODEC = simpleCodec(DoomedenKeyholeBlock::new);
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
 	public DoomedenKeyholeBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.getStateDefinition().any().setValue(LIT, false).setValue(AXIS, Direction.Axis.X));
-	}
-
-	@Override
-	protected MapCodec<DoomedenKeyholeBlock> codec() {
-		return CODEC;
 	}
 
 	@Nullable
@@ -46,18 +39,23 @@ public class DoomedenKeyholeBlock extends HorizontalAxisBlock {
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack itemStack, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
-		if (itemStack.is(ESTags.Items.DOOMEDEN_KEYS) && !blockState.getValue(LIT)) {
-			level.setBlockAndUpdate(blockPos, blockState.setValue(LIT, true));
-			level.scheduleTick(blockPos, this, 15);
-			return ItemInteractionResult.sidedSuccess(level.isClientSide);
-		} else {
-			return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+	public InteractionResult use(BlockState state, Level level, BlockPos pos,
+								 Player player, InteractionHand hand, BlockHitResult hit) {
+		ItemStack stack = player.getItemInHand(hand);
+
+		if (stack.is(ESTags.Items.DOOMEDEN_KEYS) && !state.getValue(LIT)) {
+			if (!level.isClientSide) {
+				level.setBlockAndUpdate(pos, state.setValue(LIT, true));
+				level.scheduleTick(pos, this, 15);
+			}
+			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
+
+		return InteractionResult.PASS;
 	}
 
 	@Override
-	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
 		if (level.getBlockState(fromPos).getBlock() instanceof RedstoneDoomedenKeyholeBlock && !state.getValue(LIT) && Arrays.stream(Direction.values()).anyMatch(direction -> hasInputSignal(level, pos, direction))) {
 			level.setBlockAndUpdate(pos, state.setValue(LIT, true));
 			level.scheduleTick(pos, this, 15);
@@ -76,7 +74,7 @@ public class DoomedenKeyholeBlock extends HorizontalAxisBlock {
 	}
 
 	@Override
-	protected void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
+	public void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
 		if (blockState.getValue(LIT)) {
 			if (blockState.getValue(AXIS) == Direction.Axis.X) {
 				for (int i = -1; i <= 1; i++) {

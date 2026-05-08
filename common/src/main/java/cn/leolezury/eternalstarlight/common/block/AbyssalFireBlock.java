@@ -2,7 +2,6 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -21,17 +20,11 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
 public class AbyssalFireBlock extends BaseFireBlock implements SimpleWaterloggedBlock {
-	public static final MapCodec<AbyssalFireBlock> CODEC = simpleCodec(AbyssalFireBlock::new);
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
 	public AbyssalFireBlock(Properties properties) {
 		super(properties, 3.0F);
 		this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false));
-	}
-
-	@Override
-	protected MapCodec<AbyssalFireBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

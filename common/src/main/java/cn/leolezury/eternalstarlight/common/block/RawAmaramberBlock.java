@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
@@ -10,7 +9,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 public class RawAmaramberBlock extends Block {
-	public static final MapCodec<RawAmaramberBlock> CODEC = simpleCodec(RawAmaramberBlock::new);
 
 	public static final BooleanProperty TOP = BooleanProperty.create("top");
 
@@ -20,12 +18,7 @@ public class RawAmaramberBlock extends Block {
 	}
 
 	@Override
-	protected MapCodec<RawAmaramberBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
-	protected BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos2) {
+	public BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos2) {
 		return blockState.setValue(TOP, !levelAccessor.getBlockState(blockPos.above()).is(this));
 	}
 

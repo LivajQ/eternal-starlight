@@ -1,12 +1,9 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.server.level.ServerLevel;
@@ -27,23 +24,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class ESGrassBlock extends ESSpreadingSnowyDirtBlock implements BonemealableBlock {
-	public static final MapCodec<ESGrassBlock> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
-		BuiltInRegistries.BLOCK.byNameCodec().fieldOf("spreads_on").forGetter((block) -> block.spreadsOn),
-		propertiesCodec()
-	).apply(instance, ESGrassBlock::new));
 
 	public ESGrassBlock(Block spreadOn, BlockBehaviour.Properties properties) {
 		super(spreadOn, properties);
 	}
 
 	@Override
-	protected MapCodec<ESGrassBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
-		return levelReader.getBlockState(blockPos.above()).isAir();
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
+		return level.getBlockState(pos.above()).isAir();
 	}
 
 	@Override
@@ -54,7 +42,7 @@ public class ESGrassBlock extends ESSpreadingSnowyDirtBlock implements Bonemeala
 	@Override
 	public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
 		BlockPos abovePos = pos.above();
-		BlockState shortGrass = Blocks.SHORT_GRASS.defaultBlockState();
+		BlockState shortGrass = Blocks.GRASS.defaultBlockState();
 		Optional<Holder.Reference<PlacedFeature>> optional = level.registryAccess()
 			.registryOrThrow(Registries.PLACED_FEATURE)
 			.getHolder(VegetationPlacements.GRASS_BONEMEAL);
@@ -95,10 +83,5 @@ public class ESGrassBlock extends ESSpreadingSnowyDirtBlock implements Bonemeala
 				holder.value().place(level, level.getChunkSource().getGenerator(), random, currentPos);
 			}
 		}
-	}
-
-	@Override
-	public BonemealableBlock.Type getType() {
-		return Type.NEIGHBOR_SPREADER;
 	}
 }

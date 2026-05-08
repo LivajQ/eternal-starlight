@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
@@ -25,18 +24,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class LumenstemBlock extends GrowingPlantHeadBlock implements LiquidBlockContainer {
-	public static final MapCodec<LumenstemBlock> CODEC = simpleCodec(LumenstemBlock::new);
 	public static final VoxelShape SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 16.0D, 12.0D);
 	public static final BooleanProperty BOTTOM = BlockStateProperties.BOTTOM;
 
 	public LumenstemBlock(Properties properties) {
 		super(properties, Direction.UP, SHAPE, false, 0.02);
 		this.registerDefaultState(defaultBlockState().setValue(BOTTOM, true));
-	}
-
-	@Override
-	protected MapCodec<LumenstemBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -55,7 +48,7 @@ public class LumenstemBlock extends GrowingPlantHeadBlock implements LiquidBlock
 	}
 
 	@Override
-	public boolean canPlaceLiquid(@Nullable Player player, BlockGetter blockGetter, BlockPos blockPos, BlockState blockState, Fluid fluid) {
+	public boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
 		return false;
 	}
 
@@ -75,7 +68,7 @@ public class LumenstemBlock extends GrowingPlantHeadBlock implements LiquidBlock
 	}
 
 	@Override
-	protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
 		BlockState newState = super.updateShape(state, direction, neighborState, level, pos, neighborPos);
 		return newState.hasProperty(BOTTOM) ? newState.setValue(BOTTOM, !level.getBlockState(pos.relative(growthDirection.getOpposite())).is(getBodyBlock())) : newState;
 	}

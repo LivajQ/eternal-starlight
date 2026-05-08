@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESParticles;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
@@ -11,7 +10,6 @@ import net.minecraft.world.level.block.MudBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class NightfallMudBlock extends MudBlock {
-	public static final MapCodec<NightfallMudBlock> CODEC = simpleCodec(NightfallMudBlock::new);
 
 	public NightfallMudBlock(Properties properties) {
 		super(properties);

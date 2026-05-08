@@ -2,7 +2,6 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.block.entity.AbyssalGeyserBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -14,15 +13,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class AbyssalGeyserBlock extends BaseEntityBlock {
-	public static final MapCodec<AbyssalGeyserBlock> CODEC = simpleCodec(AbyssalGeyserBlock::new);
 
 	public AbyssalGeyserBlock(Properties properties) {
 		super(properties);
-	}
-
-	@Override
-	protected MapCodec<AbyssalGeyserBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

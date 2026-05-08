@@ -2,13 +2,11 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.registry.ESParticles;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.ParticleUtils;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -25,16 +23,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class SpiralKelpBlock extends GrowingPlantHeadBlock implements LiquidBlockContainer {
-	public static final MapCodec<SpiralKelpBlock> CODEC = simpleCodec(SpiralKelpBlock::new);
 	public static final VoxelShape SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 16.0D, 12.0D);
 
 	public SpiralKelpBlock(Properties properties) {
 		super(properties, Direction.UP, SHAPE, false, 0.02);
-	}
-
-	@Override
-	protected MapCodec<SpiralKelpBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -53,7 +45,7 @@ public class SpiralKelpBlock extends GrowingPlantHeadBlock implements LiquidBloc
 	}
 
 	@Override
-	public boolean canPlaceLiquid(@Nullable Player player, BlockGetter blockGetter, BlockPos blockPos, BlockState blockState, Fluid fluid) {
+	public boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
 		return false;
 	}
 

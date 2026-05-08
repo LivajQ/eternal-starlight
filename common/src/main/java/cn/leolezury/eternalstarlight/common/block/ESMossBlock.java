@@ -1,13 +1,10 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -27,17 +24,6 @@ public class ESMossBlock extends Block implements BonemealableBlock {
 	private final ResourceKey<ConfiguredFeature<?, ?>> bonemealFeature;
 	private final Optional<Holder<ParticleType<?>>> fallingParticle;
 
-	public static final MapCodec<ESMossBlock> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
-		ResourceKey.codec(Registries.CONFIGURED_FEATURE).fieldOf("bonemeal_feature").forGetter((block) -> block.bonemealFeature),
-		BuiltInRegistries.PARTICLE_TYPE.holderByNameCodec().optionalFieldOf("falling_particle").forGetter((block) -> block.fallingParticle),
-		propertiesCodec()
-	).apply(instance, ESMossBlock::new));
-
-	@Override
-	public MapCodec<ESMossBlock> codec() {
-		return CODEC;
-	}
-
 	public ESMossBlock(ResourceKey<ConfiguredFeature<?, ?>> bonemealFeature, Holder<ParticleType<?>> fallingParticle, BlockBehaviour.Properties properties) {
 		this(bonemealFeature, Optional.of(fallingParticle), properties);
 	}
@@ -49,8 +35,8 @@ public class ESMossBlock extends Block implements BonemealableBlock {
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
-		return levelReader.getBlockState(blockPos.above()).isAir();
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
+		return level.getBlockState(pos.above()).isAir();
 	}
 
 	@Override
@@ -61,11 +47,6 @@ public class ESMossBlock extends Block implements BonemealableBlock {
 	@Override
 	public void performBonemeal(ServerLevel serverLevel, RandomSource randomSource, BlockPos blockPos, BlockState blockState) {
 		serverLevel.registryAccess().registry(Registries.CONFIGURED_FEATURE).flatMap((registry) -> registry.getHolder(bonemealFeature)).ifPresent((reference) -> reference.value().place(serverLevel, serverLevel.getChunkSource().getGenerator(), randomSource, blockPos.above()));
-	}
-
-	@Override
-	public BonemealableBlock.Type getType() {
-		return Type.NEIGHBOR_SPREADER;
 	}
 
 	@Override

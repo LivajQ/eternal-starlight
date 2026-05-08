@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESParticles;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ParticleUtils;
@@ -11,15 +10,8 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ScarletLeavesBlock extends LeavesBlock {
-	public static final MapCodec<ScarletLeavesBlock> CODEC = simpleCodec(ScarletLeavesBlock::new);
-
 	public ScarletLeavesBlock(Properties properties) {
 		super(properties);
-	}
-
-	@Override
-	public MapCodec<ScarletLeavesBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

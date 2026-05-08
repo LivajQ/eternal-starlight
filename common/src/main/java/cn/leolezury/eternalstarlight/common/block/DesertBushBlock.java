@@ -1,9 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.util.ESTags;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BlockGetter;
@@ -14,10 +11,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class DesertBushBlock extends BushBlock {
-	public static final MapCodec<DesertBushBlock> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
-		Codec.INT.fieldOf("height").forGetter((block) -> block.height),
-		propertiesCodec()
-	).apply(instance, DesertBushBlock::new));
 	private final int height;
 
 	public DesertBushBlock(Properties properties) {
@@ -27,11 +20,6 @@ public class DesertBushBlock extends BushBlock {
 	public DesertBushBlock(int height, Properties properties) {
 		super(properties);
 		this.height = height;
-	}
-
-	@Override
-	protected MapCodec<DesertBushBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

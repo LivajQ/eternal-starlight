@@ -2,7 +2,6 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.data.ESConfiguredFeatures;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -32,18 +31,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class MarimoldBlock extends BushBlock implements BonemealableBlock, SimpleWaterloggedBlock {
-	public static final MapCodec<MarimoldBlock> CODEC = simpleCodec(MarimoldBlock::new);
 	protected static final VoxelShape SHAPE = Block.box(5.0, 0.0, 5.0, 11.0, 6.0, 11.0);
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
 	public MarimoldBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.getStateDefinition().any().setValue(WATERLOGGED, false));
-	}
-
-	@Override
-	public MapCodec<MarimoldBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -72,7 +65,7 @@ public class MarimoldBlock extends BushBlock implements BonemealableBlock, Simpl
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
 		return true;
 	}
 
@@ -98,7 +91,7 @@ public class MarimoldBlock extends BushBlock implements BonemealableBlock, Simpl
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return SHAPE;
 	}
 }

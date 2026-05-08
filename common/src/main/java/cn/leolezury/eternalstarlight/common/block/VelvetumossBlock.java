@@ -1,16 +1,15 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -27,7 +26,6 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class VelvetumossBlock extends Block implements BonemealableBlock {
-	public static final MapCodec<VelvetumossBlock> CODEC = simpleCodec(VelvetumossBlock::new);
 	public static final BooleanProperty NORTH = PipeBlock.NORTH;
 	public static final BooleanProperty EAST = PipeBlock.EAST;
 	public static final BooleanProperty SOUTH = PipeBlock.SOUTH;
@@ -35,11 +33,6 @@ public class VelvetumossBlock extends Block implements BonemealableBlock {
 	public static final BooleanProperty UP = PipeBlock.UP;
 	public static final BooleanProperty DOWN = PipeBlock.DOWN;
 	private static final Map<Direction, BooleanProperty> PROPERTY_BY_DIRECTION = PipeBlock.PROPERTY_BY_DIRECTION;
-
-	@Override
-	public MapCodec<VelvetumossBlock> codec() {
-		return CODEC;
-	}
 
 	public VelvetumossBlock(BlockBehaviour.Properties properties) {
 		super(properties);
@@ -69,14 +62,14 @@ public class VelvetumossBlock extends Block implements BonemealableBlock {
 	}
 
 	@Override
-	protected BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
+	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
 		return facingState.is(this)
 			? state.setValue(PROPERTY_BY_DIRECTION.get(facing), false)
 			: super.updateShape(state, facing, facingState, level, currentPos, facingPos);
 	}
 
 	@Override
-	protected void randomTick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
+	public void randomTick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
 		if (randomSource.nextInt(12) == 0) {
 			for (Direction direction : Direction.values()) {
 				BlockPos growPos = blockPos.relative(direction);
@@ -90,7 +83,7 @@ public class VelvetumossBlock extends Block implements BonemealableBlock {
 	@Override
 	public void playerDestroy(Level level, Player player, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, ItemStack itemStack) {
 		super.playerDestroy(level, player, blockPos, blockState, blockEntity, itemStack);
-		if (!EnchantmentHelper.hasTag(itemStack, EnchantmentTags.PREVENTS_ICE_MELTING)) {
+		if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FROST_WALKER, itemStack) == 0) {
 			if (level.dimensionType().ultraWarm()) {
 				level.removeBlock(blockPos, false);
 				return;
@@ -100,7 +93,7 @@ public class VelvetumossBlock extends Block implements BonemealableBlock {
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, Rotation rot) {
+	public BlockState rotate(BlockState state, Rotation rot) {
 		return state.setValue(PROPERTY_BY_DIRECTION.get(rot.rotate(Direction.NORTH)), state.getValue(NORTH))
 			.setValue(PROPERTY_BY_DIRECTION.get(rot.rotate(Direction.SOUTH)), state.getValue(SOUTH))
 			.setValue(PROPERTY_BY_DIRECTION.get(rot.rotate(Direction.EAST)), state.getValue(EAST))
@@ -110,7 +103,7 @@ public class VelvetumossBlock extends Block implements BonemealableBlock {
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, Mirror mirror) {
+	public BlockState mirror(BlockState state, Mirror mirror) {
 		return state.setValue(PROPERTY_BY_DIRECTION.get(mirror.mirror(Direction.NORTH)), state.getValue(NORTH))
 			.setValue(PROPERTY_BY_DIRECTION.get(mirror.mirror(Direction.SOUTH)), state.getValue(SOUTH))
 			.setValue(PROPERTY_BY_DIRECTION.get(mirror.mirror(Direction.EAST)), state.getValue(EAST))
@@ -125,8 +118,8 @@ public class VelvetumossBlock extends Block implements BonemealableBlock {
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
-		return Arrays.stream(Direction.values()).anyMatch(direction -> levelReader.getBlockState(blockPos.relative(direction)).is(Blocks.WATER));
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
+		return Arrays.stream(Direction.values()).anyMatch(dir -> level.getBlockState(pos.relative(dir)).is(Blocks.WATER));
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -20,17 +19,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 public class RedstoneDoomedenKeyholeBlock extends HorizontalAxisBlock {
-	public static final MapCodec<RedstoneDoomedenKeyholeBlock> CODEC = simpleCodec(RedstoneDoomedenKeyholeBlock::new);
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
 	public RedstoneDoomedenKeyholeBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.getStateDefinition().any().setValue(LIT, false).setValue(AXIS, Direction.Axis.X));
-	}
-
-	@Override
-	protected MapCodec<RedstoneDoomedenKeyholeBlock> codec() {
-		return CODEC;
 	}
 
 	@Nullable
@@ -40,7 +33,7 @@ public class RedstoneDoomedenKeyholeBlock extends HorizontalAxisBlock {
 	}
 
 	@Override
-	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
 		boolean lit = state.getValue(LIT);
 		if (!lit && Arrays.stream(Direction.values()).filter(direction -> direction.getAxis() == state.getValue(AXIS)).anyMatch(direction -> hasInputSignal(level, pos, direction))) {
 			level.setBlockAndUpdate(pos, state.setValue(LIT, true));
@@ -62,7 +55,7 @@ public class RedstoneDoomedenKeyholeBlock extends HorizontalAxisBlock {
 	}
 
 	@Override
-	protected void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
+	public void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
 		if (blockState.getValue(LIT) && Arrays.stream(Direction.values()).filter(direction -> direction.getAxis() == blockState.getValue(AXIS)).noneMatch(direction -> hasInputSignal(serverLevel, blockPos, direction))) {
 			serverLevel.setBlockAndUpdate(blockPos, blockState.setValue(LIT, false));
 		}

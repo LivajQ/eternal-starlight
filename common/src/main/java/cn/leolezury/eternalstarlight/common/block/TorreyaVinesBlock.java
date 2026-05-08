@@ -2,12 +2,12 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -16,17 +16,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class TorreyaVinesBlock extends GrowingPlantHeadBlock {
-	public static final MapCodec<TorreyaVinesBlock> CODEC = simpleCodec(TorreyaVinesBlock::new);
 	public static final VoxelShape SHAPE = Block.box(6.0D, 0.0D, 6.0D, 10.0D, 16.0D, 10.0D);
 
 	public TorreyaVinesBlock(Properties properties) {
 		super(properties, Direction.DOWN, SHAPE, false, 0.1D);
 		this.registerDefaultState(this.stateDefinition.any().setValue(AGE, 0));
-	}
-
-	@Override
-	protected MapCodec<TorreyaVinesBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -66,7 +60,7 @@ public class TorreyaVinesBlock extends GrowingPlantHeadBlock {
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(LevelReader levelReader, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
 		return new ItemStack(ESItems.TORREYA_VINES.get());
 	}
 }

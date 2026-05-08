@@ -3,7 +3,6 @@ package cn.leolezury.eternalstarlight.common.block;
 import cn.leolezury.eternalstarlight.common.block.entity.AbstractDuskLightBlockEntity;
 import cn.leolezury.eternalstarlight.common.block.entity.DuskLightBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -19,17 +18,11 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
 
 public class ReinforcedDuskLightBlock extends BaseEntityBlock {
-	public static final MapCodec<ReinforcedDuskLightBlock> CODEC = simpleCodec(ReinforcedDuskLightBlock::new);
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
 	public ReinforcedDuskLightBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.UP));
-	}
-
-	@Override
-	protected MapCodec<ReinforcedDuskLightBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -39,12 +32,12 @@ public class ReinforcedDuskLightBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, Rotation rotation) {
+	public BlockState rotate(BlockState state, Rotation rotation) {
 		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, Mirror mirror) {
+	public BlockState mirror(BlockState state, Mirror mirror) {
 		return state.rotate(mirror.getRotation(state.getValue(FACING)));
 	}
 
@@ -59,7 +52,7 @@ public class ReinforcedDuskLightBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected RenderShape getRenderShape(BlockState blockState) {
+	public RenderShape getRenderShape(BlockState blockState) {
 		return RenderShape.MODEL;
 	}
 

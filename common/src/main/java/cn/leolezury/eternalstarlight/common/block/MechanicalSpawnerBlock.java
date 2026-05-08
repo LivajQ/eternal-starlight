@@ -1,23 +1,20 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import cn.leolezury.eternalstarlight.common.block.entity.MechanicalSpawner;
 import cn.leolezury.eternalstarlight.common.block.entity.MechanicalSpawnerBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.Spawner;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -30,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class MechanicalSpawnerBlock extends BaseEntityBlock {
-	public static final MapCodec<MechanicalSpawnerBlock> CODEC = simpleCodec(MechanicalSpawnerBlock::new);
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
 	public static final IntegerProperty POWER = BlockStateProperties.POWER;
@@ -41,12 +37,7 @@ public class MechanicalSpawnerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public MapCodec<MechanicalSpawnerBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
-	protected BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
+	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
 		DoubleBlockHalf half = state.getValue(HALF);
 		if (facing.getAxis() != Direction.Axis.Y
 			|| half == DoubleBlockHalf.LOWER != (facing == Direction.UP)
@@ -60,9 +51,16 @@ public class MechanicalSpawnerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
 		if (!level.isClientSide) {
-			int signal = Math.max(level.getBestNeighborSignal(pos), level.getBestNeighborSignal(pos.relative(state.getValue(HALF).getDirectionToOther())));
+			Direction dir = state.getValue(HALF) == DoubleBlockHalf.UPPER
+				? Direction.DOWN
+				: Direction.UP;
+
+			int signal = Math.max(
+				level.getBestNeighborSignal(pos),
+				level.getBestNeighborSignal(pos.relative(dir))
+			);
 			if (state.getValue(POWER) != signal) {
 				level.setBlockAndUpdate(pos, state.setValue(POWER, signal));
 			}
@@ -86,7 +84,7 @@ public class MechanicalSpawnerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+	public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
 		if (state.getValue(HALF) != DoubleBlockHalf.UPPER) {
 			return super.canSurvive(state, level, pos);
 		} else {
@@ -97,17 +95,27 @@ public class MechanicalSpawnerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+	public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+
 		if (!level.isClientSide) {
 			if (player.isCreative()) {
-				DoublePlantBlock.preventDropFromBottomPart(level, pos, state, player);
+				if (state.getValue(DoublePlantBlock.HALF) == DoubleBlockHalf.UPPER) {
+					BlockPos below = pos.below();
+					BlockState belowState = level.getBlockState(below);
+
+					if (belowState.getBlock() == state.getBlock()) {
+						level.setBlock(below, Blocks.AIR.defaultBlockState(), 35);
+						level.levelEvent(player, 2001, below, Block.getId(belowState));
+					}
+				}
 			} else {
 				dropResources(state, level, pos, null, player, player.getMainHandItem());
 			}
 		}
 
-		return super.playerWillDestroy(level, pos, state, player);
+		super.playerWillDestroy(level, pos, state, player);
 	}
+
 
 	@Override
 	public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity te, ItemStack stack) {
@@ -115,12 +123,12 @@ public class MechanicalSpawnerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, Rotation rot) {
+	public BlockState rotate(BlockState state, Rotation rot) {
 		return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, Mirror mirror) {
+	public BlockState mirror(BlockState state, Mirror mirror) {
 		return state.rotate(mirror.getRotation(state.getValue(FACING)));
 	}
 
@@ -130,7 +138,7 @@ public class MechanicalSpawnerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected long getSeed(BlockState state, BlockPos pos) {
+	public long getSeed(BlockState state, BlockPos pos) {
 		return Mth.getSeed(pos.getX(), pos.below(state.getValue(HALF) == DoubleBlockHalf.LOWER ? 0 : 1).getY(), pos.getZ());
 	}
 
@@ -151,8 +159,10 @@ public class MechanicalSpawnerBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-		super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-		Spawner.appendHoverText(stack, tooltipComponents, MechanicalSpawner.TAG_SPAWN_DATA);
+	public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip, TooltipFlag flag) {
+		super.appendHoverText(stack, level, tooltip, flag);
+		//Spawner.appendHoverText(stack, tooltip, MechanicalSpawner.TAG_SPAWN_DATA);
 	}
+
+
 }

@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -21,7 +20,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class DirectionalBudBlock extends Block implements SimpleWaterloggedBlock {
-	public static final MapCodec<DirectionalBudBlock> CODEC = simpleCodec(DirectionalBudBlock::new);
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 	protected final VoxelShape northAabb;
@@ -41,11 +39,6 @@ public class DirectionalBudBlock extends Block implements SimpleWaterloggedBlock
 		this.southAabb = Block.box(border, border, 0.0D, (16 - border), (16 - border), getShapeHeight());
 		this.eastAabb = Block.box(0.0D, border, border, getShapeHeight(), (16 - border), (16 - border));
 		this.westAabb = Block.box((16 - getShapeHeight()), border, border, 16.0D, (16 - border), (16 - border));
-	}
-
-	@Override
-	protected MapCodec<? extends DirectionalBudBlock> codec() {
-		return CODEC;
 	}
 
 	protected double getShapeWidth() {

@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -21,13 +20,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class LayeredBlock extends Block {
-	public static final MapCodec<LayeredBlock> CODEC = simpleCodec(LayeredBlock::new);
 	public static final IntegerProperty LAYERS = BlockStateProperties.LAYERS;
 	protected static final VoxelShape[] SHAPE_BY_LAYER = new VoxelShape[]{Shapes.empty(), Block.box(0.0, 0.0, 0.0, 16.0, 2.0, 16.0), Block.box(0.0, 0.0, 0.0, 16.0, 4.0, 16.0), Block.box(0.0, 0.0, 0.0, 16.0, 6.0, 16.0), Block.box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0), Block.box(0.0, 0.0, 0.0, 16.0, 10.0, 16.0), Block.box(0.0, 0.0, 0.0, 16.0, 12.0, 16.0), Block.box(0.0, 0.0, 0.0, 16.0, 14.0, 16.0), Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0)};
-
-	public MapCodec<? extends LayeredBlock> codec() {
-		return CODEC;
-	}
 
 	public LayeredBlock(BlockBehaviour.Properties properties) {
 		super(properties);
@@ -35,7 +29,7 @@ public class LayeredBlock extends Block {
 	}
 
 	@Override
-	protected boolean isPathfindable(BlockState blockState, PathComputationType pathComputationType) {
+	public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, PathComputationType type) {
 		return false;
 	}
 

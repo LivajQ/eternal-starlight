@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -17,13 +16,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
 
 public class CrinoaBaleBlock extends Block {
-	public static final MapCodec<CrinoaBaleBlock> CODEC = simpleCodec(CrinoaBaleBlock::new);
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
-
-	@Override
-	public MapCodec<CrinoaBaleBlock> codec() {
-		return CODEC;
-	}
 
 	public CrinoaBaleBlock(BlockBehaviour.Properties properties) {
 		super(properties);

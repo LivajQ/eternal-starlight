@@ -2,13 +2,13 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -21,22 +21,15 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class NocturnalMilletTopBlock extends CropBlock {
-	public static final MapCodec<NocturnalMilletTopBlock> CODEC = simpleCodec(NocturnalMilletTopBlock::new);
 	public static final IntegerProperty AGE = BlockStateProperties.AGE_2;
 	public static final BooleanProperty FORGOTTEN = BooleanProperty.create("forgotten");
 	public static final BooleanProperty WITHERED = BooleanProperty.create("withered");
 	private static final VoxelShape[] SHAPE_BY_AGE = new VoxelShape[]{Block.box(0.0, 0.0, 0.0, 16.0, 4.0, 16.0), Block.box(0.0, 0.0, 0.0, 16.0, 10.0, 16.0), Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0)};
-
-	@Override
-	public MapCodec<NocturnalMilletTopBlock> codec() {
-		return CODEC;
-	}
 
 	public NocturnalMilletTopBlock(Properties properties) {
 		super(properties);
@@ -64,12 +57,12 @@ public class NocturnalMilletTopBlock extends CropBlock {
 	}
 
 	@Override
-	protected boolean isRandomlyTicking(BlockState state) {
+	public boolean isRandomlyTicking(BlockState state) {
 		return true;
 	}
 
 	@Override
-	protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+	public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
 		if (level.getRawBrightness(pos, 0) >= 7) {
 			int age = this.getAge(state);
 			if (state.getValue(WITHERED)) {
@@ -116,7 +109,7 @@ public class NocturnalMilletTopBlock extends CropBlock {
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
 		return state.getValue(WITHERED);
 	}
 
@@ -130,7 +123,7 @@ public class NocturnalMilletTopBlock extends CropBlock {
 	}
 
 	@Override
-	protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
 		BlockState belowState = level.getBlockState(pos.below());
 		if (direction == Direction.DOWN && belowState.is(ESBlocks.NOCTURNAL_MILLET_STALK.get())) {
 			return state.setValue(FORGOTTEN, belowState.getValue(FORGOTTEN));
@@ -139,29 +132,45 @@ public class NocturnalMilletTopBlock extends CropBlock {
 	}
 
 	@Override
-	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+
 		int age = state.getValue(AGE);
 		boolean forgotten = state.getValue(FORGOTTEN);
+
 		if (age == 2) {
-			popResource(level, pos, new ItemStack(forgotten ? ESItems.FORGOTTEN_NOCTURNAL_MILLET.get() : ESItems.NOCTURNAL_MILLET.get(), 1));
-			level.playSound(null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + level.random.nextFloat() * 0.4F);
+			popResource(level, pos,
+				new ItemStack(forgotten
+					? ESItems.FORGOTTEN_NOCTURNAL_MILLET.get()
+					: ESItems.NOCTURNAL_MILLET.get(), 1));
+
+			level.playSound(null, pos,
+				SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES,
+				SoundSource.BLOCKS,
+				1.0F,
+				0.8F + level.random.nextFloat() * 0.4F);
+
 			BlockState newState;
+
 			if (!forgotten) {
 				if (level.getRandom().nextDouble() < 0.2) {
 					newState = state.setValue(AGE, 1).setValue(WITHERED, true);
-					level.setBlock(pos.below(), level.getBlockState(pos.below()).setValue(WITHERED, true), 2);
+					level.setBlock(pos.below(),
+						level.getBlockState(pos.below()).setValue(WITHERED, true),
+						2);
 				} else {
 					newState = state.setValue(AGE, 1);
 				}
 			} else {
 				newState = state.setValue(AGE, 1);
 			}
+
 			level.setBlock(pos, newState, Block.UPDATE_CLIENTS);
 			level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
+
 			return InteractionResult.sidedSuccess(level.isClientSide);
-		} else {
-			return super.useWithoutItem(state, level, pos, player, hitResult);
 		}
+
+		return InteractionResult.PASS;
 	}
 
 	@Override
@@ -170,7 +179,7 @@ public class NocturnalMilletTopBlock extends CropBlock {
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return SHAPE_BY_AGE[state.getValue(WITHERED) && !state.getValue(FORGOTTEN) ? 1 : this.getAge(state)];
 	}
 }

@@ -3,7 +3,6 @@ package cn.leolezury.eternalstarlight.common.block;
 import cn.leolezury.eternalstarlight.common.block.entity.AlloyFurnaceBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
 import cn.leolezury.eternalstarlight.common.util.ESBlockUtil;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -48,7 +47,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AlloyFurnaceBlock extends BaseEntityBlock implements WorldlyContainerHolder, WeatheringGolemSteel {
-	public static final MapCodec<AlloyFurnaceBlock> CODEC = simpleCodec(AlloyFurnaceBlock::new);
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final IntegerProperty X_OFFSET = IntegerProperty.create("x_offset", 0, 1);
 	public static final IntegerProperty Y_OFFSET = IntegerProperty.create("y_offset", 0, 2);
@@ -122,11 +120,6 @@ public class AlloyFurnaceBlock extends BaseEntityBlock implements WorldlyContain
 	public AlloyFurnaceBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(X_OFFSET, 0).setValue(Y_OFFSET, 0).setValue(Z_OFFSET, 1));
-	}
-
-	@Override
-	protected MapCodec<AlloyFurnaceBlock> codec() {
-		return CODEC;
 	}
 
 	public static void registerCoolingItem(Item item, AlloyFurnaceCoolingItem coolingItem) {
@@ -204,8 +197,40 @@ public class AlloyFurnaceBlock extends BaseEntityBlock implements WorldlyContain
 	}
 
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-		return use(stack, state, level, pos, player);
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+
+		ItemStack stack = player.getItemInHand(hand);
+		InteractionResult result = use(stack, state, level, pos, player);
+		if (result.consumesAction()) {
+			return result;
+		}
+
+		if (level.isClientSide) {
+			return InteractionResult.SUCCESS;
+		}
+
+		Direction facing = state.getValue(FACING);
+		int x = state.getValue(X_OFFSET);
+		int z = state.getValue(Z_OFFSET) - 1;
+
+		Vec3 rotated = new Vec3(x, 0, z)
+			.yRot((-facing.toYRot() + 90) * Mth.DEG_TO_RAD);
+
+		int rotatedX = Math.round((float) rotated.x);
+		int rotatedZ = Math.round((float) rotated.z);
+
+		BlockPos centerPos = pos.offset(
+			-rotatedX,
+			-state.getValue(Y_OFFSET),
+			-rotatedZ
+		);
+
+		BlockEntity be = level.getBlockEntity(centerPos);
+		if (be instanceof AlloyFurnaceBlockEntity entity) {
+			player.openMenu(entity);
+		}
+
+		return InteractionResult.CONSUME;
 	}
 
 	@Override
@@ -222,7 +247,12 @@ public class AlloyFurnaceBlock extends BaseEntityBlock implements WorldlyContain
 					int rotatedZ = Math.round((float) rotated.z);
 					BlockPos partPos = centerPos.offset(rotatedX, y, rotatedZ);
 					if (z == 1) {
-						ParticleUtils.spawnParticleInBlock(level, partPos, 3, particle);
+						level.addParticle(particle,
+							partPos.getX() + 0.5,
+							partPos.getY() + 0.5,
+							partPos.getZ() + 0.5,
+							0, 0, 0
+						);
 					} else {
 						ParticleUtils.spawnParticlesOnBlockFaces(level, partPos, particle, UniformInt.of(3, 5));
 					}
@@ -265,31 +295,11 @@ public class AlloyFurnaceBlock extends BaseEntityBlock implements WorldlyContain
 	}
 
 	@Override
-	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-		if (level.isClientSide) {
-			return InteractionResult.SUCCESS;
-		} else {
-			Direction facing = state.getValue(FACING);
-			int x = state.getValue(X_OFFSET);
-			int z = state.getValue(Z_OFFSET) - 1;
-			Vec3 rotated = new Vec3(x, 0, z).yRot((-facing.toYRot() + 90) * Mth.DEG_TO_RAD);
-			int rotatedX = Math.round((float) rotated.x);
-			int rotatedZ = Math.round((float) rotated.z);
-			BlockPos centerPos = pos.offset(-rotatedX, -state.getValue(Y_OFFSET), -rotatedZ);
-			BlockEntity blockEntity = level.getBlockEntity(centerPos);
-			if (blockEntity instanceof AlloyFurnaceBlockEntity entity) {
-				player.openMenu(entity);
-			}
-			return InteractionResult.CONSUME;
-		}
-	}
-
-	@Override
-	protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (!state.is(newState.getBlock())) {
 			BlockEntity blockEntity = level.getBlockEntity(pos);
 			if (blockEntity instanceof AlloyFurnaceBlockEntity entity) {
-				if (!entity.isValidBlockState(newState)) {
+				if (!newState.is(this)) {
 					if (level instanceof ServerLevel) {
 						Containers.dropContents(level, pos, entity);
 					}
@@ -346,17 +356,17 @@ public class AlloyFurnaceBlock extends BaseEntityBlock implements WorldlyContain
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return SHAPES.getOrDefault(Pair.of(state.getValue(FACING), Triple.of(state.getValue(X_OFFSET), state.getValue(Y_OFFSET), state.getValue(Z_OFFSET))), Shapes.block());
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, Rotation rotation) {
+	public BlockState rotate(BlockState state, Rotation rotation) {
 		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, Mirror mirror) {
+	public BlockState mirror(BlockState state, Mirror mirror) {
 		return state.rotate(mirror.getRotation(state.getValue(FACING)));
 	}
 

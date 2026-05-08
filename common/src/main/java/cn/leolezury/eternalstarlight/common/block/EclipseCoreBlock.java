@@ -2,7 +2,6 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.block.entity.EclipseCoreBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -18,17 +17,11 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.jetbrains.annotations.Nullable;
 
 public class EclipseCoreBlock extends BaseEntityBlock {
-	public final MapCodec<EclipseCoreBlock> CODEC = simpleCodec(EclipseCoreBlock::new);
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
 	public EclipseCoreBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(getStateDefinition().any().setValue(LIT, false));
-	}
-
-	@Override
-	protected MapCodec<EclipseCoreBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -42,7 +35,7 @@ public class EclipseCoreBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected RenderShape getRenderShape(BlockState blockState) {
+	public RenderShape getRenderShape(BlockState blockState) {
 		return RenderShape.MODEL;
 	}
 

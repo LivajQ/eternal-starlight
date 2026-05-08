@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.entity.misc.TearBomb;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
@@ -9,7 +8,6 @@ import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class TearBombBlock extends TntBlock {
-	public static final MapCodec<TearBombBlock> CODEC = simpleCodec(TearBombBlock::new);
 
 	public TearBombBlock(BlockBehaviour.Properties properties) {
 		super(properties);

@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.block.entity.LunarVineBlockEntity;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -17,7 +16,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class LunarVineBlock extends HorizontalDirectionalBlock implements EntityBlock {
-	public static final MapCodec<LunarVineBlock> CODEC = simpleCodec(LunarVineBlock::new);
 	private static final VoxelShape WEST_AABB = Block.box(0.0, 0.0, 0.0, 1.0, 16.0, 16.0);
 	private static final VoxelShape EAST_AABB = Block.box(15.0, 0.0, 0.0, 16.0, 16.0, 16.0);
 	private static final VoxelShape NORTH_AABB = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 1.0);
@@ -26,11 +24,6 @@ public class LunarVineBlock extends HorizontalDirectionalBlock implements Entity
 	public LunarVineBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.NORTH));
-	}
-
-	@Override
-	protected MapCodec<LunarVineBlock> codec() {
-		return CODEC;
 	}
 
 	@Nullable
@@ -45,16 +38,16 @@ public class LunarVineBlock extends HorizontalDirectionalBlock implements Entity
 	}
 
 	@Override
-	protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+	public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
 		return level.getBlockState(pos.relative(state.getValue(FACING))).isFaceSturdy(level, pos.relative(state.getValue(FACING)), state.getValue(FACING).getOpposite());
 	}
 
-	protected BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor level, BlockPos blockPos, BlockPos blockPos2) {
+	public BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor level, BlockPos blockPos, BlockPos blockPos2) {
 		return !blockState.canSurvive(level, blockPos) ? Blocks.AIR.defaultBlockState() : blockState;
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+	public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
 		return switch (blockState.getValue(FACING)) {
 			case NORTH -> NORTH_AABB;
 			case SOUTH -> SOUTH_AABB;
@@ -70,7 +63,7 @@ public class LunarVineBlock extends HorizontalDirectionalBlock implements Entity
 	}
 
 	@Override
-	protected RenderShape getRenderShape(BlockState blockState) {
+	public RenderShape getRenderShape(BlockState blockState) {
 		return RenderShape.ENTITYBLOCK_ANIMATED;
 	}
 

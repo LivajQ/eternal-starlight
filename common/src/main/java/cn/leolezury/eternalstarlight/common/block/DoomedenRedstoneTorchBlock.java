@@ -1,35 +1,29 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseTorchBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.RedstoneTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class DoomedenRedstoneTorchBlock extends BaseTorchBlock {
-	public static final MapCodec<DoomedenRedstoneTorchBlock> CODEC = simpleCodec(DoomedenRedstoneTorchBlock::new);
+public class DoomedenRedstoneTorchBlock extends RedstoneTorchBlock {
+
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
-	public DoomedenRedstoneTorchBlock(BlockBehaviour.Properties properties) {
+	public DoomedenRedstoneTorchBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.stateDefinition.any().setValue(LIT, true));
-	}
-
-	@Override
-	protected MapCodec<? extends DoomedenRedstoneTorchBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -66,10 +60,13 @@ public class DoomedenRedstoneTorchBlock extends BaseTorchBlock {
 	}
 
 	@Override
-	protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
-		level.setBlockAndUpdate(blockPos, blockState.setValue(LIT, !blockState.getValue(LIT)));
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		if (!level.isClientSide) {
+			level.setBlockAndUpdate(pos, state.setValue(LIT, !state.getValue(LIT)));
+		}
 		return InteractionResult.sidedSuccess(level.isClientSide);
 	}
+
 
 	@Override
 	public void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block, BlockPos blockPos2, boolean bl) {

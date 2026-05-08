@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.data.ESConfiguredFeatures;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -22,13 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CaveMossFullBlock extends Block implements BonemealableBlock {
-	public static final MapCodec<CaveMossFullBlock> CODEC = simpleCodec(CaveMossFullBlock::new);
 	public static final BooleanProperty BOTTOM = BooleanProperty.create("bottom");
-
-	@Override
-	public MapCodec<CaveMossFullBlock> codec() {
-		return CODEC;
-	}
 
 	public CaveMossFullBlock(Properties properties) {
 		super(properties);
@@ -61,8 +54,8 @@ public class CaveMossFullBlock extends Block implements BonemealableBlock {
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
-		return levelReader.getBlockState(blockPos.above()).isAir();
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
+		return level.getBlockState(pos.above()).isAir();
 	}
 
 	@Override
@@ -73,11 +66,6 @@ public class CaveMossFullBlock extends Block implements BonemealableBlock {
 	@Override
 	public void performBonemeal(ServerLevel serverLevel, RandomSource randomSource, BlockPos blockPos, BlockState blockState) {
 		serverLevel.registryAccess().registry(Registries.CONFIGURED_FEATURE).flatMap((registry) -> registry.getHolder(ESConfiguredFeatures.CAVE_MOSS_PATCH_BONEMEAL)).ifPresent((reference) -> reference.value().place(serverLevel, serverLevel.getChunkSource().getGenerator(), randomSource, blockPos.above()));
-	}
-
-	@Override
-	public Type getType() {
-		return Type.NEIGHBOR_SPREADER;
 	}
 
 	@Override

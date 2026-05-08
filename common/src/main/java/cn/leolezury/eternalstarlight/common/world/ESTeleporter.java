@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.world;
 
 import cn.leolezury.eternalstarlight.common.block.ESPortalBlock;
-import cn.leolezury.eternalstarlight.common.data.ESDimensions;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -9,11 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.portal.DimensionTransition;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -82,17 +77,5 @@ public class ESTeleporter {
 			}
 		}
 		return Optional.empty();
-	}
-
-	@Nullable
-	public static DimensionTransition getPortalInfo(Entity entity, BlockPos entrancePos, ServerLevel dest) {
-		if (entity.level().dimension() != ESDimensions.STARLIGHT_KEY && dest.dimension() != ESDimensions.STARLIGHT_KEY) {
-			return null;
-		} else {
-			WorldBorder border = dest.getWorldBorder();
-			double coordinateDifference = DimensionType.getTeleportationScale(entity.level().dimensionType(), dest.dimensionType());
-			BlockPos pos = border.clampToBounds(entity.getX() * coordinateDifference, entity.getY(), entity.getZ() * coordinateDifference);
-			return getOrMakePortal(dest, entity, entrancePos, pos).map((result) -> new DimensionTransition(dest, Vec3.atCenterOf(result), Vec3.ZERO, entity.getYRot(), entity.getXRot(), DimensionTransition.PLACE_PORTAL_TICKET)).orElse(null);
-		}
 	}
 }

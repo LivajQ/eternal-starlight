@@ -1,9 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESParticles;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ParticleUtils;
@@ -22,10 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ShadegrieveBlock extends Block {
-	public static final MapCodec<ShadegrieveBlock> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
-		Codec.BOOL.fieldOf("particles").forGetter((block) -> block.particles),
-		propertiesCodec()
-	).apply(instance, ShadegrieveBlock::new));
 	public static final BooleanProperty TOP = BooleanProperty.create("top");
 	private final boolean particles;
 
@@ -33,11 +26,6 @@ public class ShadegrieveBlock extends Block {
 		super(properties);
 		this.particles = particles;
 		this.registerDefaultState(this.stateDefinition.any().setValue(TOP, false));
-	}
-
-	@Override
-	protected MapCodec<ShadegrieveBlock> codec() {
-		return CODEC;
 	}
 
 	@Nullable

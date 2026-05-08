@@ -2,12 +2,12 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -30,17 +30,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class AbyssalKelpBlock extends GrowingPlantHeadBlock implements LiquidBlockContainer, AbyssalKelp {
-	public static final MapCodec<AbyssalKelpBlock> CODEC = simpleCodec(AbyssalKelpBlock::new);
 	protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 9.0, 16.0);
 
 	public AbyssalKelpBlock(Properties properties) {
 		super(properties, Direction.UP, SHAPE, true, 0.14);
 		this.registerDefaultState(this.stateDefinition.any().setValue(AGE, 0).setValue(BERRIES, false));
-	}
-
-	@Override
-	public MapCodec<AbyssalKelpBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -59,13 +53,13 @@ public class AbyssalKelpBlock extends GrowingPlantHeadBlock implements LiquidBlo
 	}
 
 	@Override
-	public ItemStack getCloneItemStack(LevelReader levelReader, BlockPos pos, BlockState state) {
+	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
 		return new ItemStack(ESItems.ABYSSAL_FRUIT.get());
 	}
 
 	@Override
-	protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
-		return AbyssalKelp.use(blockState, level, blockPos);
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		return AbyssalKelp.use(state, level, pos);
 	}
 
 	@Override
@@ -75,8 +69,8 @@ public class AbyssalKelpBlock extends GrowingPlantHeadBlock implements LiquidBlo
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
-		return !blockState.getValue(BERRIES);
+	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos pos, BlockState state, boolean isClientSide) {
+		return !state.getValue(BERRIES);
 	}
 
 	@Override
@@ -100,7 +94,7 @@ public class AbyssalKelpBlock extends GrowingPlantHeadBlock implements LiquidBlo
 	}
 
 	@Override
-	public boolean canPlaceLiquid(@Nullable Player player, BlockGetter blockGetter, BlockPos blockPos, BlockState blockState, Fluid fluid) {
+	public boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
 		return false;
 	}
 

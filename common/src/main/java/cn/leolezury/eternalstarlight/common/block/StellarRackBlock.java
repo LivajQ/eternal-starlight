@@ -2,11 +2,11 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.block.entity.StellarRackBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +25,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class StellarRackBlock extends BaseEntityBlock {
-	public static final MapCodec<StellarRackBlock> CODEC = simpleCodec(StellarRackBlock::new);
 	protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 12.0, 16.0);
 
 	public StellarRackBlock(Properties properties) {
@@ -33,48 +32,58 @@ public class StellarRackBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected MapCodec<StellarRackBlock> codec() {
-		return CODEC;
-	}
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 
-	@Override
-	protected ItemInteractionResult useItemOn(ItemStack itemStack, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
-		if (level.getBlockEntity(blockPos) instanceof StellarRackBlockEntity entity) {
-			ItemStack stack = player.getItemInHand(interactionHand);
+		ItemStack stack = player.getItemInHand(hand);
+
+		if (level.getBlockEntity(pos) instanceof StellarRackBlockEntity entity) {
+
 			if (entity.anyEmpty() && !stack.isEmpty()) {
+
 				if (!level.isClientSide && entity.placeItem(stack.copyWithCount(1))) {
-					stack.consume(1, player);
-					return ItemInteractionResult.SUCCESS;
+					stack.shrink(1);
+					return InteractionResult.sidedSuccess(level.isClientSide);
 				}
-				return ItemInteractionResult.CONSUME;
+
+				return InteractionResult.CONSUME;
 			}
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+
+		return InteractionResult.PASS;
 	}
 
 	@Override
-	protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-		Containers.dropContentsOnDestroy(state, newState, level, pos);
+	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+
+		if (!state.is(newState.getBlock())) {
+			BlockEntity be = level.getBlockEntity(pos);
+
+			if (be instanceof Container container) {
+				Containers.dropContents(level, pos, container);
+				level.updateNeighbourForOutputSignal(pos, this);
+			}
+		}
+
 		super.onRemove(state, level, pos, newState, isMoving);
 	}
 
 	@Override
-	protected boolean hasAnalogOutputSignal(BlockState state) {
+	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 
 	@Override
-	protected int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
+	public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
 		return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(level.getBlockEntity(pos));
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+	public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
 		return SHAPE;
 	}
 
 	@Override
-	protected RenderShape getRenderShape(BlockState blockState) {
+	public RenderShape getRenderShape(BlockState blockState) {
 		return RenderShape.MODEL;
 	}
 

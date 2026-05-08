@@ -1,12 +1,10 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
@@ -22,16 +20,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class HangingAlgaleavesBlock extends GrowingPlantHeadBlock implements LiquidBlockContainer {
-	public static final MapCodec<HangingAlgaleavesBlock> CODEC = simpleCodec(HangingAlgaleavesBlock::new);
 	public static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 16.0D, 15.0D);
 
 	public HangingAlgaleavesBlock(Properties properties) {
 		super(properties, Direction.DOWN, SHAPE, false, 0.02);
-	}
-
-	@Override
-	protected MapCodec<HangingAlgaleavesBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -50,7 +42,7 @@ public class HangingAlgaleavesBlock extends GrowingPlantHeadBlock implements Liq
 	}
 
 	@Override
-	public boolean canPlaceLiquid(@Nullable Player player, BlockGetter blockGetter, BlockPos blockPos, BlockState blockState, Fluid fluid) {
+	public boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
 		return false;
 	}
 

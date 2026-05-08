@@ -1,10 +1,7 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
@@ -17,10 +14,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 public class VelvetumossVilliBlock extends DirectionalBudBlock implements BonemealableBlock {
-	public static final MapCodec<VelvetumossVilliBlock> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
-		BuiltInRegistries.BLOCK.holderByNameCodec().fieldOf("full_block").forGetter((block) -> block.fullBlock),
-		propertiesCodec()
-	).apply(instance, VelvetumossVilliBlock::new));
 	public static final IntegerProperty AGE = BlockStateProperties.AGE_25;
 
 	private final Holder<Block> fullBlock;
@@ -32,12 +25,7 @@ public class VelvetumossVilliBlock extends DirectionalBudBlock implements Boneme
 	}
 
 	@Override
-	protected MapCodec<VelvetumossVilliBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
-	protected void randomTick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
+	public void randomTick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
 		if (blockState.getValue(AGE) == 25) {
 			serverLevel.setBlockAndUpdate(blockPos, fullBlock.value().defaultBlockState());
 		} else if (randomSource.nextInt(5) == 0) {
@@ -52,7 +40,7 @@ public class VelvetumossVilliBlock extends DirectionalBudBlock implements Boneme
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
 		return true;
 	}
 

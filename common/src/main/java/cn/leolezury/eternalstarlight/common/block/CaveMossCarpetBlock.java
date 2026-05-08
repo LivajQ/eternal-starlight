@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -18,13 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CaveMossCarpetBlock extends CarpetBlock {
-	public static final MapCodec<CaveMossCarpetBlock> CODEC = simpleCodec(CaveMossCarpetBlock::new);
 	public static final BooleanProperty BOTTOM = BooleanProperty.create("bottom");
-
-	@Override
-	public MapCodec<CaveMossCarpetBlock> codec() {
-		return CODEC;
-	}
 
 	public CaveMossCarpetBlock(Properties properties) {
 		super(properties);

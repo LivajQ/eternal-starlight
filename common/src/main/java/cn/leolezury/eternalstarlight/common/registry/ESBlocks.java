@@ -520,7 +520,7 @@ public class ESBlocks {
 	public static final RegistryObject<Block, WallBlock> NIGHTFALL_MUD_BRICK_WALL = BLOCKS.register("nightfall_mud_brick_wall", () -> new WallBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.MUD_BRICK_WALL)));
 
 	// sand
-	public static final RegistryObject<Block, ColoredFallingBlock> TWILIGHT_SAND = BLOCKS.register("twilight_sand", () -> new ColoredFallingBlock(new ColorRGBA(0x907e9b), BlockBehaviour.Properties.ofFullCopy(Blocks.SAND).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, FallingBlock> TWILIGHT_SAND = BLOCKS.register("twilight_sand", () -> new ColoredFallingBlock(new ColorRGBA(0x907e9b), BlockBehaviour.Properties.ofFullCopy(Blocks.SAND).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, Block> TWILIGHT_SANDSTONE = BLOCKS.register("twilight_sandstone", () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.SANDSTONE).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, SlabBlock> TWILIGHT_SANDSTONE_SLAB = BLOCKS.register("twilight_sandstone_slab", () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.SANDSTONE_SLAB).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, StairBlock> TWILIGHT_SANDSTONE_STAIRS = BLOCKS.register("twilight_sandstone_stairs", () -> new StairBlock(TWILIGHT_SANDSTONE.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.SANDSTONE_STAIRS).mapColor(MapColor.COLOR_PURPLE)));
@@ -532,7 +532,7 @@ public class ESBlocks {
 	public static final RegistryObject<Block, Block> CHISELED_TWILIGHT_SANDSTONE = BLOCKS.register("chiseled_twilight_sandstone", () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.CHISELED_SANDSTONE).mapColor(MapColor.COLOR_PURPLE)));
 
 	// gravel
-	public static final RegistryObject<Block, ColoredFallingBlock> DUSTED_GRAVEL = BLOCKS.register("dusted_gravel", () -> new ColoredFallingBlock(new ColorRGBA(0x53415e), BlockBehaviour.Properties.ofFullCopy(Blocks.GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, FallingBlock> DUSTED_GRAVEL = BLOCKS.register("dusted_gravel", () -> new ColoredFallingBlock(new ColorRGBA(0x53415e), BlockBehaviour.Properties.ofFullCopy(Blocks.GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, Block> DUSTED_BRICKS = BLOCKS.register("dusted_bricks", () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.SMOOTH_SANDSTONE).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, SlabBlock> DUSTED_BRICK_SLAB = BLOCKS.register("dusted_brick_slab", () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.SANDSTONE_SLAB).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, StairBlock> DUSTED_BRICK_STAIRS = BLOCKS.register("dusted_brick_stairs", () -> new StairBlock(DUSTED_BRICKS.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.SANDSTONE_STAIRS).mapColor(MapColor.COLOR_PURPLE)));
@@ -542,7 +542,7 @@ public class ESBlocks {
 	public static final RegistryObject<Block, ESBrushableBlock> SUSPICIOUS_DUSTED_GRAVEL = BLOCKS.register("suspicious_dusted_gravel", () -> new ESBrushableBlock(DUSTED_GRAVEL.get(), SoundEvents.BRUSH_GRAVEL, SoundEvents.BRUSH_GRAVEL_COMPLETED, BlockBehaviour.Properties.ofFullCopy(Blocks.SUSPICIOUS_GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
 
 	// slag
-	public static final RegistryObject<Block, ColoredFallingBlock> DIMSLAG = BLOCKS.register("dimslag", () -> new ColoredFallingBlock(new ColorRGBA(0x514c5d), BlockBehaviour.Properties.ofFullCopy(Blocks.GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, FallingBlock> DIMSLAG = BLOCKS.register("dimslag", () -> new ColoredFallingBlock(new ColorRGBA(0x514c5d), BlockBehaviour.Properties.ofFullCopy(Blocks.GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, ESBrushableBlock> SUSPICIOUS_DIMSLAG = BLOCKS.register("suspicious_dimslag", () -> new ESBrushableBlock(DIMSLAG.get(), SoundEvents.BRUSH_GRAVEL, SoundEvents.BRUSH_GRAVEL_COMPLETED, BlockBehaviour.Properties.ofFullCopy(Blocks.SUSPICIOUS_GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
 
 	// common plant

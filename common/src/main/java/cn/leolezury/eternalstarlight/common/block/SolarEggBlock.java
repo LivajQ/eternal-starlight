@@ -2,7 +2,6 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.block.entity.SolarEggBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SolarEggBlock extends BaseEntityBlock {
-	public static final MapCodec<SolarEggBlock> CODEC = simpleCodec(SolarEggBlock::new);
 	public static final IntegerProperty X_OFFSET = IntegerProperty.create("x_offset", 0, 2);
 	public static final IntegerProperty Y_OFFSET = IntegerProperty.create("y_offset", 0, 2);
 	public static final IntegerProperty Z_OFFSET = IntegerProperty.create("z_offset", 0, 2);
@@ -50,11 +48,6 @@ public class SolarEggBlock extends BaseEntityBlock {
 	public SolarEggBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.defaultBlockState().setValue(X_OFFSET, 1).setValue(Y_OFFSET, 0).setValue(Z_OFFSET, 1));
-	}
-
-	@Override
-	protected MapCodec<SolarEggBlock> codec() {
-		return CODEC;
 	}
 
 	@Nullable
@@ -131,7 +124,7 @@ public class SolarEggBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return SHAPES.getOrDefault(Triple.of(state.getValue(X_OFFSET), state.getValue(Y_OFFSET), state.getValue(Z_OFFSET)), Shapes.block());
 	}
 
@@ -141,7 +134,7 @@ public class SolarEggBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected RenderShape getRenderShape(BlockState state) {
+	public RenderShape getRenderShape(BlockState state) {
 		return state.getValue(X_OFFSET) == 1 && state.getValue(Y_OFFSET) == 0 && state.getValue(Z_OFFSET) == 1 ? RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.INVISIBLE;
 	}
 

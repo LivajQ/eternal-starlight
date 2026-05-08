@@ -1,13 +1,11 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -27,18 +25,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class OrbfloraBlock extends GrowingPlantHeadBlock implements LiquidBlockContainer {
-	public static final MapCodec<OrbfloraBlock> CODEC = simpleCodec(OrbfloraBlock::new);
 	public static final VoxelShape SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 7.0D, 13.0D);
 	public static final IntegerProperty ORBFLORA_AGE = IntegerProperty.create("orbflora_age", 0, 2);
 
 	public OrbfloraBlock(Properties properties) {
 		super(properties, Direction.UP, SHAPE, false, 0.02);
 		this.registerDefaultState(this.stateDefinition.any().setValue(ORBFLORA_AGE, 0));
-	}
-
-	@Override
-	protected MapCodec<OrbfloraBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -71,8 +63,9 @@ public class OrbfloraBlock extends GrowingPlantHeadBlock implements LiquidBlockC
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
-		return super.isValidBonemealTarget(levelReader, blockPos, blockState) || levelReader.getBlockState(blockPos.above()).isAir();
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
+		return super.isValidBonemealTarget(level, pos, state, isClientSide)
+			|| level.getBlockState(pos.above()).isAir();
 	}
 
 	@Override
@@ -100,7 +93,7 @@ public class OrbfloraBlock extends GrowingPlantHeadBlock implements LiquidBlockC
 	}
 
 	@Override
-	public boolean canPlaceLiquid(@Nullable Player player, BlockGetter blockGetter, BlockPos blockPos, BlockState blockState, Fluid fluid) {
+	public boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
 		return false;
 	}
 

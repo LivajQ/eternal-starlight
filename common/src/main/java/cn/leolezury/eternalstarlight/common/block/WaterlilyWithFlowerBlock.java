@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -15,7 +14,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 public class WaterlilyWithFlowerBlock extends WaterlilyBlock implements BonemealableBlock {
-	public static final MapCodec<WaterlilyWithFlowerBlock> CODEC = simpleCodec(WaterlilyWithFlowerBlock::new);
 
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
@@ -25,7 +23,7 @@ public class WaterlilyWithFlowerBlock extends WaterlilyBlock implements Bonemeal
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
 		return !state.getValue(LIT);
 	}
 

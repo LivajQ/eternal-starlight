@@ -288,7 +288,7 @@ public class StarfireBirdNestBlockEntity extends SimpleContainerBlockEntity {
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
+	public void saveAdditional(CompoundTag tag) {
 		super.saveAdditional(tag);
 
 		ListTag list = new ListTag();

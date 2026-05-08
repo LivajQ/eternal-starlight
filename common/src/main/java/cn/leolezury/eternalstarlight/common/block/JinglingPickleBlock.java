@@ -3,7 +3,6 @@ package cn.leolezury.eternalstarlight.common.block;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.util.ESMathUtil;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -24,17 +23,11 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class JinglingPickleBlock extends BushBlock implements BonemealableBlock, SimpleWaterloggedBlock {
-	public static final MapCodec<JinglingPickleBlock> CODEC = simpleCodec(JinglingPickleBlock::new);
 	private static final VoxelShape SHAPE = Block.box(6.0, 0.0, 6.0, 10.0, 12.0, 10.0);
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-
-	public @NotNull MapCodec<JinglingPickleBlock> codec() {
-		return CODEC;
-	}
 
 	public JinglingPickleBlock(BlockBehaviour.Properties properties) {
 		super(properties);
@@ -94,7 +87,7 @@ public class JinglingPickleBlock extends BushBlock implements BonemealableBlock,
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
 		return true;
 	}
 
@@ -122,7 +115,7 @@ public class JinglingPickleBlock extends BushBlock implements BonemealableBlock,
 	}
 
 	@Override
-	protected boolean isPathfindable(BlockState blockState, PathComputationType pathComputationType) {
+	public boolean isPathfindable(BlockState state, BlockGetter level, BlockPos pos, PathComputationType type) {
 		return false;
 	}
 }

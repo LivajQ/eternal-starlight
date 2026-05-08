@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
@@ -13,17 +12,11 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 public class SnowyLeavesBlock extends LeavesBlock {
-	public static final MapCodec<SnowyLeavesBlock> CODEC = simpleCodec(SnowyLeavesBlock::new);
 	public static final BooleanProperty SNOWY = BlockStateProperties.SNOWY;
 
 	public SnowyLeavesBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.defaultBlockState().setValue(SNOWY, false));
-	}
-
-	@Override
-	public MapCodec<SnowyLeavesBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

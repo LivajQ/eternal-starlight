@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
@@ -17,10 +16,7 @@ public abstract class HorizontalAxisBlock extends Block {
 	}
 
 	@Override
-	protected abstract MapCodec<? extends HorizontalAxisBlock> codec();
-
-	@Override
-	protected BlockState rotate(BlockState blockState, Rotation rotation) {
+	public BlockState rotate(BlockState blockState, Rotation rotation) {
 		switch (rotation) {
 			case COUNTERCLOCKWISE_90:
 			case CLOCKWISE_90:

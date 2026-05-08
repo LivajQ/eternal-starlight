@@ -10,9 +10,4 @@ public enum ESSkullType implements SkullBlock.Type {
 	ESSkullType(String name) {
 		this.name = name;
 	}
-
-	@Override
-	public String getSerializedName() {
-		return name;
-	}
 }

@@ -2,12 +2,12 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.block.entity.CrystalbornCatalystBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -28,33 +28,28 @@ public class CrystalbornCatalystBlock extends BaseEntityBlock {
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
-	public static final MapCodec<CrystalbornCatalystBlock> CODEC = simpleCodec(CrystalbornCatalystBlock::new);
-
 	public CrystalbornCatalystBlock(Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(LIT, false));
 	}
 
 	@Override
-	protected MapCodec<CrystalbornCatalystBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
-	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (level.isClientSide) {
 			return InteractionResult.SUCCESS;
-		} else {
-			BlockEntity blockEntity = level.getBlockEntity(pos);
-			if (blockEntity instanceof CrystalbornCatalystBlockEntity entity) {
-				player.openMenu(entity);
-			}
-			return InteractionResult.CONSUME;
 		}
+
+		BlockEntity blockEntity = level.getBlockEntity(pos);
+		if (blockEntity instanceof CrystalbornCatalystBlockEntity entity) {
+			player.openMenu(entity);
+		}
+
+		return InteractionResult.CONSUME;
 	}
 
+
 	@Override
-	protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (!state.is(newState.getBlock())) {
 			BlockEntity blockentity = level.getBlockEntity(pos);
 			if (blockentity instanceof CrystalbornCatalystBlockEntity entity) {
@@ -75,7 +70,7 @@ public class CrystalbornCatalystBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
 		if (!level.isClientSide) {
 			boolean lit = state.getValue(LIT);
 			if (lit != level.hasNeighborSignal(pos)) {
@@ -89,19 +84,19 @@ public class CrystalbornCatalystBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected void tick(BlockState state, ServerLevel serverLevel, BlockPos pos, RandomSource random) {
+	public void tick(BlockState state, ServerLevel serverLevel, BlockPos pos, RandomSource random) {
 		if (state.getValue(LIT) && !serverLevel.hasNeighborSignal(pos)) {
 			serverLevel.setBlock(pos, state.cycle(LIT), Block.UPDATE_CLIENTS);
 		}
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, Rotation rotation) {
+	public BlockState rotate(BlockState state, Rotation rotation) {
 		return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, Mirror mirror) {
+	public BlockState mirror(BlockState state, Mirror mirror) {
 		return state.rotate(mirror.getRotation(state.getValue(FACING)));
 	}
 

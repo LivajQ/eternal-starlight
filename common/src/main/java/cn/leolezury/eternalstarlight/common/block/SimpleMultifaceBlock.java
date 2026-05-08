@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -21,14 +20,8 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
 public class SimpleMultifaceBlock extends MultifaceBlock implements BonemealableBlock, SimpleWaterloggedBlock {
-	public static final MapCodec<SimpleMultifaceBlock> CODEC = simpleCodec(SimpleMultifaceBlock::new);
 	private static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	private final MultifaceSpreader spreader = new MultifaceSpreader(this);
-
-	@Override
-	protected MapCodec<? extends SimpleMultifaceBlock> codec() {
-		return CODEC;
-	}
 
 	public SimpleMultifaceBlock(BlockBehaviour.Properties properties) {
 		super(properties);
@@ -50,13 +43,15 @@ public class SimpleMultifaceBlock extends MultifaceBlock implements Bonemealable
 	}
 
 	@Override
-	protected boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
+	public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
 		return !(context.getItemInHand().getItem() instanceof BlockItem item && item.getBlock() == this) || super.canBeReplaced(state, context);
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
-		return Direction.stream().anyMatch((direction) -> this.spreader.canSpreadInAnyDirection(state, level, pos, direction.getOpposite()));
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
+		return Direction.stream().anyMatch(direction ->
+			this.spreader.canSpreadInAnyDirection(state, level, pos, direction.getOpposite())
+		);
 	}
 
 	@Override

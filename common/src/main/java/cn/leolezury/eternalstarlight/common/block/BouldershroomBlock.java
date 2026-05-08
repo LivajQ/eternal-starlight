@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -17,7 +16,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BouldershroomBlock extends DirectionalBudBlock implements BonemealableBlock {
-	public static final MapCodec<BouldershroomBlock> CODEC = simpleCodec(BouldershroomBlock::new);
 
 	public BouldershroomBlock(Properties properties) {
 		super(properties);
@@ -31,11 +29,6 @@ public class BouldershroomBlock extends DirectionalBudBlock implements Bonemeala
 	@Override
 	protected double getShapeHeight() {
 		return 6;
-	}
-
-	@Override
-	protected MapCodec<BouldershroomBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -192,7 +185,7 @@ public class BouldershroomBlock extends DirectionalBudBlock implements Bonemeala
 	}
 
 	@Override
-	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+	public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, boolean isClientSide) {
 		return true;
 	}
 

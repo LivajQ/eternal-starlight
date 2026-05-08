@@ -6,11 +6,11 @@ import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import cn.leolezury.eternalstarlight.common.util.ESBlockUtil;
 import com.mojang.math.OctahedralGroup;
 import com.mojang.math.SymmetricGroup3;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -32,8 +32,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class EnergyTransmitterBlock extends BaseEntityBlock {
-	public static final MapCodec<EnergyTransmitterBlock> CODEC = simpleCodec(EnergyTransmitterBlock::new);
-
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 	public static final EnumProperty<OctahedralGroup> OFFSET_TRANSFORMATION = EnumProperty.create("offset_transformation", OctahedralGroup.class, group -> !group.inverts(Direction.Axis.Y) && (group.permutation == SymmetricGroup3.P123 || group.permutation == SymmetricGroup3.P321));
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
@@ -55,31 +53,35 @@ public class EnergyTransmitterBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected MapCodec<? extends EnergyTransmitterBlock> codec() {
-		return CODEC;
-	}
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 
-	@Override
-	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-		if (level.isClientSide) {
-			return InteractionResult.SUCCESS;
-		} else if (level.getBlockEntity(pos) instanceof EnergyTransmitterBlockEntity entity) {
-			GlobalPos sourcePos = ESDataAttachments.ENERGY_TRANSMITTER_SOURCE.getData(player);
-			if (sourcePos != null
-				&& sourcePos.dimension() == level.dimension()
-				&& sourcePos.pos().distManhattan(pos) <= MAX_CONNECTION_DISTANCE
-				&& level.getBlockEntity(sourcePos.pos()) instanceof EnergyTransmitterBlockEntity sourceEntity) {
-				entity.setInputOffset(sourcePos.pos().subtract(pos));
-				entity.setOutputOffset(Vec3i.ZERO);
-				sourceEntity.setOutputOffset(pos.subtract(sourcePos.pos()));
-				sourceEntity.setInputOffset(Vec3i.ZERO);
-				ESDataAttachments.ENERGY_TRANSMITTER_SOURCE.removeData(player);
-			} else {
-				ESDataAttachments.ENERGY_TRANSMITTER_SOURCE.setData(player, GlobalPos.of(level.dimension(), pos));
+		if (level.getBlockEntity(pos) instanceof EnergyTransmitterBlockEntity entity) {
+
+			if (!level.isClientSide) {
+				GlobalPos sourcePos = ESDataAttachments.ENERGY_TRANSMITTER_SOURCE.getData(player);
+
+				if (sourcePos != null
+					&& sourcePos.dimension() == level.dimension()
+					&& sourcePos.pos().distManhattan(pos) <= MAX_CONNECTION_DISTANCE
+					&& level.getBlockEntity(sourcePos.pos()) instanceof EnergyTransmitterBlockEntity sourceEntity) {
+
+					entity.setInputOffset(sourcePos.pos().subtract(pos));
+					entity.setOutputOffset(Vec3i.ZERO);
+
+					sourceEntity.setOutputOffset(pos.subtract(sourcePos.pos()));
+					sourceEntity.setInputOffset(Vec3i.ZERO);
+
+					ESDataAttachments.ENERGY_TRANSMITTER_SOURCE.removeData(player);
+
+				} else {
+					ESDataAttachments.ENERGY_TRANSMITTER_SOURCE.setData(player, GlobalPos.of(level.dimension(), pos));
+				}
 			}
+
 			return InteractionResult.CONSUME;
 		}
-		return super.useWithoutItem(state, level, pos, player, hitResult);
+
+		return InteractionResult.PASS;
 	}
 
 	@Override
@@ -102,7 +104,7 @@ public class EnergyTransmitterBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
 		if (!level.isClientSide) {
 			int signal = level.getSignal(pos.relative(state.getValue(FACING).getOpposite()), state.getValue(FACING).getOpposite());
 			if (state.getValue(DIRECT_POWER) != signal) {
@@ -112,7 +114,7 @@ public class EnergyTransmitterBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+	public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
 		if (!level.isClientSide) {
 			int signal = level.getSignal(pos.relative(state.getValue(FACING).getOpposite()), state.getValue(FACING).getOpposite());
 			if (state.getValue(DIRECT_POWER) != signal) {
@@ -122,12 +124,12 @@ public class EnergyTransmitterBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected boolean isSignalSource(BlockState state) {
+	public boolean isSignalSource(BlockState state) {
 		return state.getValue(POWER) > 0;
 	}
 
 	@Override
-	protected int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
+	public int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
 		return side == blockState.getValue(FACING) ? blockState.getValue(POWER) : 0;
 	}
 
@@ -137,7 +139,7 @@ public class EnergyTransmitterBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return switch (state.getValue(FACING)) {
 			case DOWN -> DOWN_SHAPE;
 			case UP -> UP_SHAPE;
@@ -149,12 +151,12 @@ public class EnergyTransmitterBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, Rotation rotation) {
+	public BlockState rotate(BlockState state, Rotation rotation) {
 		return state.setValue(FACING, rotation.rotate(state.getValue(FACING))).setValue(OFFSET_TRANSFORMATION, rotation.rotation().compose(state.getValue(OFFSET_TRANSFORMATION)));
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, Mirror mirror) {
+	public BlockState mirror(BlockState state, Mirror mirror) {
 		return state.setValue(FACING, mirror.getRotation(state.getValue(FACING)).rotate(state.getValue(FACING))).setValue(OFFSET_TRANSFORMATION, mirror.rotation().compose(state.getValue(OFFSET_TRANSFORMATION)));
 	}
 

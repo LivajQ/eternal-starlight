@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.block;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
@@ -15,27 +14,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 
 public class StarcoreBlock extends Block {
-	public static final MapCodec<StarcoreBlock> CODEC = simpleCodec(StarcoreBlock::new);
 	private static final Direction[] ALL_DIRECTIONS = Direction.values();
-
-	@Override
-	public MapCodec<StarcoreBlock> codec() {
-		return CODEC;
-	}
 
 	public StarcoreBlock(BlockBehaviour.Properties properties) {
 		super(properties);
 	}
 
 	@Override
-	protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+	public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
 		if (!oldState.is(state.getBlock())) {
 			this.tryAbsorbLava(level, pos);
 		}
 	}
 
 	@Override
-	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
 		this.tryAbsorbLava(level, pos);
 		super.neighborChanged(state, level, pos, block, fromPos, isMoving);
 	}
@@ -67,7 +60,7 @@ public class StarcoreBlock extends Block {
 					} else {
 						Block block = blockState.getBlock();
 						if (block instanceof BucketPickup bucketPickup) {
-							if (!bucketPickup.pickupBlock(null, level, foundPos, blockState).isEmpty()) {
+							if (!bucketPickup.pickupBlock(level, foundPos, blockState).isEmpty()) {
 								return true;
 							}
 						}

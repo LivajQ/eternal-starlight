@@ -14,7 +14,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.ParticleUtils;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.UniformInt;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -57,36 +58,63 @@ public interface WeatheringGolemSteel {
 		.put(ESBlocks.ALLOY_FURNACE.get(), ESBlocks.WAXED_ALLOY_FURNACE.get())
 		.build());
 
-	default ItemInteractionResult use(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player) {
-		Optional<Block> scraped = TO_OXIDIZED.get().entrySet().stream().filter(e -> e.getValue() == state.getBlock()).findFirst().map(Map.Entry::getKey);
-		Optional<Block> unwaxed = TO_WAXED.get().entrySet().stream().filter(e -> e.getValue() == state.getBlock()).findFirst().map(Map.Entry::getKey);
+	default InteractionResult use(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player) {
+
+		Optional<Block> scraped = TO_OXIDIZED.get().entrySet().stream()
+			.filter(e -> e.getValue() == state.getBlock())
+			.map(Map.Entry::getKey)
+			.findFirst();
+
+		Optional<Block> unwaxed = TO_WAXED.get().entrySet().stream()
+			.filter(e -> e.getValue() == state.getBlock())
+			.map(Map.Entry::getKey)
+			.findFirst();
+
 		if (ESPlatform.INSTANCE.canScrape(stack)) {
 			Block result = null;
 			boolean waxSound = false;
+
 			if (scraped.isPresent()) {
 				result = scraped.get();
 			} else if (unwaxed.isPresent()) {
 				result = unwaxed.get();
 				waxSound = true;
 			}
+
 			if (result != null) {
 				placeTransformedBlock(level, pos, result.withPropertiesOf(state));
 				spawnWaxOrScrapeParticles(level, pos, ParticleTypes.WAX_OFF);
 				player.playSound(waxSound ? SoundEvents.AXE_WAX_OFF : SoundEvents.AXE_SCRAPE);
-				stack.hurtAndBreak(1, player, player.getEquipmentSlotForItem(stack));
-				return ItemInteractionResult.sidedSuccess(level.isClientSide);
+
+				stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+
+				return InteractionResult.sidedSuccess(level.isClientSide);
 			}
 		}
+
 		Optional<BlockState> waxed = getWaxedState(state);
-		if ((stack.is(Items.HONEYCOMB) || stack.is(ESItems.RAW_AMARAMBER.get())) && waxed.isPresent()) {
+
+		if ((stack.is(Items.HONEYCOMB) || stack.is(ESItems.RAW_AMARAMBER.get()))
+			&& waxed.isPresent()) {
+
 			placeTransformedBlock(level, pos, waxed.get());
-			spawnWaxOrScrapeParticles(level, pos, stack.is(Items.HONEYCOMB) ? ParticleTypes.WAX_ON : ESParticles.AMARAMBER_WAX_ON.get());
+			spawnWaxOrScrapeParticles(
+				level,
+				pos,
+				stack.is(Items.HONEYCOMB)
+					? ParticleTypes.WAX_ON
+					: ESParticles.AMARAMBER_WAX_ON.get()
+			);
 			player.playSound(SoundEvents.HONEYCOMB_WAX_ON);
-			stack.consume(1, player);
-			return ItemInteractionResult.sidedSuccess(level.isClientSide);
+
+			stack.shrink(1);
+
+			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+
+		return InteractionResult.PASS;
 	}
+
 
 	default void spawnWaxOrScrapeParticles(Level level, BlockPos pos, ParticleOptions particle) {
 		ParticleUtils.spawnParticlesOnBlockFaces(level, pos, particle, UniformInt.of(3, 5));

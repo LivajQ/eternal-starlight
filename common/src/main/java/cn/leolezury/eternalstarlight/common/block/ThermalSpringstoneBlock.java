@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -13,15 +12,9 @@ import net.minecraft.world.level.block.BubbleColumnBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ThermalSpringstoneBlock extends Block {
-	public static final MapCodec<ThermalSpringstoneBlock> CODEC = simpleCodec(ThermalSpringstoneBlock::new);
 
 	public ThermalSpringstoneBlock(Properties properties) {
 		super(properties);
-	}
-
-	@Override
-	protected MapCodec<ThermalSpringstoneBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

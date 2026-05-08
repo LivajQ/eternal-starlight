@@ -3,9 +3,9 @@ package cn.leolezury.eternalstarlight.common.block;
 import cn.leolezury.eternalstarlight.common.block.entity.AbstractDuskLightBlockEntity;
 import cn.leolezury.eternalstarlight.common.block.entity.DuskEmitterBlockEntity;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 public class DuskEmitterBlock extends BaseEntityBlock {
-	public static final MapCodec<DuskEmitterBlock> CODEC = simpleCodec(DuskEmitterBlock::new);
 	public static final BooleanProperty NORTH = PipeBlock.NORTH;
 	public static final BooleanProperty EAST = PipeBlock.EAST;
 	public static final BooleanProperty SOUTH = PipeBlock.SOUTH;
@@ -37,24 +36,20 @@ public class DuskEmitterBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected MapCodec<DuskEmitterBlock> codec() {
-		return CODEC;
-	}
-
-	@Override
-	protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
-		if (level.getBlockEntity(blockPos) instanceof DuskEmitterBlockEntity entity && entity.isLit()) {
+	public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+		if (level.getBlockEntity(pos) instanceof DuskEmitterBlockEntity entity && entity.isLit()) {
 			if (!level.isClientSide) {
-				BooleanProperty property = PROPERTY_BY_DIRECTION.get(blockHitResult.getDirection());
-				level.setBlockAndUpdate(blockPos, blockState.setValue(property, !blockState.getValue(property)));
+				BooleanProperty property = PROPERTY_BY_DIRECTION.get(hit.getDirection());
+				level.setBlockAndUpdate(pos, state.setValue(property, !state.getValue(property)));
 			}
 			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
+
 		return InteractionResult.PASS;
 	}
 
 	@Override
-	protected BlockState rotate(BlockState state, Rotation rot) {
+	public BlockState rotate(BlockState state, Rotation rot) {
 		return state.setValue(PROPERTY_BY_DIRECTION.get(rot.rotate(Direction.NORTH)), state.getValue(NORTH))
 			.setValue(PROPERTY_BY_DIRECTION.get(rot.rotate(Direction.SOUTH)), state.getValue(SOUTH))
 			.setValue(PROPERTY_BY_DIRECTION.get(rot.rotate(Direction.EAST)), state.getValue(EAST))
@@ -64,7 +59,7 @@ public class DuskEmitterBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected BlockState mirror(BlockState state, Mirror mirror) {
+	public BlockState mirror(BlockState state, Mirror mirror) {
 		return state.setValue(PROPERTY_BY_DIRECTION.get(mirror.mirror(Direction.NORTH)), state.getValue(NORTH))
 			.setValue(PROPERTY_BY_DIRECTION.get(mirror.mirror(Direction.SOUTH)), state.getValue(SOUTH))
 			.setValue(PROPERTY_BY_DIRECTION.get(mirror.mirror(Direction.EAST)), state.getValue(EAST))
@@ -84,7 +79,7 @@ public class DuskEmitterBlock extends BaseEntityBlock {
 	}
 
 	@Override
-	protected RenderShape getRenderShape(BlockState blockState) {
+	public RenderShape getRenderShape(BlockState blockState) {
 		return RenderShape.MODEL;
 	}
 

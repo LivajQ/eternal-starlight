@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -21,18 +20,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class DoomedenRedstoneWallTorchBlock extends DoomedenRedstoneTorchBlock {
-	public static final MapCodec<DoomedenRedstoneWallTorchBlock> CODEC = simpleCodec(DoomedenRedstoneWallTorchBlock::new);
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	public static final BooleanProperty LIT = RedstoneTorchBlock.LIT;
 
 	public DoomedenRedstoneWallTorchBlock(BlockBehaviour.Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(LIT, true));
-	}
-
-	@Override
-	protected MapCodec<DoomedenRedstoneWallTorchBlock> codec() {
-		return CODEC;
 	}
 
 	@Override
@@ -46,8 +39,8 @@ public class DoomedenRedstoneWallTorchBlock extends DoomedenRedstoneTorchBlock {
 	}
 
 	@Override
-	public boolean canSurvive(BlockState blockState, LevelReader levelReader, BlockPos blockPos) {
-		return WallTorchBlock.canSurvive(levelReader, blockPos, blockState.getValue(FACING));
+	public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+		return super.canSurvive(state, level, pos);
 	}
 
 	@Override
