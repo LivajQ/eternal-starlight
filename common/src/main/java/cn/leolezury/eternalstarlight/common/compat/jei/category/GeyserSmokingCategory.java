@@ -3,7 +3,6 @@ package cn.leolezury.eternalstarlight.common.compat.jei.category;
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.item.recipe.GeyserSmokingRecipe;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import cn.leolezury.eternalstarlight.common.registry.ESRecipes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -13,10 +12,11 @@ import mezz.jei.api.recipe.category.AbstractRecipeCategory;
 import mezz.jei.library.util.RecipeUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
-public class GeyserSmokingCategory extends AbstractRecipeCategory<RecipeHolder<GeyserSmokingRecipe>> {
-	public static final RecipeType<RecipeHolder<GeyserSmokingRecipe>> GEYSER_SMOKING = RecipeType.createFromVanilla(ESRecipes.GEYSER_SMOKING.get());
+public class GeyserSmokingCategory extends AbstractRecipeCategory<GeyserSmokingRecipe> {
+
+	public static final RecipeType<GeyserSmokingRecipe> GEYSER_SMOKING =
+		RecipeType.create(EternalStarlight.ID, "geyser_smoking", GeyserSmokingRecipe.class);
 
 	public GeyserSmokingCategory(IGuiHelper guiHelper) {
 		super(
@@ -29,8 +29,7 @@ public class GeyserSmokingCategory extends AbstractRecipeCategory<RecipeHolder<G
 	}
 
 	@Override
-	public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<GeyserSmokingRecipe> recipeHolder, IFocusGroup focuses) {
-		GeyserSmokingRecipe recipe = recipeHolder.value();
+	public void setRecipe(IRecipeLayoutBuilder builder, GeyserSmokingRecipe recipe, IFocusGroup focuses) {
 
 		builder.addInputSlot(1, 9)
 			.setStandardSlotBackground()
@@ -42,7 +41,7 @@ public class GeyserSmokingCategory extends AbstractRecipeCategory<RecipeHolder<G
 	}
 
 	@Override
-	public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<GeyserSmokingRecipe> recipeHolder, IFocusGroup focuses) {
+	public void createRecipeExtras(IRecipeExtrasBuilder builder, GeyserSmokingRecipe recipe, IFocusGroup focuses) {
 		builder.addRecipeArrow().setPosition(26, 9);
 	}
 }

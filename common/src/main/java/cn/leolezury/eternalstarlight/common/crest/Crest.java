@@ -49,18 +49,26 @@ public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optio
 	}
 
 	public record LevelBasedAttributeModifier(Holder<Attribute> attribute, ResourceLocation id, double amount, double amountAddition, AttributeModifier.Operation operation) {
-		public static final Codec<LevelBasedAttributeModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			BuiltInRegistries.ATTRIBUTE.holderByNameCodec().fieldOf("attribute").forGetter(LevelBasedAttributeModifier::attribute),
-			ResourceLocation.CODEC.fieldOf("id").forGetter(LevelBasedAttributeModifier::id),
-			Codec.DOUBLE.fieldOf("amount").forGetter(LevelBasedAttributeModifier::amount),
-			Codec.DOUBLE.fieldOf("amount_addition").forGetter(LevelBasedAttributeModifier::amountAddition),
-			AttributeModifier.Operation.CODEC.fieldOf("operation").forGetter(LevelBasedAttributeModifier::operation)
-		).apply(instance, LevelBasedAttributeModifier::new));
+		public static final Codec<AttributeModifier.Operation> OPERATION_CODEC =
+			Codec.INT.xmap(AttributeModifier.Operation::fromValue,
+				AttributeModifier.Operation::toValue);
+
+		public static final Codec<LevelBasedAttributeModifier> CODEC =
+			RecordCodecBuilder.create(instance -> instance.group(
+				BuiltInRegistries.ATTRIBUTE.holderByNameCodec().fieldOf("attribute").forGetter(LevelBasedAttributeModifier::attribute),
+				ResourceLocation.CODEC.fieldOf("id").forGetter(LevelBasedAttributeModifier::id),
+				Codec.DOUBLE.fieldOf("amount").forGetter(LevelBasedAttributeModifier::amount),
+				Codec.DOUBLE.fieldOf("amount_addition").forGetter(LevelBasedAttributeModifier::amountAddition),
+				OPERATION_CODEC.fieldOf("operation").forGetter(LevelBasedAttributeModifier::operation)
+			).apply(instance, LevelBasedAttributeModifier::new));
 
 		public AttributeModifier getModifier(int level) {
-			return new AttributeModifier(id(), amount() + (level - 1) * amountAddition(), operation());
+			return new AttributeModifier(id().toString(),
+				amount() + (level - 1) * amountAddition(),
+				operation());
 		}
 	}
+
 
 	public record Instance(Holder<Crest> crest, int level) {
 		public static final Codec<Instance> CODEC = RecordCodecBuilder.create(instance -> instance.group(

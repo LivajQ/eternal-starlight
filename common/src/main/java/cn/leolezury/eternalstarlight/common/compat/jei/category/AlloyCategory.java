@@ -3,7 +3,6 @@ package cn.leolezury.eternalstarlight.common.compat.jei.category;
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.item.recipe.AlloyRecipe;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import cn.leolezury.eternalstarlight.common.registry.ESRecipes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawableAnimated;
 import mezz.jei.api.gui.drawable.IDrawableStatic;
@@ -23,12 +22,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.List;
 
-public class AlloyCategory extends AbstractRecipeCategory<RecipeHolder<AlloyRecipe>> {
-	public static final RecipeType<RecipeHolder<AlloyRecipe>> ALLOY = RecipeType.createFromVanilla(ESRecipes.ALLOY.get());
+public class AlloyCategory extends AbstractRecipeCategory<AlloyRecipe> {
+	public static final RecipeType<AlloyRecipe> ALLOY = RecipeType.create(EternalStarlight.ID, "alloy", AlloyRecipe.class);
 	private static final RandomSource RANDOM = RandomSource.create();
 
 	private final IDrawableStatic background;
@@ -47,13 +45,12 @@ public class AlloyCategory extends AbstractRecipeCategory<RecipeHolder<AlloyReci
 	}
 
 	@Override
-	public void draw(RecipeHolder<AlloyRecipe> recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+	public void draw(AlloyRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
 		background.draw(guiGraphics, 0, 1);
 	}
 
 	@Override
-	public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<AlloyRecipe> recipeHolder, IFocusGroup focuses) {
-		AlloyRecipe recipe = recipeHolder.value();
+	public void setRecipe(IRecipeLayoutBuilder builder, AlloyRecipe recipe, IFocusGroup focuses) {
 		List<Ingredient> ingredients = recipe.getIngredients();
 		List<AlloyRecipe.Result> results = recipe.results();
 
@@ -83,17 +80,16 @@ public class AlloyCategory extends AbstractRecipeCategory<RecipeHolder<AlloyReci
 	}
 
 	@Override
-	public void onDisplayedIngredientsUpdate(RecipeHolder<AlloyRecipe> recipe, List<IRecipeSlotDrawable> recipeSlots, IFocusGroup focuses) {
+	public void onDisplayedIngredientsUpdate(AlloyRecipe recipe, List<IRecipeSlotDrawable> recipeSlots, IFocusGroup focuses) {
 		for (int i = 0; i < 3; i++) {
-			if (recipe.value().results().size() > i) {
-				recipeSlots.get(i + recipe.value().getIngredients().size() + 2).createDisplayOverrides().addItemStack(recipe.value().results().get(i).getResultItem(RANDOM));
+			if (recipe.results().size() > i) {
+				recipeSlots.get(i + recipe.getIngredients().size() + 2).createDisplayOverrides().addItemStack(recipe.results().get(i).getResultItem(RANDOM));
 			}
 		}
 	}
 
 	@Override
-	public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<AlloyRecipe> recipeHolder, IFocusGroup focuses) {
-		AlloyRecipe recipe = recipeHolder.value();
+	public void createRecipeExtras(IRecipeExtrasBuilder builder, AlloyRecipe recipe, IFocusGroup focuses) {
 		int burnTime = recipe.burnTime();
 
 		addRecipeArrow(builder, burnTime);

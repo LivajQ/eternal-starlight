@@ -5,36 +5,71 @@ import cn.leolezury.eternalstarlight.common.handler.ESCommonHandler;
 import cn.leolezury.eternalstarlight.common.registry.ESWeathers;
 import cn.leolezury.eternalstarlight.common.weather.AbstractWeather;
 import cn.leolezury.eternalstarlight.common.weather.WeatherInstance;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.EntityPredicate;
-import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
+import com.google.gson.JsonObject;
+import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.GsonHelper;
 
 import java.util.Optional;
 
 public class WitnessWeatherTrigger extends SimpleCriterionTrigger<WitnessWeatherTrigger.TriggerInstance> {
+
+	private static final ResourceLocation ID = new ResourceLocation("eternalstarlight", "witness_weather");
+
 	@Override
-	public Codec<TriggerInstance> codec() {
-		return WitnessWeatherTrigger.TriggerInstance.CODEC;
+	public ResourceLocation getId() {
+		return ID;
 	}
 
-	public void trigger(ServerPlayer serverPlayer) {
-		this.trigger(serverPlayer, (triggerInstance) -> triggerInstance.matches(serverPlayer.serverLevel()));
+	public void trigger(ServerPlayer player) {
+		this.trigger(player, inst -> inst.matches(player.serverLevel()));
 	}
 
-	public record TriggerInstance(Optional<ContextAwarePredicate> player, Holder<AbstractWeather> weather) implements SimpleCriterionTrigger.SimpleInstance {
-		public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create((instance) -> {
-			return instance.group(EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player), ESWeathers.WEATHERS.registry().holderByNameCodec().fieldOf("weather").forGetter(TriggerInstance::weather)).apply(instance, TriggerInstance::new);
-		});
+	@Override
+	protected TriggerInstance createInstance(JsonObject json, ContextAwarePredicate player, DeserializationContext ctx) {
+		String weatherId = GsonHelper.getAsString(json, "weather");
+		ResourceLocation weatherKey = new ResourceLocation(weatherId);
 
-		public boolean matches(ServerLevel serverLevel) {
+		return new TriggerInstance(player, weatherKey);
+	}
+
+	public static class TriggerInstance extends AbstractCriterionTriggerInstance {
+
+		private final ResourceLocation weatherKey;
+
+		public TriggerInstance(ContextAwarePredicate player, ResourceLocation weatherKey) {
+			super(WitnessWeatherTrigger.ID, player);
+			this.weatherKey = weatherKey;
+		}
+
+		public boolean matches(ServerLevel level) {
 			Optional<WeatherInstance> active = ESCommonHandler.getActiveWeather();
-			return serverLevel.dimension().location().equals(ESDimensions.STARLIGHT_KEY.location())
-				&& active.isPresent() && weather().isBound() && active.get().getWeather() == weather().value();
+
+			if (active.isEmpty()) return false;
+
+			Registry<AbstractWeather> registry =
+				level.registryAccess().registryOrThrow(ESWeathers.REGISTRY_KEY);
+
+			Holder<AbstractWeather> expected =
+				registry.getHolder(ResourceKey.create(ESWeathers.REGISTRY_KEY, weatherKey))
+					.orElse(null);
+
+			return expected != null
+				&& level.dimension().location().equals(ESDimensions.STARLIGHT_KEY.location())
+				&& expected.isBound()
+				&& active.get().getWeather() == expected.value();
+		}
+
+		@Override
+		public JsonObject serializeToJson(SerializationContext ctx) {
+			JsonObject json = super.serializeToJson(ctx);
+			json.addProperty("weather", weatherKey.toString());
+			return json;
 		}
 	}
 }

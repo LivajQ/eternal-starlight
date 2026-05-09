@@ -3,7 +3,6 @@ package cn.leolezury.eternalstarlight.common.compat.jei.category;
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.item.recipe.DryingRecipe;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import cn.leolezury.eternalstarlight.common.registry.ESRecipes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.placement.HorizontalAlignment;
 import mezz.jei.api.gui.placement.VerticalAlignment;
@@ -17,13 +16,14 @@ import mezz.jei.library.util.RecipeUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class DryingCategory extends AbstractRecipeCategory<RecipeHolder<DryingRecipe>> {
-	public static final RecipeType<RecipeHolder<DryingRecipe>> DRYING = RecipeType.createFromVanilla(ESRecipes.DRYING.get());
+public class DryingCategory extends AbstractRecipeCategory<DryingRecipe> {
+
+	public static final RecipeType<DryingRecipe> DRYING =
+		RecipeType.create(EternalStarlight.ID, "drying", DryingRecipe.class);
 
 	public DryingCategory(IGuiHelper guiHelper) {
 		super(
@@ -36,8 +36,7 @@ public class DryingCategory extends AbstractRecipeCategory<RecipeHolder<DryingRe
 	}
 
 	@Override
-	public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<DryingRecipe> recipeHolder, IFocusGroup focuses) {
-		DryingRecipe recipe = recipeHolder.value();
+	public void setRecipe(IRecipeLayoutBuilder builder, DryingRecipe recipe, IFocusGroup focuses) {
 
 		builder.addInputSlot(1, 9)
 			.setStandardSlotBackground()
@@ -49,18 +48,20 @@ public class DryingCategory extends AbstractRecipeCategory<RecipeHolder<DryingRe
 
 		if (recipe.fireBelow()) {
 			builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 1, 28)
-				.addItemStacks(StreamSupport.stream(BuiltInRegistries.BLOCK.getTagOrEmpty(BlockTags.CAMPFIRES).spliterator(), false)
-					.map(holder -> holder.value().asItem().getDefaultInstance())
-					.collect(Collectors.toList()));
+				.addItemStacks(
+					StreamSupport.stream(
+							BuiltInRegistries.BLOCK.getTagOrEmpty(BlockTags.CAMPFIRES).spliterator(),
+							false
+						)
+						.map(holder -> holder.value().asItem().getDefaultInstance())
+						.collect(Collectors.toList())
+				);
 		}
 	}
 
 	@Override
-	public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<DryingRecipe> recipeHolder, IFocusGroup focuses) {
-		DryingRecipe recipe = recipeHolder.value();
-
+	public void createRecipeExtras(IRecipeExtrasBuilder builder, DryingRecipe recipe, IFocusGroup focuses) {
 		builder.addRecipeArrow().setPosition(26, 9);
-
 		addDryTime(builder, recipe.durationTicks());
 	}
 
