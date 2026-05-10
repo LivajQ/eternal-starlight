@@ -5,6 +5,7 @@ import cn.leolezury.eternalstarlight.common.entity.living.monster.Tangled;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESStructureTypes;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -18,11 +19,12 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 
 public class CursedGardenStructure extends Structure {
-	public static final MapCodec<CursedGardenStructure> CODEC = simpleCodec(CursedGardenStructure::new);
+	public static final Codec<CursedGardenStructure> CODEC = simpleCodec(CursedGardenStructure::new);
 
 	public CursedGardenStructure(StructureSettings structureSettings) {
 		super(structureSettings);
@@ -52,7 +54,7 @@ public class CursedGardenStructure extends Structure {
 							if ((level.isEmptyBlock(pos) || level.getBlockState(pos).is(Blocks.VINE)) && (level.isEmptyBlock(pos.above()) || level.getBlockState(pos.above()).is(Blocks.VINE)) && level.getBlockState(pos.below()).is(ESBlocks.TENACIOUS_NIGHTFALL_GRASS_BLOCK.get())) {
 								if (random.nextInt(150) == 0) {
 									Tangled tangled = new Tangled(ESEntities.TANGLED.get(), level.getLevel());
-									tangled.setPos(pos.getBottomCenter());
+									tangled.setPos(Vec3.atBottomCenterOf(pos));
 									tangled.setPersistenceRequired();
 									level.addFreshEntity(tangled);
 								}

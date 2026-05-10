@@ -14,7 +14,6 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
 
 public class GlaciteFeature extends ESFeature<NoneFeatureConfiguration> {
 	public GlaciteFeature(Codec<NoneFeatureConfiguration> codec) {
@@ -27,7 +26,7 @@ public class GlaciteFeature extends ESFeature<NoneFeatureConfiguration> {
 		BlockPos pos = context.origin();
 		RandomSource random = context.random();
 		BlockPos toPos = pos.offset(random.nextInt(8, 10) * (random.nextBoolean() ? -1 : 1), random.nextInt(8, 10) * (random.nextBoolean() ? -1 : 1), random.nextInt(8, 10) * (random.nextBoolean() ? -1 : 1));
-		BlockHitResult result = level.clip(new ClipContext(pos.getCenter(), toPos.getCenter(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+		BlockHitResult result = level.clip(new ClipContext(pos.getCenter(), toPos.getCenter(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
 		if (result.getType() != HitResult.Type.MISS) {
 			toPos = result.getBlockPos();
 		} else {

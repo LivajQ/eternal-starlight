@@ -14,17 +14,15 @@ public class ESCaveCarver extends CaveWorldCarver {
 	}
 
 	@Override
-	protected boolean canReplaceBlock(CaveCarverConfiguration carverConfiguration, BlockState blockState) {
+	protected boolean canReplaceBlock(CaveCarverConfiguration config, BlockState state) {
 		// we should not replace water
-		return super.canReplaceBlock(carverConfiguration, blockState) && blockState.getFluidState().isEmpty();
+		return super.canReplaceBlock(config, state) && state.getFluidState().isEmpty();
 	}
 
 	@Override
-	public BlockState getCarveState(CarvingContext carvingContext, CaveCarverConfiguration carverConfiguration, BlockPos blockPos, Aquifer aquifer) {
-		if (blockPos.getY() <= carverConfiguration.lavaLevel.resolveY(carvingContext)) {
-			return LAVA.createLegacyBlock();
-		} else {
-			return CAVE_AIR;
-		}
+	protected BlockState getCarveState(CarvingContext context, CaveCarverConfiguration config, BlockPos pos, Aquifer aquifer) {
+		int lavaY = config.lavaLevel.resolveY(context);
+		if (pos.getY() <= lavaY) return LAVA.createLegacyBlock();
+		else return CAVE_AIR;
 	}
 }

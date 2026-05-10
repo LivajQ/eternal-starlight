@@ -16,13 +16,20 @@ import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
 import java.util.Optional;
 
 public class AvoidLandmarkStructurePlacement extends RandomSpreadStructurePlacement {
-	public static final MapCodec<AvoidLandmarkStructurePlacement> CODEC = RecordCodecBuilder.<AvoidLandmarkStructurePlacement>mapCodec(
-		instance -> placementCodec(instance)
-			.and(instance.group(
-				Codec.intRange(0, 4096).fieldOf("spacing").forGetter(AvoidLandmarkStructurePlacement::spacing),
-				Codec.intRange(0, 4096).fieldOf("separation").forGetter(AvoidLandmarkStructurePlacement::separation),
-				RandomSpreadType.CODEC.optionalFieldOf("spread_type", RandomSpreadType.LINEAR).forGetter(AvoidLandmarkStructurePlacement::spreadType)
-			)).apply(instance, AvoidLandmarkStructurePlacement::new)).validate(AvoidLandmarkStructurePlacement::validate);
+	public static final MapCodec<AvoidLandmarkStructurePlacement> CODEC =
+		RecordCodecBuilder.mapCodec(instance ->
+			placementCodec(instance)
+				.and(instance.group(
+					Codec.intRange(0, 4096).fieldOf("spacing")
+						.forGetter(AvoidLandmarkStructurePlacement::spacing),
+					Codec.intRange(0, 4096).fieldOf("separation")
+						.forGetter(AvoidLandmarkStructurePlacement::separation),
+					RandomSpreadType.CODEC
+						.optionalFieldOf("spread_type", RandomSpreadType.LINEAR)
+						.forGetter(AvoidLandmarkStructurePlacement::spreadType)
+				))
+				.apply(instance, AvoidLandmarkStructurePlacement::new)
+		);
 
 	private static DataResult<AvoidLandmarkStructurePlacement> validate(AvoidLandmarkStructurePlacement placement) {
 		return placement.spacing() <= placement.separation() ? DataResult.error(() -> "Spacing has to be larger than separation") : DataResult.success(placement);
@@ -30,6 +37,8 @@ public class AvoidLandmarkStructurePlacement extends RandomSpreadStructurePlacem
 
 	public AvoidLandmarkStructurePlacement(Vec3i locateOffset, StructurePlacement.FrequencyReductionMethod frequencyReductionMethod, float frequency, int salt, Optional<ExclusionZone> exclusionZone, int spacing, int separation, RandomSpreadType spreadType) {
 		super(locateOffset, frequencyReductionMethod, frequency, salt, exclusionZone, spacing, separation, spreadType);
+
+		if (spacing <= separation) throw new IllegalArgumentException("Spacing has to be larger than separation");
 	}
 
 	public AvoidLandmarkStructurePlacement(int spacing, int separation, RandomSpreadType spreadType, int salt) {

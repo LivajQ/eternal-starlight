@@ -91,8 +91,8 @@ public class ESBiomeSource extends BiomeSource {
 	}
 
 	@Override
-	protected MapCodec<? extends BiomeSource> codec() {
-		return CODEC;
+	protected Codec<? extends BiomeSource> codec() {
+		return CODEC.codec();
 	}
 
 	@Override

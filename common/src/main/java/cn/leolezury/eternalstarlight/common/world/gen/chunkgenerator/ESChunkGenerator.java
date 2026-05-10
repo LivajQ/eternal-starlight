@@ -6,6 +6,7 @@ import cn.leolezury.eternalstarlight.common.world.gen.biome.BiomeData;
 import cn.leolezury.eternalstarlight.common.world.gen.biomesource.ESBiomeSource;
 import cn.leolezury.eternalstarlight.common.world.gen.structure.placement.LandmarkStructurePlacement;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -89,12 +90,12 @@ public class ESChunkGenerator extends NoiseBasedChunkGenerator {
 	}
 
 	@Override
-	protected MapCodec<? extends ChunkGenerator> codec() {
-		return CODEC;
+	protected Codec<? extends ChunkGenerator> codec() {
+		return CODEC.codec();
 	}
 
 	@Override
-	protected ChunkAccess doFill(Blender blender, StructureManager structureManager, RandomState randomState, ChunkAccess chunkAccess, int i, int j) {
+	public ChunkAccess doFill(Blender blender, StructureManager structureManager, RandomState randomState, ChunkAccess chunkAccess, int i, int j) {
 		ChunkPos chunkPos = chunkAccess.getPos();
 		Beardifier beardifier = Beardifier.forStructuresInChunk(structureManager, chunkPos);
 		Heightmap oceanFloorMap = chunkAccess.getOrCreateHeightmapUnprimed(Heightmap.Types.OCEAN_FLOOR_WG);

@@ -7,7 +7,7 @@ import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.registry.ESStructureTypes;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
-import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -23,11 +23,12 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.PiecesContainer;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Optional;
 
 public class StranghoulDenStructure extends Structure {
-	public static final MapCodec<StranghoulDenStructure> CODEC = simpleCodec(StranghoulDenStructure::new);
+	public static final Codec<StranghoulDenStructure> CODEC = simpleCodec(StranghoulDenStructure::new);
 
 	public StranghoulDenStructure(StructureSettings structureSettings) {
 		super(structureSettings);
@@ -58,7 +59,7 @@ public class StranghoulDenStructure extends Structure {
 						if (piecesBox.isInside(pos) && piecesContainer.isInsidePiece(pos)) {
 							if ((level.isEmptyBlock(pos) || level.getBlockState(pos).is(ESBlocks.FANTASY_GRASS_CARPET.get())) && level.isEmptyBlock(pos.above()) && (level.getBlockState(pos.below()).is(BlockTags.DIRT) || level.getBlockState(pos.below()).is(ESTags.Blocks.BASE_STONE_STARLIGHT))) {
 								Stranghoul stranghoul = new Stranghoul(ESEntities.STRANGHOUL.get(), level.getLevel());
-								stranghoul.setPos(pos.getBottomCenter());
+								stranghoul.setPos(Vec3.atBottomCenterOf(pos));
 								stranghoul.setPersistenceRequired();
 								stranghoul.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null);
 								level.addFreshEntity(stranghoul);
