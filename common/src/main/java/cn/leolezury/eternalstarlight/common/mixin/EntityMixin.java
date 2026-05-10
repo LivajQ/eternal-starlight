@@ -63,7 +63,7 @@ public abstract class EntityMixin {
 		if (level().isClientSide && feetInWater && entity instanceof LivingEntity living && living.getDeltaMovement().length() > 0.01 && living.getItemBySlot(EquipmentSlot.FEET).is(ESItems.AIR_SAC_BOOTS.get())) {
 			Vec3 pos = living.getBoundingBox().getBottomCenter().offsetRandom(living.getRandom(), living.getBbWidth());
 			Vec3 speed = living.getDeltaMovement().normalize().offsetRandom(living.getRandom(), 0.3f).scale(-0.2);
-			level().addParticle(ColorParticleOption.create(ESParticles.COLORED_INK.get(), FastColor.ARGB32.color(255, 51, 61, 58)), pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
+			level().addParticle(ESParticles.COLORED_INK.get(), pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
 		}
 	}
 

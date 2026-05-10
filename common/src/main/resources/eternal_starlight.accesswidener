@@ -46,6 +46,7 @@ accessible field com/mojang/math/OctahedralGroup permutation Lcom/mojang/math/Sy
 # world visual effects
 
 # particle
+accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
 
 # spellcasting camera
 

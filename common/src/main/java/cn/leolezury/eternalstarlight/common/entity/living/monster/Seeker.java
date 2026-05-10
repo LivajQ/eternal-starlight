@@ -199,7 +199,20 @@ public class Seeker extends Monster implements VariantHolder<Holder<SeekerVarian
 					for (int i = 0; i < 64; i++) {
 						Vec3 particleMovement = nextMovement.add((getRandom().nextDouble() - 0.5) * 0.5, (getRandom().nextDouble() - 0.5) * 0.5, (getRandom().nextDouble() - 0.5) * 0.5).normalize();
 						double particleSpeed = 0.1 + getRandom().nextDouble() * 0.4;
-						ESPlatform.INSTANCE.sendToTrackingClients(serverLevel, this, new ParticlePacket(ColorParticleOption.create(ESParticles.COLORED_INK.get(), getVariant().value().particleColor()), getX() - nextMovement.x() * 0.5, getY() + getBbHeight() / 2 - nextMovement.y() * 0.5, getZ() - nextMovement.z() * 0.5, -particleMovement.x() * particleSpeed, -particleMovement.y() * particleSpeed, -particleMovement.z() * particleSpeed));
+						ESPlatform.INSTANCE.sendToTrackingClients(
+							serverLevel,
+							this,
+							new ParticlePacket(
+								ESParticles.COLORED_INK.get(),
+								getX() - nextMovement.x() * 0.5,
+								getY() + getBbHeight() / 2 - nextMovement.y() * 0.5,
+								getZ() - nextMovement.z() * 0.5,
+								-particleMovement.x() * particleSpeed,
+								-particleMovement.y() * particleSpeed,
+								-particleMovement.z() * particleSpeed
+							)
+						);
+
 					}
 				}
 				if (target != null) {

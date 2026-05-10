@@ -1,14 +1,14 @@
 package cn.leolezury.eternalstarlight.common.particle;
 
 import cn.leolezury.eternalstarlight.common.registry.ESParticles;
+import com.mojang.brigadier.StringReader;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.ExtraCodecs;
 import org.joml.Vector3f;
 
@@ -22,19 +22,68 @@ public record ESSmokeParticleOptions(Vector3f fromColor, Vector3f toColor, float
 	public static final ESSmokeParticleOptions PUNGENCY_FRUIT = fromIntColor(new Vector3f(87, 58, 69), new Vector3f(179, 116, 116), 1, 1, 0.3f, true);
 
 	public static ESSmokeParticleOptions fromIntColor(Vector3f fromColor, Vector3f toColor, float alpha, float lifeScale, float motionScale, boolean rise) {
-		return new ESSmokeParticleOptions(new Vector3f(fromColor).div(255f), new Vector3f(toColor).div(255f), alpha, lifeScale, motionScale, rise);
+		return new ESSmokeParticleOptions(
+			new Vector3f(fromColor).div(255f),
+			new Vector3f(toColor).div(255f),
+			alpha,
+			lifeScale,
+			motionScale,
+			rise
+		);
 	}
 
-	public static final MapCodec<ESSmokeParticleOptions> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
-		ExtraCodecs.VECTOR3F.fieldOf("from_color").forGetter(ESSmokeParticleOptions::fromColor),
-		ExtraCodecs.VECTOR3F.fieldOf("to_color").forGetter(ESSmokeParticleOptions::toColor),
-		Codec.FLOAT.fieldOf("alpha").forGetter(ESSmokeParticleOptions::alpha),
-		Codec.FLOAT.fieldOf("life_scale").forGetter(ESSmokeParticleOptions::lifeScale),
-		Codec.FLOAT.fieldOf("motion_scale").forGetter(ESSmokeParticleOptions::motionScale),
-		Codec.BOOL.fieldOf("rise").forGetter(ESSmokeParticleOptions::rise)
-	).apply(instance, ESSmokeParticleOptions::new));
+	public static final MapCodec<ESSmokeParticleOptions> CODEC =
+		RecordCodecBuilder.mapCodec(instance -> instance.group(
+			ExtraCodecs.VECTOR3F.fieldOf("from_color").forGetter(ESSmokeParticleOptions::fromColor),
+			ExtraCodecs.VECTOR3F.fieldOf("to_color").forGetter(ESSmokeParticleOptions::toColor),
+			Codec.FLOAT.fieldOf("alpha").forGetter(ESSmokeParticleOptions::alpha),
+			Codec.FLOAT.fieldOf("life_scale").forGetter(ESSmokeParticleOptions::lifeScale),
+			Codec.FLOAT.fieldOf("motion_scale").forGetter(ESSmokeParticleOptions::motionScale),
+			Codec.BOOL.fieldOf("rise").forGetter(ESSmokeParticleOptions::rise)
+		).apply(instance, ESSmokeParticleOptions::new));
 
-	public static final StreamCodec<RegistryFriendlyByteBuf, ESSmokeParticleOptions> STREAM_CODEC = ByteBufCodecs.fromCodecWithRegistries(CODEC.codec());
+	public static final Deserializer<ESSmokeParticleOptions> DESERIALIZER =
+		new Deserializer<>() {
+
+			@Override
+			public ESSmokeParticleOptions fromCommand(ParticleType<ESSmokeParticleOptions> type, StringReader reader) {
+				return new ESSmokeParticleOptions(
+					new Vector3f(1, 1, 1),
+					new Vector3f(1, 1, 1),
+					1F,
+					1F,
+					1F,
+					false
+				);
+			}
+
+			@Override
+			public ESSmokeParticleOptions fromNetwork(ParticleType<ESSmokeParticleOptions> type, FriendlyByteBuf buf) {
+				return new ESSmokeParticleOptions(
+					buf.readVector3f(),
+					buf.readVector3f(),
+					buf.readFloat(),
+					buf.readFloat(),
+					buf.readFloat(),
+					buf.readBoolean()
+				);
+			}
+		};
+
+	@Override
+	public void writeToNetwork(FriendlyByteBuf buf) {
+		buf.writeVector3f(fromColor);
+		buf.writeVector3f(toColor);
+		buf.writeFloat(alpha);
+		buf.writeFloat(lifeScale);
+		buf.writeFloat(motionScale);
+		buf.writeBoolean(rise);
+	}
+
+	@Override
+	public String writeToString() {
+		return BuiltInRegistries.PARTICLE_TYPE.getKey(getType()).toString();
+	}
 
 	@Override
 	public ParticleType<ESSmokeParticleOptions> getType() {

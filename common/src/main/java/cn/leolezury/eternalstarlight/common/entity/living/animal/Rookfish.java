@@ -40,7 +40,7 @@ public class Rookfish extends Squid implements Bucketable {
 
 	@Override
 	protected ParticleOptions getInkParticle() {
-		return ColorParticleOption.create(ESParticles.COLORED_INK.get(), FastColor.ARGB32.color(255, 51, 61, 58));
+		return ESParticles.COLORED_INK.get();
 	}
 
 	@Override
