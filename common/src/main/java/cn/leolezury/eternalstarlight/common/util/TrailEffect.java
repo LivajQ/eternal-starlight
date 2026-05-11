@@ -32,11 +32,11 @@ public class TrailEffect {
 	}
 
 	public void update(TrailPoint point) {
-		if (points.isEmpty() || points.getFirst().pos().distanceTo(point.pos()) > 0.01) {
-			points.addFirst(point);
+		if (points.isEmpty() || points.get(0).pos().distanceTo(point.pos()) > 0.01) {
+			points.add(0, point);
 		}
 		if (points.size() > MAX_CAPACITY) {
-			points.removeLast();
+			points.remove(points.size() - 1);
 		}
 	}
 
@@ -53,35 +53,49 @@ public class TrailEffect {
 
 	private void prepare(TrailPoint point, float partialTicks) {
 		ArrayList<TrailPoint> modified = new ArrayList<>();
-		renderPoints.addFirst(point);
+
+		// addFirst(point)
+		renderPoints.add(0, point);
+
 		float totalLength = 0;
 		float renderLength = Mth.lerp(partialTicks, oldLength, length);
+
 		for (int i = 0; i < renderPoints.size() - 1; i++) {
 			TrailPoint from = renderPoints.get(i);
 			TrailPoint to = renderPoints.get(i + 1);
+
 			float distance = (float) from.pos().distanceTo(to.pos());
 			totalLength += distance;
+
 			if (totalLength > renderLength) {
-				renderPoints.set(i + 1, interpolateTrailPoint((totalLength - renderLength) / distance, to, from));
+				float progress = (totalLength - renderLength) / distance;
+				renderPoints.set(i + 1, interpolateTrailPoint(progress, to, from));
+
 				modified.addAll(renderPoints.subList(0, i + 2));
 				totalLength = renderLength;
 				break;
 			}
 		}
+
 		if (!modified.isEmpty()) {
 			renderPoints.clear();
 			renderPoints.addAll(modified);
 		}
+
 		float currentLength = 0;
 		for (int i = 0; i < renderPoints.size() - 1; i++) {
 			TrailPoint from = renderPoints.get(i);
 			TrailPoint to = renderPoints.get(i + 1);
+
 			float distance = (float) from.pos().distanceTo(to.pos());
-			renderPoints.set(i, renderPoints.get(i).withProgressFactor((totalLength - currentLength) / renderLength));
+			renderPoints.set(i, from.withProgressFactor((totalLength - currentLength) / renderLength));
+
 			currentLength += distance;
 		}
+
 		if (renderPoints.size() > 1) {
-			renderPoints.set(renderPoints.size() - 1, renderPoints.getLast().withProgressFactor(0));
+			int last = renderPoints.size() - 1;
+			renderPoints.set(last, renderPoints.get(last).withProgressFactor(0));
 		}
 	}
 
@@ -91,8 +105,12 @@ public class TrailEffect {
 
 	@FunctionalInterface
 	public interface TrailOffsetFunction {
-		TrailOffsetFunction FACE_CAMERA = (look, camXRot, camYRot, tangent) -> tangent.cross(look);
-		TrailOffsetFunction Z_ROT = (look, camXRot, camYRot, tangent) -> new Vec3(0, 1, 0).zRot(camXRot * -Mth.DEG_TO_RAD);
+		TrailOffsetFunction FACE_CAMERA =
+			(look, camXRot, camYRot, tangent) -> tangent.cross(look);
+
+		TrailOffsetFunction Z_ROT =
+			(look, camXRot, camYRot, tangent) ->
+				new Vec3(0, 1, 0).zRot(camXRot * -Mth.DEG_TO_RAD);
 
 		Vec3 calculateTrailOffset(Vec3 look, float camXRot, float camYRot, Vec3 tangent);
 	}

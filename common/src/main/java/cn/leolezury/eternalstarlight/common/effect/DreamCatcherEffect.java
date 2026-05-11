@@ -11,6 +11,6 @@ public class DreamCatcherEffect extends MobEffect {
 
 	public DreamCatcherEffect(MobEffectCategory category, int color) {
 		super(category, color);
-		this.addAttributeModifier(Attributes.ARMOR, EternalStarlight.id("armor.dream_catcher"), ARMOR_ADDITION, AttributeModifier.Operation.ADD_VALUE);
+		this.addAttributeModifier(Attributes.ARMOR, EternalStarlight.id("armor.dream_catcher").toString(), ARMOR_ADDITION, AttributeModifier.Operation.ADDITION);
 	}
 }

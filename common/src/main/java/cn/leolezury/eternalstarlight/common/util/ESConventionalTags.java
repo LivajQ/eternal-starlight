@@ -118,7 +118,7 @@ public class ESConventionalTags {
 		}
 
 		private static TagKey<Item> create(String string) {
-			return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", string));
+			return TagKey.create(Registries.ITEM, new ResourceLocation("c", string));
 		}
 	}
 
@@ -173,7 +173,7 @@ public class ESConventionalTags {
 		}
 
 		private static TagKey<Block> create(String string) {
-			return TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("c", string));
+			return TagKey.create(Registries.BLOCK, new ResourceLocation("c", string));
 		}
 	}
 }

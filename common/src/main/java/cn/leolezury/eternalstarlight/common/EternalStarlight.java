@@ -5,6 +5,7 @@ import cn.leolezury.eternalstarlight.common.client.helper.ClientHelper;
 import cn.leolezury.eternalstarlight.common.client.helper.ClientSideHelper;
 import cn.leolezury.eternalstarlight.common.client.helper.EmptyClientHelper;
 import cn.leolezury.eternalstarlight.common.config.ESConfig;
+import cn.leolezury.eternalstarlight.common.data.ESEnchantments;
 import cn.leolezury.eternalstarlight.common.data.ESRegistries;
 import cn.leolezury.eternalstarlight.common.network.ESPackets;
 import cn.leolezury.eternalstarlight.common.registry.*;
@@ -26,7 +27,6 @@ public class EternalStarlight {
 		ESBlocks.loadClass();
 		ESPoiTypes.loadClass();
 		ESDataComponents.loadClass();
-		ESEnchantmentEffectComponents.loadClass();
 		ESArmorMaterials.loadClass();
 		ESSpells.loadClass();
 		ESEntities.loadClass();
@@ -39,7 +39,6 @@ public class EternalStarlight {
 		ESMobEffects.loadClass();
 		ESBlockEntities.loadClass();
 		ESMenuTypes.loadClass();
-		ESEnchantmentEntityEffects.loadClass();
 		ESMaterialConditions.loadClass();
 		ESWorldCarvers.loadClass();
 		ESFeatures.loadClass();
@@ -59,10 +58,11 @@ public class EternalStarlight {
 		ESDataAttachments.loadClass();
 		ESRegistries.loadClass();
 		ESFlammabilityRegistry.registerDefaults();
+		ESEnchantments.register();
 	}
 
 	public static ResourceLocation id(String string) {
-		return ResourceLocation.fromNamespaceAndPath(ID, string);
+		return new ResourceLocation(EternalStarlight.ID, string);
 	}
 
 	public static ClientHelper getClientHelper() {

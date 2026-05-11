@@ -4,7 +4,6 @@ import cn.leolezury.eternalstarlight.common.entity.interfaces.SpellCaster;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import cn.leolezury.eternalstarlight.common.util.ESSpellUtil;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -24,9 +23,13 @@ public abstract class AbstractSpell {
 	}
 
 	public boolean canCast(LivingEntity entity, boolean checkCrystal) {
-		boolean crystalCheck = !checkCrystal || (entity instanceof Player player && (player.hasInfiniteMaterials() || hasNeededCrystal(player.getInventory())));
-		return crystalCheck && ESSpellUtil.getCooldown(entity, this) <= 0 && checkExtraConditions(entity);
+		boolean crystalCheck = !checkCrystal || (entity instanceof Player player && (player.getAbilities().instabuild || hasNeededCrystal(player.getInventory())));
+
+		return crystalCheck &&
+			ESSpellUtil.getCooldown(entity, this) <= 0 &&
+			checkExtraConditions(entity);
 	}
+
 
 	public boolean hasNeededCrystal(Inventory inventory) {
 		for (int i = 0; i < inventory.getContainerSize(); i++) {
@@ -47,7 +50,7 @@ public abstract class AbstractSpell {
 	}
 
 	public void start(LivingEntity entity, int strength, boolean damageCrystal) {
-		if (damageCrystal && entity instanceof Player player && !player.hasInfiniteMaterials()) {
+		if (damageCrystal && entity instanceof Player player && !player.getAbilities().instabuild) {
 			damageCrystal(player);
 		}
 		onStart(entity);
@@ -61,7 +64,7 @@ public abstract class AbstractSpell {
 		for (int i = 0; i < inventory.getContainerSize(); i++) {
 			ItemStack stack = inventory.getItem(i);
 			if (spellProperties().types().stream().anyMatch(t -> stack.is(t.getCrystalsTag()))) {
-				stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
+				stack.hurtAndBreak(1, player, p -> LivingEntity.getEquipmentSlotForItem(stack));
 				return;
 			}
 		}

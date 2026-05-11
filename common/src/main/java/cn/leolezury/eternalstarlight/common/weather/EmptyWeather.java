@@ -47,7 +47,7 @@ public class EmptyWeather extends AbstractWeather {
 
 	@Override
 	public float modifyRainLevel(float original) {
-		float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally());
+		float partialTick = Minecraft.getInstance().getFrameTime();
 		ClientWeatherState.levelTarget = 1;
 		return ClientWeatherState.getRainLevel(partialTick);
 	}

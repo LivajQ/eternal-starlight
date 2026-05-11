@@ -15,17 +15,16 @@ public class CrystalInfectionEffect extends MobEffect {
 
 	public CrystalInfectionEffect(MobEffectCategory category, int color) {
 		super(category, color);
-		this.addAttributeModifier(Attributes.ARMOR, ARMOR_MODIFIER_ID, ARMOR_ADDITION, AttributeModifier.Operation.ADD_VALUE);
+		this.addAttributeModifier(Attributes.ARMOR, ARMOR_MODIFIER_ID.toString(), ARMOR_ADDITION, AttributeModifier.Operation.ADDITION);
 	}
 
 	@Override
-	public boolean applyEffectTick(LivingEntity living, int amplifier) {
-		living.hurt(ESDamageTypes.getDamageSource(living.level(), ESDamageTypes.CRYSTAL_INFECTION), (amplifier + 1));
-		return true;
+	public void applyEffectTick(LivingEntity living, int amplifier) {
+		living.hurt(ESDamageTypes.getDamageSource(living.level(), ESDamageTypes.CRYSTAL_INFECTION), amplifier + 1);
 	}
 
 	@Override
-	public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+	public boolean isDurationEffectTick(int duration, int amplifier) {
 		return duration % 35 == 0;
 	}
 }

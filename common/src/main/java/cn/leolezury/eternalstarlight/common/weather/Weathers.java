@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.weather;
 
 import cn.leolezury.eternalstarlight.common.registry.ESWeathers;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -19,6 +18,7 @@ public class Weathers extends SavedData {
 
 	public Weathers(ServerLevel serverLevel) {
 		this.serverLevel = serverLevel;
+
 		ESWeathers.WEATHERS.registry().forEach(weather -> {
 			WeatherInstance instance = new WeatherInstance(serverLevel, weather);
 			weathers.add(instance);
@@ -30,7 +30,7 @@ public class Weathers extends SavedData {
 	}
 
 	public Optional<WeatherInstance> getActiveWeather() {
-		for (WeatherInstance instance : getWeathers()) {
+		for (WeatherInstance instance : weathers) {
 			if (instance.active) {
 				return Optional.of(instance);
 			}
@@ -39,12 +39,12 @@ public class Weathers extends SavedData {
 	}
 
 	public void setActiveWeather(AbstractWeather weather, int duration) {
-		for (WeatherInstance instance : getWeathers()) {
+		for (WeatherInstance instance : weathers) {
 			if (!instance.active && instance.getWeather() == weather) {
 				instance.start();
 				instance.currentDuration = duration;
 			}
-			if (instance.active && !(instance.getWeather() == weather)) {
+			if (instance.active && instance.getWeather() != weather) {
 				instance.stop();
 			}
 		}
@@ -52,58 +52,74 @@ public class Weathers extends SavedData {
 	}
 
 	public void clearAllWeathers(int duration) {
-		for (WeatherInstance instance : getWeathers()) {
+		for (WeatherInstance instance : weathers) {
 			instance.stop();
 			instance.ticksUntilNext = duration;
 		}
 		setDirty();
 	}
 
-	public static SavedData.Factory<Weathers> factory(ServerLevel serverLevel) {
-		return new SavedData.Factory<>(() -> new Weathers(serverLevel), (compoundTag, lookup) -> load(serverLevel, compoundTag), null);
+	public static Weathers get(ServerLevel level) {
+		return level.getDataStorage().computeIfAbsent(
+			tag -> load(level, tag),
+			() -> new Weathers(level),
+			"weathers"
+		);
 	}
 
 	public void tick() {
-		List<WeatherInstance> canStartWeathers = new ArrayList<>();
+		List<WeatherInstance> canStart = new ArrayList<>();
 		boolean hasActive = false;
+
 		for (WeatherInstance instance : weathers) {
 			if (instance.tick()) {
-				canStartWeathers.add(instance);
+				canStart.add(instance);
 			}
-			hasActive = hasActive || instance.active;
+			hasActive |= instance.active;
 		}
-		if (!hasActive && !canStartWeathers.isEmpty()) {
-			canStartWeathers.get(serverLevel.getRandom().nextInt(canStartWeathers.size())).start();
+
+		if (!hasActive && !canStart.isEmpty()) {
+			canStart.get(serverLevel.getRandom().nextInt(canStart.size())).start();
 		}
+
 		setDirty();
 	}
 
-	public static Weathers load(ServerLevel serverLevel, CompoundTag compoundTag) {
-		Weathers weathersData = new Weathers(serverLevel);
-		if (compoundTag.contains(TAG_WEATHERS, CompoundTag.TAG_COMPOUND)) {
-			CompoundTag weathersTag = compoundTag.getCompound(TAG_WEATHERS);
+	public static Weathers load(ServerLevel serverLevel, CompoundTag tag) {
+		Weathers data = new Weathers(serverLevel);
+
+		if (tag.contains(TAG_WEATHERS, CompoundTag.TAG_COMPOUND)) {
+			CompoundTag weathersTag = tag.getCompound(TAG_WEATHERS);
+
+			data.weathers.clear();
+
 			ESWeathers.WEATHERS.registry().forEach(weather -> {
 				WeatherInstance instance = new WeatherInstance(serverLevel, weather);
 				String id = Objects.requireNonNull(ESWeathers.WEATHERS.registry().getKey(weather)).toString();
+
 				if (weathersTag.contains(id, CompoundTag.TAG_COMPOUND)) {
 					instance.load(weathersTag.getCompound(id));
 				}
-				weathersData.weathers.add(instance);
+
+				data.weathers.add(instance);
 			});
 		}
-		return weathersData;
+
+		return data;
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag compoundTag, HolderLookup.Provider provider) {
+	public CompoundTag save(CompoundTag tag) {
 		CompoundTag weathersTag = new CompoundTag();
+
 		for (WeatherInstance instance : weathers) {
 			String id = Objects.requireNonNull(ESWeathers.WEATHERS.registry().getKey(instance.getWeather())).toString();
 			CompoundTag weatherTag = new CompoundTag();
 			instance.save(weatherTag);
 			weathersTag.put(id, weatherTag);
 		}
-		compoundTag.put(TAG_WEATHERS, weathersTag);
-		return compoundTag;
+
+		tag.put(TAG_WEATHERS, weathersTag);
+		return tag;
 	}
 }

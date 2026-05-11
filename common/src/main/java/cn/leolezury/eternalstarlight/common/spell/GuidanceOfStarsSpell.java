@@ -16,7 +16,6 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
 
 public class GuidanceOfStarsSpell extends AbstractSpell {
 	public GuidanceOfStarsSpell(Properties properties) {
@@ -58,7 +57,7 @@ public class GuidanceOfStarsSpell extends AbstractSpell {
 			if (blockPos != null) {
 				Vec3 startPos = entity.getEyePosition();
 				Vec3 endPos = startPos.add(blockPos.getCenter().subtract(startPos).normalize().scale(5));
-				BlockHitResult result = entity.level().clip(new ClipContext(startPos, endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.of(entity)));
+				BlockHitResult result = entity.level().clip(new ClipContext(startPos, endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
 				if (result.getType() != HitResult.Type.MISS) {
 					endPos = result.getLocation();
 				}

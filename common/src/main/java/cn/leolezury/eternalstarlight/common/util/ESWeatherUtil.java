@@ -5,6 +5,11 @@ import net.minecraft.server.level.ServerLevel;
 
 public class ESWeatherUtil {
 	public static Weathers getOrCreateWeathers(ServerLevel serverLevel) {
-		return serverLevel.getDataStorage().computeIfAbsent(Weathers.factory(serverLevel), "weathers");
+		return serverLevel.getDataStorage().computeIfAbsent(
+			tag -> Weathers.load(serverLevel, tag),
+			() -> new Weathers(serverLevel),
+			"weathers"
+		);
 	}
+
 }

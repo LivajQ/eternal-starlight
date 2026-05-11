@@ -11,7 +11,7 @@ public class ConventionalTags {
 		public static final TagKey<Item> ENDER_PEARLS = create("ender_pearls");
 
 		private static TagKey<Item> create(String string) {
-			return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", string));
+			return TagKey.create(Registries.ITEM, new ResourceLocation("c", string));
 		}
 	}
 }

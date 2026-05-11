@@ -24,7 +24,7 @@ public class ScreenShakeVfx implements SyncedVfxType {
 	@Override
 	public void spawnOnClient(CompoundTag tag) {
 		ESMiscUtil.runWhenOnClient(() -> () -> ESClientHandler.SCREEN_SHAKES.add(new ScreenShake(
-			ResourceLocation.parse(tag.getString(TAG_DIMENSION)),
+			new ResourceLocation(tag.getString(TAG_DIMENSION)),
 			new Vec3(tag.getDouble(TAG_X), tag.getDouble(TAG_Y), tag.getDouble(TAG_Z)),
 			tag.getFloat(TAG_RADIUS),
 			tag.getInt(TAG_DURATION),
