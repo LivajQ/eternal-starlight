@@ -9,7 +9,6 @@ import cn.leolezury.eternalstarlight.common.item.armor.DeepsilverArmorItem;
 import cn.leolezury.eternalstarlight.common.item.armor.GlaciteArmorItem;
 import cn.leolezury.eternalstarlight.common.item.combat.*;
 import cn.leolezury.eternalstarlight.common.item.component.Accessory;
-import cn.leolezury.eternalstarlight.common.item.component.GuideBook;
 import cn.leolezury.eternalstarlight.common.item.magic.LivingArmItem;
 import cn.leolezury.eternalstarlight.common.item.magic.OrbOfProphecyItem;
 import cn.leolezury.eternalstarlight.common.item.misc.*;
@@ -18,6 +17,8 @@ import cn.leolezury.eternalstarlight.common.platform.registry.RegistrationProvid
 import cn.leolezury.eternalstarlight.common.platform.registry.RegistryObject;
 import cn.leolezury.eternalstarlight.common.spell.ManaType;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.Direction;
@@ -31,6 +32,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.food.FoodProperties;
@@ -1112,11 +1114,12 @@ public class ESItems {
 
 	public static final RegistryObject<Item, Item> GLEECH_EGG = registerItem("gleech_egg", () -> new GleechEggItem(new Item.Properties().stacksTo(16)));
 
-	public static final RegistryObject<Item, Item> SHATTERED_SWORD = registerItem("shattered_sword", () -> new ShatteredSwordItem(ESItemTiers.DEEPSILVER, new Item.Properties().rarity(Rarity.RARE).attributes(SwordItem.createAttributes(ESItemTiers.DEEPSILVER, 3, -2.4F))));
+	public static final RegistryObject<Item, Item> SHATTERED_SWORD = registerItem("shattered_sword", () -> new ShatteredSwordItem(ESItemTiers.DEEPSILVER, 3, -2.4F, new Item.Properties().rarity(Rarity.RARE)));
 	public static final RegistryObject<Item, Item> SHATTERED_SWORD_BLADE = registerItem("shattered_sword_blade", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE)));
 
 	public static final RegistryObject<Item, Item> TOOTH_OF_HUNGER = registerItem("tooth_of_hunger", () -> new Item(new Item.Properties()));
-	public static final RegistryObject<Item, Item> DAGGER_OF_HUNGER = registerItem("dagger_of_hunger", () -> new DaggerOfHungerItem(ESItemTiers.TOOTH_OF_HUNGER, new Item.Properties().rarity(Rarity.RARE).attributes(DaggerOfHungerItem.DEFAULT_ATTRIBUTE)));
+	public static final RegistryObject<Item, Item> DAGGER_OF_HUNGER = registerItem("dagger_of_hunger", () -> new DaggerOfHungerItem(ESItemTiers.TOOTH_OF_HUNGER, new Item.Properties().rarity(Rarity.RARE)));
+
 	public static final RegistryObject<Item, Item> VORACIOUS_ARROW = registerItem("voracious_arrow", () -> new VoraciousArrowItem(new Item.Properties()));
 	public static final RegistryObject<Item, Item> TOOTH_OF_HUNGER_TILES = registerItem("tooth_of_hunger_tiles", () -> new BlockItem(ESBlocks.TOOTH_OF_HUNGER_TILES.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> TOOTH_OF_HUNGER_TILE_SLAB = registerItem("tooth_of_hunger_tile_slab", () -> new BlockItem(ESBlocks.TOOTH_OF_HUNGER_TILE_SLAB.get(), new Item.Properties()));
@@ -1127,94 +1130,212 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> CRYSTALLIZED_SAND = registerItem("crystallized_sand", () -> new BlockItem(ESBlocks.CRYSTALLIZED_SAND.get(), new Item.Properties()));
 
 	// accessories
-	public static final RegistryObject<Item, Item> BATTLEAXE_PENDANT = registerItem("battleaxe_pendant", () -> new Item(new Item.Properties()
-		.component(ESDataComponents.ACCESSORY.get(), new Accessory(
-			ESTags.Items.AXE_ACCESSORY_APPLICABLE,
-			Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.axe").withStyle(ChatFormatting.BLUE),
-			ItemAttributeModifiers.builder()
-				.add(Attributes.ATTACK_SPEED, new AttributeModifier(EternalStarlight.id("battleaxe_pendant_attack_speed"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL), EquipmentSlotGroup.MAINHAND)
-				.build(),
-			List.of(
-				Component.translatable("tooltip." + EternalStarlight.ID + ".battleaxe_pendant.durability").withStyle(ChatFormatting.BLUE),
-				Component.translatable("tooltip." + EternalStarlight.ID + ".battleaxe_pendant.strip").withStyle(ChatFormatting.BLUE)
-			),
-			Optional.of(Style.EMPTY.withColor(0x415548)),
-			Optional.of(EternalStarlight.id("textures/accessory/battleaxe_pendant_overlay"))
-		))
-		.stacksTo(1)));
-	public static final RegistryObject<Item, Item> WARHAMMER_PENDANT = registerItem("warhammer_pendant", () -> new Item(new Item.Properties()
-		.component(ESDataComponents.ACCESSORY.get(), new Accessory(
-			ESTags.Items.HAMMER_ACCESSORY_APPLICABLE,
-			Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.hammer").withStyle(ChatFormatting.BLUE),
-			ItemAttributeModifiers.builder()
-				.add(Attributes.ATTACK_SPEED, new AttributeModifier(EternalStarlight.id("warhammer_pendant_attack_speed"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL), EquipmentSlotGroup.MAINHAND)
-				.build(),
-			List.of(
-				Component.translatable("tooltip." + EternalStarlight.ID + ".warhammer_pendant.speed_based_damage").withStyle(ChatFormatting.BLUE)
-			),
-			Optional.of(Style.EMPTY.withColor(0x8797b8)),
-			Optional.of(EternalStarlight.id("textures/accessory/warhammer_pendant_overlay"))
-		))
-		.stacksTo(1)));
-	public static final RegistryObject<Item, Item> BUTTERFLY_WINGS_AMULET = registerItem("butterfly_wings_amulet", () -> new Item(new Item.Properties()
-		.component(ESDataComponents.ACCESSORY.get(), new Accessory(
-			ESTags.Items.CHEST_ARMOR_ACCESSORY_APPLICABLE,
-			Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.chestplate").withStyle(ChatFormatting.BLUE),
-			ItemAttributeModifiers.builder()
-				.add(ESAttributes.ETHER_RESISTANCE.asHolder(), new AttributeModifier(EternalStarlight.id("butterfly_wings_amulet_ether_resistance"), 0.5, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.CHEST)
-				.build(),
-			List.of(
-				Component.translatable("tooltip." + EternalStarlight.ID + ".butterfly_wings_amulet.armor_erosion").withStyle(ChatFormatting.BLUE)
-			),
-			Optional.of(Style.EMPTY.withColor(0xd1ffe1)),
-			Optional.of(EternalStarlight.id("textures/accessory/butterfly_wings_amulet_overlay"))
-		))
-		.stacksTo(1)));
-	public static final RegistryObject<Item, Item> FUNGUS_AMULET = registerItem("fungus_amulet", () -> new Item(new Item.Properties()
-		.component(ESDataComponents.ACCESSORY.get(), new Accessory(
-			ESTags.Items.CHEST_ARMOR_ACCESSORY_APPLICABLE,
-			Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.chestplate").withStyle(ChatFormatting.BLUE),
-			ItemAttributeModifiers.builder()
-				.add(ESAttributes.HEAL_MULTIPLIER.asHolder(), new AttributeModifier(EternalStarlight.id("fungus_amulet_heal_multiplier"), 0.5, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.CHEST)
-				.build(),
-			List.of(
-				Component.translatable("tooltip." + EternalStarlight.ID + ".fungus_amulet.consume_fungus").withStyle(ChatFormatting.BLUE)
-			),
-			Optional.of(Style.EMPTY.withColor(0xccbb98)),
-			Optional.of(EternalStarlight.id("textures/accessory/fungus_amulet_overlay"))
-		))
-		.stacksTo(1)));
-	public static final RegistryObject<Item, Item> PEARL_NECKLACE = registerItem("pearl_necklace", () -> new Item(new Item.Properties()
-		.component(ESDataComponents.ACCESSORY.get(), new Accessory(
-			ESTags.Items.CHEST_ARMOR_ACCESSORY_APPLICABLE,
-			Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.chestplate").withStyle(ChatFormatting.BLUE),
-			ItemAttributeModifiers.builder()
-				.add(Attributes.OXYGEN_BONUS, new AttributeModifier(EternalStarlight.id("pearl_necklace_oxygen_bonus"), 3, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.CHEST)
-				.add(Attributes.SUBMERGED_MINING_SPEED, new AttributeModifier(EternalStarlight.id("pearl_necklace_submerged_mining_speed"), 4, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL), EquipmentSlotGroup.CHEST)
-				.build(),
-			List.of(
-				Component.translatable("tooltip." + EternalStarlight.ID + ".pearl_necklace.instant_air_recovery").withStyle(ChatFormatting.BLUE)
-			),
-			Optional.of(Style.EMPTY.withColor(0xcfddb4)),
-			Optional.of(EternalStarlight.id("textures/accessory/pearl_necklace_overlay"))
-		))
-		.stacksTo(1)));
-	public static final RegistryObject<Item, Item> CRESCENT_PENDANT = registerItem("crescent_pendant", () -> new Item(new Item.Properties()
-		.rarity(Rarity.RARE)
-		.component(ESDataComponents.ACCESSORY.get(), new Accessory(
-			ESTags.Items.CHEST_ARMOR_ACCESSORY_APPLICABLE,
-			Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.chestplate").withStyle(ChatFormatting.BLUE),
-			ItemAttributeModifiers.builder()
-				.add(Attributes.ATTACK_DAMAGE, new AttributeModifier(EternalStarlight.id("crescent_pendant_attack_damage"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL), EquipmentSlotGroup.CHEST)
-				.build(),
-			List.of(
-				Component.translatable("tooltip." + EternalStarlight.ID + ".crescent_pendant.damage_cap").withStyle(ChatFormatting.BLUE),
-				Component.translatable("tooltip." + EternalStarlight.ID + ".crescent_pendant.repair").withStyle(ChatFormatting.BLUE)
-			),
-			Optional.of(Style.EMPTY.withColor(0x6666a3)),
-			Optional.of(EternalStarlight.id("textures/accessory/crescent_pendant_overlay"))
-		))
-		.stacksTo(1)));
+	public static final RegistryObject<Item, Item> BATTLEAXE_PENDANT =
+		registerItem("battleaxe_pendant", () -> {
+			Item item = new Item(new Item.Properties().stacksTo(1));
+
+			Multimap<Attribute, AttributeModifier> attrs =
+				ImmutableMultimap.<Attribute, AttributeModifier>builder()
+					.put(
+						Attributes.ATTACK_SPEED,
+						new AttributeModifier(
+							EternalStarlight.id("battleaxe_pendant_attack_speed").toString(),
+							0.15,
+							AttributeModifier.Operation.MULTIPLY_TOTAL
+						)
+					)
+					.build();
+
+			ESAccessories.register(item, new Accessory(
+				ESTags.Items.AXE_ACCESSORY_APPLICABLE,
+				Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.axe")
+					.withStyle(ChatFormatting.BLUE),
+				attrs,
+				List.of(
+					Component.translatable("tooltip." + EternalStarlight.ID + ".battleaxe_pendant.durability")
+						.withStyle(ChatFormatting.BLUE),
+					Component.translatable("tooltip." + EternalStarlight.ID + ".battleaxe_pendant.strip")
+						.withStyle(ChatFormatting.BLUE)
+				),
+				Optional.of(Style.EMPTY.withColor(0x415548)),
+				Optional.of(EternalStarlight.id("textures/accessory/battleaxe_pendant_overlay"))
+			));
+
+			return item;
+		});
+
+	public static final RegistryObject<Item, Item> WARHAMMER_PENDANT =
+		registerItem("warhammer_pendant", () -> {
+			Item item = new Item(new Item.Properties().stacksTo(1));
+
+			Multimap<Attribute, AttributeModifier> attrs =
+				ImmutableMultimap.<Attribute, AttributeModifier>builder()
+					.put(
+						Attributes.ATTACK_SPEED,
+						new AttributeModifier(
+							EternalStarlight.id("warhammer_pendant_attack_speed").toString(),
+							0.15,
+							AttributeModifier.Operation.MULTIPLY_TOTAL
+						)
+					)
+					.build();
+
+			ESAccessories.register(item, new Accessory(
+				ESTags.Items.HAMMER_ACCESSORY_APPLICABLE,
+				Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.hammer")
+					.withStyle(ChatFormatting.BLUE),
+				attrs,
+				List.of(
+					Component.translatable("tooltip." + EternalStarlight.ID + ".warhammer_pendant.speed_based_damage")
+						.withStyle(ChatFormatting.BLUE)
+				),
+				Optional.of(Style.EMPTY.withColor(0x8797b8)),
+				Optional.of(EternalStarlight.id("textures/accessory/warhammer_pendant_overlay"))
+			));
+
+			return item;
+		});
+
+	public static final RegistryObject<Item, Item> BUTTERFLY_WINGS_AMULET =
+		registerItem("butterfly_wings_amulet", () -> {
+			Item item = new Item(new Item.Properties().stacksTo(1));
+
+			Multimap<Attribute, AttributeModifier> attrs =
+				ImmutableMultimap.<Attribute, AttributeModifier>builder()
+					.put(
+						ESAttributes.ETHER_RESISTANCE.get(),
+						new AttributeModifier(
+							EternalStarlight.id("butterfly_wings_amulet_ether_resistance").toString(),
+							0.5,
+							AttributeModifier.Operation.ADDITION
+						)
+					)
+					.build();
+
+			ESAccessories.register(item, new Accessory(
+				ESTags.Items.CHEST_ARMOR_ACCESSORY_APPLICABLE,
+				Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.chestplate")
+					.withStyle(ChatFormatting.BLUE),
+				attrs,
+				List.of(
+					Component.translatable("tooltip." + EternalStarlight.ID + ".butterfly_wings_amulet.armor_erosion")
+						.withStyle(ChatFormatting.BLUE)
+				),
+				Optional.of(Style.EMPTY.withColor(0xd1ffe1)),
+				Optional.of(EternalStarlight.id("textures/accessory/butterfly_wings_amulet_overlay"))
+			));
+
+			return item;
+		});
+
+	public static final RegistryObject<Item, Item> FUNGUS_AMULET =
+		registerItem("fungus_amulet", () -> {
+			Item item = new Item(new Item.Properties().stacksTo(1));
+
+			Multimap<Attribute, AttributeModifier> attrs =
+				ImmutableMultimap.<Attribute, AttributeModifier>builder()
+					.put(
+						ESAttributes.HEAL_MULTIPLIER.get(),
+						new AttributeModifier(
+							EternalStarlight.id("fungus_amulet_heal_multiplier").toString(),
+							0.5,
+							AttributeModifier.Operation.ADDITION
+						)
+					)
+					.build();
+
+			ESAccessories.register(item, new Accessory(
+				ESTags.Items.CHEST_ARMOR_ACCESSORY_APPLICABLE,
+				Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.chestplate")
+					.withStyle(ChatFormatting.BLUE),
+				attrs,
+				List.of(
+					Component.translatable("tooltip." + EternalStarlight.ID + ".fungus_amulet.consume_fungus")
+						.withStyle(ChatFormatting.BLUE)
+				),
+				Optional.of(Style.EMPTY.withColor(0xccbb98)),
+				Optional.of(EternalStarlight.id("textures/accessory/fungus_amulet_overlay"))
+			));
+
+			return item;
+		});
+
+	/* attributes don't exist in 1.20.1
+
+	public static final RegistryObject<Item, Item> PEARL_NECKLACE =
+		registerItem("pearl_necklace", () -> {
+			Item item = new Item(new Item.Properties().stacksTo(1));
+
+			Multimap<Attribute, AttributeModifier> attrs =
+				ImmutableMultimap.<Attribute, AttributeModifier>builder()
+					.put(
+						Attributes.OXYGEN_BONUS,
+						new AttributeModifier(
+							EternalStarlight.id("pearl_necklace_oxygen_bonus").toString(),
+							3,
+							AttributeModifier.Operation.ADDITION
+						)
+					)
+					.put(
+						Attributes.SUBMERGED_MINING_SPEED,
+						new AttributeModifier(
+							EternalStarlight.id("pearl_necklace_submerged_mining_speed").toString(),
+							4,
+							AttributeModifier.Operation.MULTIPLY_TOTAL
+						)
+					)
+					.build();
+
+			ESAccessories.register(item, new Accessory(
+				ESTags.Items.CHEST_ARMOR_ACCESSORY_APPLICABLE,
+				Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.chestplate")
+					.withStyle(ChatFormatting.BLUE),
+				attrs,
+				List.of(
+					Component.translatable("tooltip." + EternalStarlight.ID + ".pearl_necklace.instant_air_recovery")
+						.withStyle(ChatFormatting.BLUE)
+				),
+				Optional.of(Style.EMPTY.withColor(0xcfddb4)),
+				Optional.of(EternalStarlight.id("textures/accessory/pearl_necklace_overlay"))
+			));
+
+			return item;
+		});
+	 */
+
+	public static final RegistryObject<Item, Item> CRESCENT_PENDANT =
+		registerItem("crescent_pendant", () -> {
+			Item item = new Item(new Item.Properties().stacksTo(1).rarity(Rarity.RARE));
+
+			Multimap<Attribute, AttributeModifier> attrs =
+				ImmutableMultimap.<Attribute, AttributeModifier>builder()
+					.put(
+						Attributes.ATTACK_DAMAGE,
+						new AttributeModifier(
+							EternalStarlight.id("crescent_pendant_attack_damage").toString(),
+							0.15,
+							AttributeModifier.Operation.MULTIPLY_TOTAL
+						)
+					)
+					.build();
+
+			ESAccessories.register(item, new Accessory(
+				ESTags.Items.CHEST_ARMOR_ACCESSORY_APPLICABLE,
+				Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target.chestplate")
+					.withStyle(ChatFormatting.BLUE),
+				attrs,
+				List.of(
+					Component.translatable("tooltip." + EternalStarlight.ID + ".crescent_pendant.damage_cap")
+						.withStyle(ChatFormatting.BLUE),
+					Component.translatable("tooltip." + EternalStarlight.ID + ".crescent_pendant.repair")
+						.withStyle(ChatFormatting.BLUE)
+				),
+				Optional.of(Style.EMPTY.withColor(0x6666a3)),
+				Optional.of(EternalStarlight.id("textures/accessory/crescent_pendant_overlay"))
+			));
+
+			return item;
+		});
 
 	// loot chest
 	public static final RegistryObject<Item, Item> LOOT_CHEST = registerItem("loot_chest", () -> new BlockItem(ESBlocks.LOOT_CHEST.get(), new Item.Properties()));
@@ -1229,7 +1350,8 @@ public class ESItems {
 	// gatekeeper
 	public static final RegistryObject<Item, Item> LOOT_BAG = registerItem("loot_bag", () -> new LootBagItem(new Item.Properties().fireResistant().rarity(Rarity.RARE)));
 	public static final RegistryObject<Item, Item> STARLIGHT_SILVER_COIN = registerItem("starlight_silver_coin", () -> new Item(new Item.Properties().rarity(Rarity.RARE)));
-	public static final RegistryObject<Item, Item> BOOK = registerItem("book", () -> new ESBookItem(new Item.Properties().component(ESDataComponents.BOOK.get(), new GuideBook(EternalStarlight.id("main"), new HashSet<>(Set.of(EternalStarlight.ID)))).rarity(Rarity.RARE).stacksTo(1)));
+	public static final RegistryObject<Item, Item> BOOK = registerItem("book", () -> new ESBookItem(new Item.Properties().rarity(Rarity.RARE).stacksTo(1)));
+
 	public static final RegistryObject<Item, Item> SEEKING_EYE = registerItem("seeking_eye", () -> new SeekingEyeItem(new Item.Properties()));
 	public static final RegistryObject<Item, Item> GLISTERING_SWORD = registerItem("glistering_sword",
 		() -> new SwordItem(ESItemTiers.GLISTERING, new Item.Properties().rarity(Rarity.RARE).attributes(SwordItem.createAttributes(ESItemTiers.GLISTERING, 3, -2.4F))));

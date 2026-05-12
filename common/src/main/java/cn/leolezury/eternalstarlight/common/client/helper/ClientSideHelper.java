@@ -120,7 +120,7 @@ public class ClientSideHelper implements ClientHelper {
 			Inventory inventory = player.getInventory();
 			for (int i = 0; i < inventory.getContainerSize(); i++) {
 				ItemStack stack = inventory.getItem(i);
-				GuideBook guideBook = stack.get(ESDataComponents.BOOK.get());
+				GuideBook guideBook = GuideBook.getGuideBook(stack);
 				if (guideBook != null) {
 					bookIds.add(guideBook.id());
 				}

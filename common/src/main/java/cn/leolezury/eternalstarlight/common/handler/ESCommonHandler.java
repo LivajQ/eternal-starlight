@@ -70,6 +70,7 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -163,90 +164,138 @@ public class ESCommonHandler {
 		}
 	}
 
-	public static void onItemTooltip(Player player, TooltipFlag flags, ItemStack itemStack, List<Component> tooltip, Item.TooltipContext context) {
-		HolderLookup.Provider lookup = context.registries();
-		Accessory accessory = itemStack.get(ESDataComponents.ACCESSORY.get());
-		// copied from ItemStack#addAttributeTooltips
+	public static void onItemTooltip(Player player, TooltipFlag flags, ItemStack itemStack, List<Component> tooltip) {
+
+		Accessory accessory = ESAccessories.get(itemStack);
 		if (accessory != null) {
-			if ((accessory.attributeModifiers().showInTooltip() && !accessory.attributeModifiers().modifiers().isEmpty()) || !accessory.extraDescription().isEmpty()) {
+
+			boolean hasAttributes = !accessory.attributeModifiers().isEmpty();
+			boolean hasExtra = !accessory.extraDescription().isEmpty();
+
+			if (hasAttributes || hasExtra) {
 				tooltip.add(CommonComponents.EMPTY);
-				tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combined").withStyle(ChatFormatting.GRAY));
+				tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combined")
+					.withStyle(ChatFormatting.GRAY));
 			}
-			if (accessory.attributeModifiers().showInTooltip()) {
-				for (EquipmentSlotGroup slotGroup : EquipmentSlotGroup.values()) {
-					accessory.attributeModifiers().forEach(slotGroup, (holder, modifier) -> itemStack.addModifierTooltip(tooltip::add, player, holder, modifier));
+
+			if (hasAttributes) {
+				for (var entry : accessory.attributeModifiers().entries()) {
+					Attribute attr = entry.getKey();
+					AttributeModifier mod = entry.getValue();
+
+					tooltip.add(
+						Component.literal(" ")
+							.append(Component.translatable(attr.getDescriptionId()))
+							.append(": ")
+							.append(Component.literal(String.valueOf(mod.getAmount()))
+								.withStyle(mod.getAmount() >= 0 ? ChatFormatting.BLUE : ChatFormatting.RED))
+					);
 				}
 			}
+
 			for (Component desc : accessory.extraDescription()) {
 				tooltip.add(Component.literal(" ").append(desc));
 			}
+
 			tooltip.add(CommonComponents.EMPTY);
-			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target").withStyle(ChatFormatting.GRAY));
+			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_combination_target")
+				.withStyle(ChatFormatting.GRAY));
 			tooltip.add(Component.literal(" ").append(accessory.combinationTargetDescription()));
 		}
-		if (itemStack.has(ESDataComponents.ACCESSORIES.get())) {
-			List<ItemStack> accessories = itemStack.getOrDefault(ESDataComponents.ACCESSORIES.get(), new ArrayList<>());
-			if (!accessories.isEmpty()) {
-				tooltip.add(CommonComponents.EMPTY);
-				tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".accessories").withStyle(ChatFormatting.GRAY));
-				accessories.forEach(accessoryStack -> {
-					Accessory data = accessoryStack.get(ESDataComponents.ACCESSORY.get());
-					MutableComponent name = Component.literal(" ").append(accessoryStack.getHoverName());
-					if (data != null && data.nameStyle().isPresent()) {
-						name.withStyle(data.nameStyle().get());
+
+		List<ItemStack> accessories = ESAccessoryUtil.getAccessoryStacks(itemStack);
+		if (!accessories.isEmpty()) {
+			tooltip.add(CommonComponents.EMPTY);
+			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".accessories")
+				.withStyle(ChatFormatting.GRAY));
+
+			for (ItemStack accStack : accessories) {
+				Accessory data = ESAccessories.get(accStack);
+
+				MutableComponent name = Component.literal(" ").append(accStack.getHoverName());
+				if (data != null && data.nameStyle().isPresent()) {
+					name.withStyle(data.nameStyle().get());
+				}
+				tooltip.add(name);
+
+				if (data != null) {
+					for (Component desc : data.extraDescription()) {
+						tooltip.add(Component.literal(" ").append(desc));
 					}
-					tooltip.add(name);
-					if (data != null) {
-						for (Component desc : data.extraDescription()) {
-							tooltip.add(Component.literal(" ").append(desc));
-						}
-					}
-				});
+				}
 			}
 		}
-		int accessorySlotCount = itemStack.getOrDefault(ESDataComponents.ACCESSORY_SLOT_COUNT.get(), 1);
+
+		int accessorySlotCount = ESAccessoryUtil.getAccessorySlotCount(itemStack);
 		if (accessorySlotCount > 1) {
 			tooltip.add(CommonComponents.EMPTY);
-			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".accessory_slot_count", accessorySlotCount).withStyle(ChatFormatting.BLUE));
+			tooltip.add(Component.translatable(
+				"tooltip." + EternalStarlight.ID + ".accessory_slot_count",
+				accessorySlotCount
+			).withStyle(ChatFormatting.BLUE));
 		}
+
 		if (itemStack.is(ESTags.Items.FLOWGLAZE_WEAPONS)) {
 			tooltip.add(CommonComponents.EMPTY);
 			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".flowglaze_weapon").withColor(0x8ed6b0));
 			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".flowglaze_tool").withColor(0x8ed6b0));
 		}
+
 		if (itemStack.is(ESItems.FLOWGLAZE_BOW.get())) {
 			tooltip.add(CommonComponents.EMPTY);
 			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".flowglaze_bow").withColor(0x8ed6b0));
 		}
+
 		if (itemStack.is(ESItems.FLOWGLAZE_SHIELD.get())) {
 			tooltip.add(CommonComponents.EMPTY);
 			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".flowglaze_shield").withColor(0x8ed6b0));
 		}
-		if (player != null && lookup != null && itemStack.is(ESTags.Items.SEEDS_LAUNCHER_AMMO) && player.getInventory().contains(stack -> stack.is(ESItems.SEEDS_LAUNCHER.get()))) {
+
+
+		// === SEEDS LAUNCHER AMMO ===
+		if (player != null &&
+			itemStack.is(ESTags.Items.SEEDS_LAUNCHER_AMMO) &&
+			player.getInventory().contains(s -> s.is(ESItems.SEEDS_LAUNCHER.get()))) {
+
 			tooltip.add(CommonComponents.EMPTY);
-			SeedsLauncherAmmoType type = SeedsLauncherAmmoType.getAmmoType(lookup, itemStack.getItem()).value();
-			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".seeds_launcher.ammo").withStyle(ChatFormatting.GRAY));
+
+			HolderLookup.Provider lookup = player.level().registryAccess();
+
+			SeedsLauncherAmmoType type =
+				SeedsLauncherAmmoType.getAmmoType(lookup, itemStack.getItem()).value();
+
+			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".seeds_launcher.ammo")
+				.withStyle(ChatFormatting.GRAY));
+
 			String damage = Math.round((type.damageMultiplier() - 1) * 100) + "%";
-			if (!damage.startsWith("-")) {
-				damage = "+" + damage;
-			}
+			if (!damage.startsWith("-")) damage = "+" + damage;
+
 			String speed = Math.round((type.speedMultiplier() - 1) * 100) + "%";
-			if (!speed.startsWith("-")) {
-				speed = "+" + speed;
-			}
+			if (!speed.startsWith("-")) speed = "+" + speed;
+
 			if (!damage.equals("+0%")) {
-				tooltip.add(Component.literal(" ").append(Component.translatable("tooltip." + EternalStarlight.ID + ".seeds_launcher.damage_multiplier", damage).withStyle(damage.startsWith("-") ? ChatFormatting.RED : ChatFormatting.BLUE)));
+				tooltip.add(Component.literal(" ")
+					.append(Component.translatable("tooltip." + EternalStarlight.ID + ".seeds_launcher.damage_multiplier", damage)
+						.withStyle(damage.startsWith("-") ? ChatFormatting.RED : ChatFormatting.BLUE)));
 			}
+
 			if (!speed.equals("+0%")) {
-				tooltip.add(Component.literal(" ").append(Component.translatable("tooltip." + EternalStarlight.ID + ".seeds_launcher.speed_multiplier", speed).withStyle(speed.startsWith("-") ? ChatFormatting.RED : ChatFormatting.BLUE)));
+				tooltip.add(Component.literal(" ")
+					.append(Component.translatable("tooltip." + EternalStarlight.ID + ".seeds_launcher.speed_multiplier", speed)
+						.withStyle(speed.startsWith("-") ? ChatFormatting.RED : ChatFormatting.BLUE)));
 			}
-			tooltip.add(Component.literal(" ").append(Component.translatable("tooltip." + EternalStarlight.ID + ".seeds_launcher.cooldown", type.cooldown()).withStyle(ChatFormatting.DARK_GREEN)));
+
+			tooltip.add(Component.literal(" ")
+				.append(Component.translatable("tooltip." + EternalStarlight.ID + ".seeds_launcher.cooldown", type.cooldown())
+					.withStyle(ChatFormatting.DARK_GREEN)));
 		}
+
 		if (itemStack.is(ESItems.UNDERMINER.get())) {
 			tooltip.add(CommonComponents.EMPTY);
 			tooltip.add(Component.translatable("tooltip." + EternalStarlight.ID + ".underminer").withColor(0x47adc4));
 		}
 	}
+
 
 	public static boolean onAllowLivingHurt(LivingEntity entity, DamageSource source, float amount) {
 		if (entity.getItemBySlot(EquipmentSlot.HEAD).is(ESItems.UNREALIUM_HELMET.get()) && source.is(DamageTypes.IN_WALL)) {
@@ -925,26 +974,35 @@ public class ESCommonHandler {
 				List<Crest.Instance> crests = ESCrestUtil.getOwnedCrests(player);
 				ItemStack mainHand = player.getMainHandItem();
 				ItemStack offHand = player.getOffhandItem();
-				ItemStack spellItem;
-				Holder<Crest> component = null;
 				Holder<Crest> nextCrest = null;
-				if (mainHand.has(ESDataComponents.CURRENT_CREST.get())) {
-					component = mainHand.get(ESDataComponents.CURRENT_CREST.get());
+				Crest.Instance component = null;
+				ItemStack spellItem;
+
+				Crest.Instance mainCrest = Crest.Instance.get(mainHand);
+				Crest.Instance offCrest  = Crest.Instance.get(offHand);
+
+				if (mainCrest != null) {
+					component = mainCrest;
 					spellItem = mainHand;
-				} else if (offHand.has(ESDataComponents.CURRENT_CREST.get())) {
-					component = offHand.get(ESDataComponents.CURRENT_CREST.get());
+
+				} else if (offCrest != null) {
+					component = offCrest;
 					spellItem = offHand;
+
 				} else if (mainHand.is(ESItems.ORB_OF_PROPHECY.get())) {
 					spellItem = mainHand;
+
 				} else if (offHand.is(ESItems.ORB_OF_PROPHECY.get())) {
 					spellItem = offHand;
+
 				} else {
 					spellItem = null;
 				}
+
 				if (component != null) {
 					find:
 					for (int i = 0; i < crests.size(); i++) {
-						if (crests.get(i).crest().is(component) && i < crests.size() - 1) {
+						if (sameCrest(crests.get(i).crest(), component.crest()) && i < crests.size() - 1) {
 							for (int j = i + 1; j < crests.size(); j++) {
 								if (crests.get(j).crest().value().getSpell().isPresent()) {
 									nextCrest = crests.get(j).crest();
@@ -953,7 +1011,8 @@ public class ESCommonHandler {
 							}
 						}
 					}
-				} else {
+				}
+				else {
 					for (Crest.Instance instance : crests) {
 						if (instance.crest().value().getSpell().isPresent()) {
 							nextCrest = instance.crest();
@@ -963,12 +1022,21 @@ public class ESCommonHandler {
 				}
 				if (spellItem != null) {
 					if (nextCrest != null && nextCrest.isBound()) {
-						spellItem.applyComponentsAndValidate(DataComponentPatch.builder().set(ESDataComponents.CURRENT_CREST.get(), nextCrest).build());
+						Crest.Instance.set(
+							spellItem,
+							new Crest.Instance(nextCrest, 1)
+						);
 					} else {
-						spellItem.remove(ESDataComponents.CURRENT_CREST.get());
+						spellItem.removeTagKey(Crest.Instance.TAG_CREST);
 					}
 				}
 			}
 		}
 	}
+
+	private static boolean sameCrest(Holder<Crest> a, Holder<Crest> b) {
+		return a.unwrapKey().orElseThrow().location()
+			.equals(b.unwrapKey().orElseThrow().location());
+	}
+
 }

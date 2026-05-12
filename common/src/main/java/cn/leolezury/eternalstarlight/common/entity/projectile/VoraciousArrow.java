@@ -1,11 +1,10 @@
 package cn.leolezury.eternalstarlight.common.entity.projectile;
 
-import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
 import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.particles.DustColorTransitionOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -44,15 +43,21 @@ public class VoraciousArrow extends AbstractArrow {
 	@Override
 	protected void doPostHurtEffects(LivingEntity livingEntity) {
 		super.doPostHurtEffects(livingEntity);
-		MobEffectInstance mobEffectInstance = new MobEffectInstance(MobEffects.HUNGER, this.duration, 0);
-		livingEntity.addEffect(mobEffectInstance, this.getEffectSource());
+		livingEntity.addEffect(new MobEffectInstance(MobEffects.HUNGER, this.duration, 0), this.getEffectSource());
+
 		if (getOwner() instanceof Player player) {
 			player.getFoodData().eat(3, 0);
+
 			for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
 				ItemStack stack = player.getInventory().getItem(i);
+
 				if (stack.is(ESItems.DAGGER_OF_HUNGER.get())) {
-					float hungerLevel = stack.getOrDefault(ESDataComponents.HUNGER_LEVEL.get(), 0f);
-					stack.applyComponentsAndValidate(DataComponentPatch.builder().set(ESDataComponents.HUNGER_LEVEL.get(), Math.min(1, hungerLevel + 0.05f)).build());
+					CompoundTag tag = stack.getOrCreateTag();
+
+					float hungerLevel = Mth.clamp(tag.getFloat("HungerLevel"), -1f, 1f);
+					float newHungerLevel = Math.min(1f, hungerLevel + 0.05f);
+
+					tag.putFloat("HungerLevel", newHungerLevel);
 				}
 			}
 		}

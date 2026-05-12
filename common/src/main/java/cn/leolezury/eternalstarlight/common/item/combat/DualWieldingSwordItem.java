@@ -24,8 +24,8 @@ import net.minecraft.world.phys.*;
 import java.util.List;
 
 public class DualWieldingSwordItem extends SwordItem {
-	public DualWieldingSwordItem(Tier tier, Properties properties) {
-		super(tier, properties);
+	public DualWieldingSwordItem(Tier tier, int attackDamage, float attackSpeed, Properties properties) {
+		super(tier, attackDamage, attackSpeed, properties);
 	}
 
 	@Override

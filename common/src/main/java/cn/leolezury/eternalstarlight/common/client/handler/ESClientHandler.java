@@ -244,12 +244,9 @@ public class ESClientHandler {
 			}
 			ItemStack mainHand = player.getMainHandItem();
 			ItemStack offHand = player.getOffhandItem();
-			Holder<Crest> component = null;
-			if (mainHand.has(ESDataComponents.CURRENT_CREST.get())) {
-				component = mainHand.get(ESDataComponents.CURRENT_CREST.get());
-			} else if (offHand.has(ESDataComponents.CURRENT_CREST.get())) {
-				component = offHand.get(ESDataComponents.CURRENT_CREST.get());
-			}
+			Crest.Instance component = Crest.Instance.get(mainHand);
+			if (component == null) component = Crest.Instance.get(offHand);
+
 			for (Map.Entry<ResourceKey<Crest>, GuiCrest> entry : GUI_CRESTS.entrySet()) {
 				entry.getValue().shouldShow = false;
 			}
@@ -722,10 +719,21 @@ public class ESClientHandler {
 
 	public static void renderOrbOfProphecyUse(GuiGraphics guiGraphics) {
 		LocalPlayer player = Minecraft.getInstance().player;
-		if (player != null && player.isUsingItem() && player.getUseItem().is(ESItems.ORB_OF_PROPHECY.get()) && !player.getUseItem().has(ESDataComponents.CURRENT_CREST.get())) {
+		if (player == null) return;
+
+		ItemStack using = player.getUseItem();
+		boolean hasCrest = Crest.Instance.get(using) != null;
+
+		if (player.isUsingItem() &&
+			using.is(ESItems.ORB_OF_PROPHECY.get()) &&
+			!hasCrest) {
+
 			int usingTicks = player.getTicksUsingItem();
-			float ticks = Math.min(usingTicks + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally()), 150f);
-			float progress = Math.min(ticks, 150f) / 150f;
+			float partial = Minecraft.getInstance().getFrameTime();
+
+			float ticks = Math.min(usingTicks + partial, 150f);
+			float progress = ticks / 150f;
+
 			if (usingTicks < 150) {
 				renderTextureOverlay(guiGraphics, ORB_OF_PROPHECY_USE, progress);
 			}

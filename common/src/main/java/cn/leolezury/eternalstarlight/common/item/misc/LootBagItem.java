@@ -1,9 +1,8 @@
 package cn.leolezury.eternalstarlight.common.item.misc;
 
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
-import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -18,30 +17,55 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 public class LootBagItem extends Item {
 	public LootBagItem(Properties properties) {
 		super(properties);
 	}
 
+	public static ResourceLocation getLootTable(ItemStack stack) {
+		CompoundTag tag = stack.getTag();
+		if (tag == null || !tag.contains("LootTable")) return null;
+		return new ResourceLocation(tag.getString("LootTable"));
+	}
+
+	public static void setLootTable(ItemStack stack, ResourceLocation table) {
+		stack.getOrCreateTag().putString("LootTable", table.toString());
+	}
+
 	private boolean dropLoot(Level level, Player player, ItemStack stack) {
-		ResourceKey<LootTable> component = stack.get(ESDataComponents.LOOT_TABLE.get());
-		if (!level.isClientSide && level instanceof ServerLevel serverLevel && component != null) {
-			MinecraftServer server = serverLevel.getServer();
-			LootTable table = server.reloadableRegistries().getLootTable(component);
-			LootParams.Builder paramBuilder = new LootParams.Builder(serverLevel);
-			LootParams params = paramBuilder.create(LootContextParamSets.EMPTY);
-			table.getRandomItems(params).forEach((loot) -> {
-				ItemEntity itemEntity = new ItemEntity(level, player.getX(), player.getY(), player.getZ(), loot);
+		ResourceLocation tableId = LootBagItem.getLootTable(stack);
+		if (tableId == null) return false;
+
+		if (!level.isClientSide && level instanceof ServerLevel serverLevel) {
+			LootTable table = serverLevel.getServer().getLootData().getLootTable(tableId);
+
+			LootParams params = new LootParams.Builder(serverLevel)
+				.withParameter(LootContextParams.THIS_ENTITY, player)
+				.withParameter(LootContextParams.ORIGIN, player.position())
+				.create(LootContextParamSets.EMPTY);
+
+			for (ItemStack loot : table.getRandomItems(params)) {
+				ItemEntity itemEntity = new ItemEntity(
+					level,
+					player.getX(),
+					player.getY(),
+					player.getZ(),
+					loot
+				);
+
 				ESDataAttachments.IMPORTANT_ITEM.setData(itemEntity, true);
 				itemEntity.setNoPickUpDelay();
 				itemEntity.setTarget(player.getUUID());
 				itemEntity.setExtendedLifetime();
 				level.addFreshEntity(itemEntity);
-			});
-			stack.consume(1, player);
+			}
+
+			stack.shrink(1);
 		}
-		return component != null;
+
+		return true;
 	}
 
 	@Override

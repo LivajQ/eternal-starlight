@@ -25,7 +25,7 @@ public abstract class InventoryChangeTriggerMixin {
 		List<String> listeningNamespaces = null;
 		for (int i = 0; i < inventory.getContainerSize(); i++) {
 			ItemStack inventoryItem = inventory.getItem(i);
-			GuideBook guideBook = inventoryItem.get(ESDataComponents.BOOK.get());
+			GuideBook guideBook = GuideBook.getGuideBook(inventoryItem);
 			if (guideBook != null) {
 				if (listeningNamespaces == null) {
 					listeningNamespaces = new ArrayList<>();

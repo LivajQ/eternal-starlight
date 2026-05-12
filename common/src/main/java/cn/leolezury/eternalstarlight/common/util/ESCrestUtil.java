@@ -122,19 +122,39 @@ public class ESCrestUtil {
 	public static void tickCrests(Player player) {
 		List<Crest.Instance> ownedSet = getOwnedCrests(player);
 		List<Crest.Instance> set = getCrests(player);
+
 		ItemStack mainHand = player.getMainHandItem();
-		ItemStack offHand = player.getOffhandItem();
-		if (mainHand.has(ESDataComponents.CURRENT_CREST.get())) {
-			Holder<Crest> component = mainHand.get(ESDataComponents.CURRENT_CREST.get());
-			if (component != null && component.isBound() && ownedSet.stream().noneMatch(c -> c.crest().is(component))) {
-				mainHand.remove(ESDataComponents.CURRENT_CREST.get());
+		ItemStack offHand  = player.getOffhandItem();
+
+		Crest.Instance mainInst = Crest.Instance.get(mainHand);
+		if (mainInst != null) {
+			Holder<Crest> component = mainInst.crest();
+
+			boolean owned = ownedSet.stream().anyMatch(c ->
+				c.crest().unwrapKey().orElseThrow().location()
+					.equals(component.unwrapKey().orElseThrow().location())
+			);
+
+			if (component.isBound() && !owned) {
+				mainHand.removeTagKey(Crest.Instance.TAG_CREST);
 			}
-		} else if (offHand.has(ESDataComponents.CURRENT_CREST.get())) {
-			Holder<Crest> component = offHand.get(ESDataComponents.CURRENT_CREST.get());
-			if (component != null && component.isBound() && ownedSet.stream().noneMatch(c -> c.crest().is(component))) {
-				offHand.remove(ESDataComponents.CURRENT_CREST.get());
+
+		} else {
+			Crest.Instance offInst = Crest.Instance.get(offHand);
+			if (offInst != null) {
+				Holder<Crest> component = offInst.crest();
+
+				boolean owned = ownedSet.stream().anyMatch(c ->
+					c.crest().unwrapKey().orElseThrow().location()
+						.equals(component.unwrapKey().orElseThrow().location())
+				);
+
+				if (component.isBound() && !owned) {
+					offHand.removeTagKey(Crest.Instance.TAG_CREST);
+				}
 			}
 		}
+
 		List<Crest.Instance> oldActiveCrests = new ArrayList<>(ESDataAttachments.OLD_ACTIVE_CRESTS.getData(player));
 		List<Crest.Instance> activeCrests = new ArrayList<>();
 		set.forEach(crest -> {

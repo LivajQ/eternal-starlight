@@ -2,7 +2,9 @@ package cn.leolezury.eternalstarlight.common.mixin.client;
 
 import cn.leolezury.eternalstarlight.common.client.handler.ESClientHandler;
 import cn.leolezury.eternalstarlight.common.item.component.Accessory;
+import cn.leolezury.eternalstarlight.common.registry.ESAccessories;
 import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
+import cn.leolezury.eternalstarlight.common.util.ESAccessoryUtil;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
@@ -35,18 +37,30 @@ public abstract class GuiGraphicsMixin {
 			blit(ESClientHandler.WIP_LOCATION, x, y, 0.0F, 0.0F, 16, 16, 16, 16);
 			this.pose.popPose();
 		}
-		List<ItemStack> accessories = itemStack.get(ESDataComponents.ACCESSORIES.get());
-		if (accessories != null && !accessories.isEmpty()) {
+
+		List<ItemStack> accessories = ESAccessoryUtil.getAccessoryStacks(itemStack);
+		if (!accessories.isEmpty()) {
 			for (ItemStack stack : accessories) {
-				Accessory accessory = stack.get(ESDataComponents.ACCESSORY.get());
+
+				Accessory accessory = ESAccessories.get(stack);
 				if (accessory != null && accessory.overlay().isPresent()) {
+
 					this.pose.pushPose();
 					this.pose.translate(0.0F, 0.0F, 198.0F);
-					blit(accessory.overlay().get().withSuffix(".png"), x, y, 0.0F, 0.0F, 16, 16, 16, 16);
+
+					blit(
+						accessory.overlay().get().withSuffix(".png"),
+						x, y,
+						0.0F, 0.0F,
+						16, 16,
+						16, 16
+					);
+
 					this.pose.popPose();
 					break;
 				}
 			}
 		}
 	}
+
 }

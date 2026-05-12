@@ -7,6 +7,7 @@ import cn.leolezury.eternalstarlight.common.block.entity.spawner.BossSpawnerBloc
 import cn.leolezury.eternalstarlight.common.client.handler.ESClientHandler;
 import cn.leolezury.eternalstarlight.common.config.ESConfig;
 import cn.leolezury.eternalstarlight.common.entity.living.phase.MultiBehaviorUser;
+import cn.leolezury.eternalstarlight.common.item.misc.LootBagItem;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import cn.leolezury.eternalstarlight.common.registry.*;
 import cn.leolezury.eternalstarlight.common.util.GlobalVec3;
@@ -224,9 +225,7 @@ public class ESBoss extends Monster implements MultiBehaviorUser {
 
 	public ItemStack getBossLootBag() {
 		ItemStack lootBag = new ItemStack(ESItems.LOOT_BAG.get());
-		lootBag.applyComponentsAndValidate(DataComponentPatch.builder()
-			.set(DataComponents.LORE, new ItemLore(List.of(getDisplayName())))
-			.set(ESDataComponents.LOOT_TABLE.get(), getBossLootTable()).build());
+		LootBagItem.setLootTable(lootBag, getBossLootTable());
 		return lootBag;
 	}
 

@@ -6,7 +6,6 @@ import cn.leolezury.eternalstarlight.common.entity.interfaces.SpellCaster;
 import cn.leolezury.eternalstarlight.common.network.OpenCrestGuiPacket;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
-import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
 import cn.leolezury.eternalstarlight.common.spell.SpellCastData;
 import cn.leolezury.eternalstarlight.common.util.ESCrestUtil;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
@@ -36,10 +35,17 @@ public class OrbOfProphecyItem extends Item {
 		if (livingEntity.getPose() != Pose.STANDING) {
 			livingEntity.stopUsingItem();
 		}
+
 		if (!level.isClientSide) {
-			if (!itemStack.has(ESDataComponents.CURRENT_CREST.get())) {
+			if (Crest.Instance.get(itemStack) == null) {
 				if (livingEntity.getTicksUsingItem() >= 140 && livingEntity instanceof ServerPlayer player) {
-					ESPlatform.INSTANCE.sendToClient(player, new OpenCrestGuiPacket(ESCrestUtil.getCrests(player), ESCrestUtil.getOwnedCrests(player)));
+					ESPlatform.INSTANCE.sendToClient(
+						player,
+						new OpenCrestGuiPacket(
+							ESCrestUtil.getCrests(player),
+							ESCrestUtil.getOwnedCrests(player)
+						)
+					);
 					player.stopUsingItem();
 					player.getCooldowns().addCooldown(this, 20);
 				}
@@ -48,29 +54,49 @@ public class OrbOfProphecyItem extends Item {
 	}
 
 	@Override
-	public int getUseDuration(ItemStack itemStack, LivingEntity entity) {
+	public int getUseDuration(ItemStack itemStack) {
 		return 72000;
 	}
 
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
 		ItemStack itemStack = player.getItemInHand(interactionHand);
+
 		if (player.getPose() == Pose.STANDING) {
-			if (!itemStack.has(ESDataComponents.CURRENT_CREST.get())) {
+			if (Crest.Instance.get(itemStack) == null) {
 				player.startUsingItem(interactionHand);
 				return InteractionResultHolder.consume(itemStack);
-			} else if (!level.isClientSide && player instanceof SpellCaster && !ESDataAttachments.SPELL_CAST_DATA.getData(player).hasSpell()) {
-				Holder<Crest> component = itemStack.get(ESDataComponents.CURRENT_CREST.get());
+			}
+
+			if (!level.isClientSide && player instanceof SpellCaster caster &&
+				!ESDataAttachments.SPELL_CAST_DATA.getData(player).hasSpell()) {
+
+				Crest.Instance inst = Crest.Instance.get(itemStack);
+				Holder<Crest> component = inst != null ? inst.crest() : null;
+
 				if (component != null && component.isBound()) {
 					Crest crest = component.value();
-					if (crest.getSpell().isPresent() && crest.getSpell().get().canCast(player, true)) {
-						ESDataAttachments.SPELL_SOURCE.setData(player, new SpellCastData.ItemSpellSource(this, interactionHand));
-						crest.getSpell().get().start(player, ESCrestUtil.getCrestLevel(player, component), true);
+
+					if (crest.getSpell().isPresent() &&
+						crest.getSpell().get().canCast(player, true)) {
+
+						ESDataAttachments.SPELL_SOURCE.setData(
+							player,
+							new SpellCastData.ItemSpellSource(this, interactionHand)
+						);
+
+						crest.getSpell().get().start(
+							player,
+							ESCrestUtil.getCrestLevel(player, component),
+							true
+						);
+
 						return InteractionResultHolder.consume(itemStack);
 					}
 				}
 			}
 		}
+
 		return InteractionResultHolder.pass(itemStack);
 	}
 

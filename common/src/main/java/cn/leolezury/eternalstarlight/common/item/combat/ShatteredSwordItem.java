@@ -1,9 +1,8 @@
 package cn.leolezury.eternalstarlight.common.item.combat;
 
 import cn.leolezury.eternalstarlight.common.entity.projectile.ThrownShatteredBlade;
-import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -19,38 +18,52 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.Level;
 
 public class ShatteredSwordItem extends SwordItem {
-	public ShatteredSwordItem(Tier tier, Properties properties) {
-		super(tier, properties);
+
+	public static final String TAG_HAS_BLADE = "HasBlade";
+
+	public ShatteredSwordItem(Tier tier, int attackDamage, float attackSpeed, Properties properties) {
+		super(tier, attackDamage, attackSpeed, properties);
 	}
 
-	public static boolean hasBlade(ItemStack itemStack) {
-		return itemStack.getOrDefault(ESDataComponents.HAS_BLADE.get(), true);
+	public static boolean hasBlade(ItemStack stack) {
+		CompoundTag tag = stack.getTag();
+		return tag == null || !tag.contains(TAG_HAS_BLADE) || tag.getBoolean(TAG_HAS_BLADE);
 	}
 
-	public static void setHasBlade(ItemStack itemStack, boolean hasBlade) {
-		itemStack.applyComponentsAndValidate(DataComponentPatch.builder().set(ESDataComponents.HAS_BLADE.get(), hasBlade).build());
+	public static void setHasBlade(ItemStack stack, boolean hasBlade) {
+		stack.getOrCreateTag().putBoolean(TAG_HAS_BLADE, hasBlade);
 	}
 
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
 		ItemStack itemStack = player.getItemInHand(interactionHand);
+
 		if (hasBlade(itemStack)) {
+
 			ThrownShatteredBlade blade = new ThrownShatteredBlade(level, player, itemStack);
 			blade.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 2.5F, 1.0F);
-			if (player.hasInfiniteMaterials()) {
+
+			if (player.getAbilities().instabuild) {
 				blade.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
 			}
 
 			level.addFreshEntity(blade);
-			level.playSound(null, blade.blockPosition(), SoundEvents.TRIDENT_THROW.value(), SoundSource.PLAYERS);
-			if (!player.hasInfiniteMaterials()) {
-				itemStack.hurtAndBreak(1, player, player.getUsedItemHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+			level.playSound(null, blade.blockPosition(), SoundEvents.TRIDENT_THROW, SoundSource.PLAYERS);
+
+			if (!player.getAbilities().instabuild) {
+				EquipmentSlot slot = interactionHand == InteractionHand.MAIN_HAND
+					? EquipmentSlot.MAINHAND
+					: EquipmentSlot.OFFHAND;
+
+				itemStack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(slot));
 				setHasBlade(itemStack, false);
 			}
+
 			player.awardStat(Stats.ITEM_USED.get(this));
 			return InteractionResultHolder.success(itemStack);
+
 		} else {
-			if (player.hasInfiniteMaterials()) {
+			if (player.getAbilities().instabuild) {
 				setHasBlade(itemStack, true);
 				return InteractionResultHolder.consume(itemStack);
 			} else {
@@ -64,6 +77,7 @@ public class ShatteredSwordItem extends SwordItem {
 				}
 			}
 		}
+
 		return InteractionResultHolder.fail(itemStack);
 	}
 

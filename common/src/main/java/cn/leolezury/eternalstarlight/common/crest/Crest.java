@@ -11,6 +11,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.resources.ResourceKey;
@@ -18,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +71,6 @@ public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optio
 		}
 	}
 
-
 	public record Instance(Holder<Crest> crest, int level) {
 		public static final Codec<Instance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			RegistryFixedCodec.create(ESRegistries.CREST).fieldOf("crest").forGetter(Instance::crest),
@@ -77,6 +78,19 @@ public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optio
 		).apply(instance, Instance::new));
 
 		public static final Codec<List<Instance>> LIST_CODEC = CODEC.listOf();
+		public static final String TAG_CREST = "CurrentCrest";
+
+		public static Instance get(ItemStack stack) {
+			CompoundTag tag = stack.getTag();
+			if (tag == null || !tag.contains(TAG_CREST)) return null;
+
+			CompoundTag crestTag = tag.getCompound(TAG_CREST);
+			return loadNBT(crestTag);
+		}
+
+		public static void set(ItemStack stack, Instance instance) {
+			stack.getOrCreateTag().put(TAG_CREST, instance.saveNBT());
+		}
 
 		public static Optional<Instance> of(RegistryAccess access, ResourceKey<Crest> key, int level) {
 			Registry<Crest> registry = access.registryOrThrow(ESRegistries.CREST);
@@ -98,6 +112,24 @@ public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optio
 		public void write(FriendlyByteBuf buf) {
 			buf.writeUtf(crest.unwrapKey().orElseThrow().location().toString());
 			buf.writeInt(level);
+		}
+
+		public CompoundTag saveNBT() {
+			CompoundTag tag = new CompoundTag();
+			tag.putString("Crest", crest.unwrapKey().orElseThrow().location().toString());
+			tag.putInt("Level", level);
+			return tag;
+		}
+
+		public static Instance loadNBT(CompoundTag tag) {
+			ResourceLocation key = new ResourceLocation(tag.getString("Crest"));
+			int level = tag.getInt("Level");
+
+			Registry<Crest> registry = Minecraft.getInstance().level.registryAccess().registryOrThrow(ESRegistries.CREST);
+			Holder<Crest> holder = registry.getHolder(ResourceKey.create(ESRegistries.CREST, key))
+				.orElseThrow(() -> new IllegalStateException("Unknown crest: " + key));
+
+			return new Instance(holder, level);
 		}
 	}
 }
