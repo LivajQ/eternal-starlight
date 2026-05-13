@@ -1,10 +1,6 @@
 package cn.leolezury.eternalstarlight.common.item.component;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.AbstractList;
@@ -65,32 +61,9 @@ public class LargeItemStackList extends AbstractList<LargeItemStackList.LargeIte
 	}
 
 	public static class LargeItemStack {
+
 		private final ItemStack item;
-
-		public ItemStack getItem() {
-			return item;
-		}
-
 		private int count;
-
-		public int getCount() {
-			return count;
-		}
-
-		public void setCount(int count) {
-			this.count = count;
-		}
-
-		public static final Codec<LargeItemStack> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
-			ItemStack.SINGLE_ITEM_CODEC.fieldOf("item").forGetter(LargeItemStack::getItem),
-			Codec.INT.fieldOf("count").forGetter(LargeItemStack::getCount)
-		).apply(instance, LargeItemStack::new));
-
-		public static final StreamCodec<RegistryFriendlyByteBuf, LargeItemStack> STREAM_CODEC = StreamCodec.composite(
-			ItemStack.STREAM_CODEC, LargeItemStack::getItem,
-			ByteBufCodecs.INT, LargeItemStack::getCount,
-			LargeItemStack::new
-		);
 
 		public LargeItemStack(ItemStack stack) {
 			this(stack.copyWithCount(1), stack.getCount());
@@ -101,31 +74,41 @@ public class LargeItemStackList extends AbstractList<LargeItemStackList.LargeIte
 			this.count = count;
 		}
 
+		public ItemStack getItem() { return item; }
+		public int getCount() { return count; }
+		public void setCount(int count) { this.count = count; }
+
 		public boolean isEmpty() {
 			return item.isEmpty() || count == 0;
 		}
 
-		public void grow(int amount) {
-			setCount(getCount() + amount);
-		}
+		public void grow(int amount) { count += amount; }
+		public void shrink(int amount) { count -= amount; }
 
-		public void shrink(int amount) {
-			grow(-amount);
-		}
-
-		public ItemStack split(int splitAmount) {
-			int splitCount = Math.min(splitAmount, count);
-			ItemStack stack = item.copyWithCount(splitCount);
+		public ItemStack split(int amount) {
+			int splitCount = Math.min(amount, count);
+			ItemStack out = item.copyWithCount(splitCount);
 			count -= splitCount;
-			return stack;
+			return out;
 		}
 
 		public ItemStack splitMaxStack() {
 			return split(item.getMaxStackSize());
 		}
 
-		public ItemStack asItemStack() {
-			return item.copyWithCount(count);
+		public CompoundTag toTag() {
+			CompoundTag tag = new CompoundTag();
+			CompoundTag itemTag = new CompoundTag();
+			item.save(itemTag);
+			tag.put("Item", itemTag);
+			tag.putInt("Count", count);
+			return tag;
+		}
+
+		public static LargeItemStack fromTag(CompoundTag tag) {
+			ItemStack item = ItemStack.of(tag.getCompound("Item"));
+			int count = tag.getInt("Count");
+			return new LargeItemStack(item, count);
 		}
 	}
 }

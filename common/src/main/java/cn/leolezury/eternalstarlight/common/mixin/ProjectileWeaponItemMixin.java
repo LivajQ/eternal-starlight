@@ -1,12 +1,11 @@
 package cn.leolezury.eternalstarlight.common.mixin;
 
 import cn.leolezury.eternalstarlight.common.item.component.LargeItemStackList;
-import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
+import cn.leolezury.eternalstarlight.common.item.misc.GalacticQuiverItem;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Unit;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -26,19 +25,25 @@ import java.util.function.Predicate;
 public abstract class ProjectileWeaponItemMixin {
 	@Inject(method = "getHeldProjectile", at = @At("RETURN"), cancellable = true)
 	private static void getHeldProjectile(LivingEntity livingEntity, Predicate<ItemStack> predicate, CallbackInfoReturnable<ItemStack> cir) {
-		if (cir.getReturnValue().isEmpty() && livingEntity instanceof Player player) {
-			Inventory inventory = player.getInventory();
-			for (int i = 0; i < inventory.getContainerSize(); i++) {
-				ItemStack inventoryItem = inventory.getItem(i);
-				if (inventoryItem.is(ESItems.GALACTIC_QUIVER.get())) {
-					List<LargeItemStackList.LargeItemStack> arrows = inventoryItem.getOrDefault(ESDataComponents.ARROWS.get(), new LargeItemStackList(List.of()));
-					for (LargeItemStackList.LargeItemStack arrowStack : arrows) {
-						if (predicate.test(arrowStack.getItem())) {
-							ItemStack ammo = arrowStack.getItem().copy();
-							ammo.set(ESDataComponents.QUIVER_ARROW.get(), Unit.INSTANCE);
-							cir.setReturnValue(ammo);
-							return;
-						}
+		if (!cir.getReturnValue().isEmpty() || !(livingEntity instanceof Player player)) return;
+
+		Inventory inv = player.getInventory();
+
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack quiver = inv.getItem(i);
+
+			if (quiver.is(ESItems.GALACTIC_QUIVER.get())) {
+
+				LargeItemStackList arrows = GalacticQuiverItem.getArrows(quiver);
+
+				for (LargeItemStackList.LargeItemStack arrow : arrows) {
+
+					if (predicate.test(arrow.getItem())) {
+						ItemStack ammo = arrow.getItem().copy();
+						ammo.getOrCreateTag().putBoolean("FromQuiver", true);
+
+						cir.setReturnValue(ammo);
+						return;
 					}
 				}
 			}
@@ -46,29 +51,45 @@ public abstract class ProjectileWeaponItemMixin {
 	}
 
 	@Inject(method = "useAmmo", at = @At("RETURN"))
-	private static void useAmmo(ItemStack weapon, ItemStack ammo, LivingEntity shooter, boolean intangable, CallbackInfoReturnable<ItemStack> cir, @Local(ordinal = 0) int ammoUse) {
+	private static void useAmmo(ItemStack weapon, ItemStack ammo, LivingEntity shooter, boolean intangible, CallbackInfoReturnable<ItemStack> cir, @Local(ordinal = 0) int ammoUse) {
 		int use = ammoUse;
 		ItemStack result = cir.getReturnValue();
-		if (shooter instanceof Player player && result.has(ESDataComponents.QUIVER_ARROW.get()) && use > 0) {
-			Inventory inventory = player.getInventory();
-			for (int i = 0; i < inventory.getContainerSize(); i++) {
-				ItemStack inventoryItem = inventory.getItem(i);
-				if (inventoryItem.is(ESItems.GALACTIC_QUIVER.get())) {
-					List<LargeItemStackList.LargeItemStack> arrows = new ArrayList<>(inventoryItem.getOrDefault(ESDataComponents.ARROWS.get(), new LargeItemStackList(List.of())));
-					for (LargeItemStackList.LargeItemStack arrowStack : arrows) {
-						ItemStack item = arrowStack.getItem().copy();
-						item.set(ESDataComponents.QUIVER_ARROW.get(), Unit.INSTANCE);
-						if (ItemStack.isSameItemSameComponents(item, result)) {
-							int shrink = Math.min(use, arrowStack.getCount());
-							arrowStack.shrink(shrink);
-							use -= shrink;
-						}
+
+		if (!(shooter instanceof Player player)) return;
+		if (use <= 0) return;
+
+		if (!result.hasTag() || !result.getTag().getBoolean("FromQuiver")) return;
+
+		Inventory inv = player.getInventory();
+
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack quiver = inv.getItem(i);
+
+			if (quiver.is(ESItems.GALACTIC_QUIVER.get())) {
+				LargeItemStackList list = GalacticQuiverItem.getArrows(quiver);
+				List<LargeItemStackList.LargeItemStack> arrows = new ArrayList<>(list);
+
+				for (LargeItemStackList.LargeItemStack arrowStack : arrows) {
+					ItemStack compare = arrowStack.getItem().copy();
+					compare.getOrCreateTag().putBoolean("FromQuiver", true);
+
+					if (ItemStack.isSameItemSameTags(compare, result)) {
+
+						int shrink = Math.min(use, arrowStack.getCount());
+						arrowStack.shrink(shrink);
+						use -= shrink;
+
+						if (use <= 0) break;
 					}
-					arrows.removeIf(LargeItemStackList.LargeItemStack::isEmpty);
-					inventoryItem.set(ESDataComponents.ARROWS.get(), new LargeItemStackList(Collections.unmodifiableList(arrows)));
-					if (player instanceof ServerPlayer serverPlayer) {
-						serverPlayer.connection.send(new ClientboundContainerSetSlotPacket(ClientboundContainerSetSlotPacket.PLAYER_INVENTORY, 0, i, inventoryItem));
-					}
+				}
+
+				arrows.removeIf(LargeItemStackList.LargeItemStack::isEmpty);
+				GalacticQuiverItem.setArrows(quiver, new LargeItemStackList(Collections.unmodifiableList(arrows)));
+
+				if (player instanceof ServerPlayer sp) {
+					sp.connection.send(new ClientboundContainerSetSlotPacket(
+						ClientboundContainerSetSlotPacket.PLAYER_INVENTORY, 0, i, quiver
+					));
 				}
 			}
 		}

@@ -48,6 +48,7 @@ import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -643,13 +644,25 @@ public class ESCommonHandler {
 			}
 		}
 		if (!level.isClientSide && entity instanceof AbstractArrow arrow) {
-			if (arrow.getPickupItemStackOrigin().has(ESDataComponents.QUIVER_ARROW.get())) {
-				arrow.getPickupItemStackOrigin().remove(ESDataComponents.QUIVER_ARROW.get());
+			ItemStack pickup = arrow.getPickupItem();
+			if (!pickup.isEmpty() && pickup.hasTag()) {
+				CompoundTag tag = pickup.getTag();
+				if (tag.getBoolean("FromQuiver")) {
+					tag.remove("FromQuiver");
+					if (tag.isEmpty()) {
+						pickup.setTag(null);
+					}
+				}
 			}
+
+			//TODO no stored weapon ref or even nbt on arrow so probably gotta figure something else out
+			/*
 			ItemStack weaponItem = arrow.getWeaponItem();
 			if (weaponItem != null && weaponItem.is(ESItems.UNREALIUM_CROSSBOW.get())) {
 				arrow.setPierceLevel(Byte.MAX_VALUE);
 			}
+			 */
+
 			if (!arrow.inGround) {
 				if (ESDataAttachments.ARROW_TYPE.getData(arrow).equals(FLOWGLAZE_ARROW)) {
 					float previousExtra = ESDataAttachments.FLOWGLAZE_ARROW_EXTRA_BASE_DAMAGE.getData(arrow);
@@ -707,8 +720,12 @@ public class ESCommonHandler {
 				}
 				Inventory inventory = player.getInventory();
 				for (int i = 0; i < inventory.getContainerSize(); i++) {
-					if (inventory.getItem(i).has(ESDataComponents.QUIVER_ARROW.get())) {
-						inventory.getItem(i).remove(ESDataComponents.QUIVER_ARROW.get());
+					ItemStack stack = inventory.getItem(i);
+					if (stack.hasTag() && stack.getTag().getBoolean("FromQuiver")) {
+						stack.getTag().remove("FromQuiver");
+						if (stack.getTag().isEmpty()) {
+							stack.setTag(null);
+						}
 					}
 				}
 				if (player.getMainHandItem().is(ESItems.GRAVITY_PICKAXE.get()) || player.getOffhandItem().is(ESItems.GRAVITY_PICKAXE.get())) {

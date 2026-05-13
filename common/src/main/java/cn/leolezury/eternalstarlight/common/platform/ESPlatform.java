@@ -117,7 +117,16 @@ public interface ESPlatform {
 	}
 
 	default ArmorItem createStarlitDiamondArmor(Holder<ArmorMaterial> material, ArmorItem.Type type, Item.Properties properties) {
-		return new ArmorItem(material.value(), type, properties);
+		return new ArmorItem(material.value(), type, properties) {
+			@Override
+			public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+				super.inventoryTick(stack, level, entity, slot, selected);
+
+				if (level.getGameTime() % 20 == 0 && !level.isClientSide && level.getGameTime() % 20 == 0) {
+					stack.getOrCreateTag().putInt("AccessorySlotCount", 3);
+				}
+			}
+		};
 	}
 
 	default UnrealiumArmorItem createUnrealiumArmor(Holder<ArmorMaterial> material, ArmorItem.Type type, Item.Properties properties) {

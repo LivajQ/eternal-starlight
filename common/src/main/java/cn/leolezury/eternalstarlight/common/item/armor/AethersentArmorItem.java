@@ -1,41 +1,59 @@
 package cn.leolezury.eternalstarlight.common.item.armor;
 
 import cn.leolezury.eternalstarlight.common.registry.ESAttributes;
-import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
-
-import java.util.function.Supplier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class AethersentArmorItem extends ArmorItem {
-	private final Supplier<ItemAttributeModifiers> extraModifiers;
 
-	public AethersentArmorItem(Holder<ArmorMaterial> holder, Type type, Properties properties) {
-		super(holder, type, properties);
-		this.extraModifiers = Suppliers.memoize(() -> {
-			ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder();
-			EquipmentSlotGroup equipmentSlotGroup = EquipmentSlotGroup.bySlot(type.getSlot());
-			ResourceLocation resourceLocation = ResourceLocation.withDefaultNamespace("armor." + type.getName());
-			builder.add(ESAttributes.METEOR_COUNTERATTACK_CHANCE.asHolder(), new AttributeModifier(resourceLocation, 0.25, AttributeModifier.Operation.ADD_VALUE), equipmentSlotGroup);
-			return builder.build();
-		});
+	private final Multimap<Attribute, AttributeModifier> extraModifiers;
+
+	public AethersentArmorItem(Holder<ArmorMaterial> material, Type type, Properties properties) {
+		super(material.value(), type, properties);
+
+		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+
+		String id = "armor." + type.getName() + "_meteor_counterattack";
+
+		builder.put(
+			ESAttributes.METEOR_COUNTERATTACK_CHANCE.get(),
+			new AttributeModifier(id, 0.25, AttributeModifier.Operation.ADDITION)
+		);
+
+		this.extraModifiers = builder.build();
 	}
 
 	@Override
-	public ItemAttributeModifiers getDefaultAttributeModifiers() {
-		ItemAttributeModifiers modifiers = super.getDefaultAttributeModifiers();
-		ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder();
-		for (ItemAttributeModifiers.Entry entry : modifiers.modifiers()) {
-			builder.add(entry.attribute(), entry.modifier(), entry.slot());
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+		Multimap<Attribute, AttributeModifier> base = super.getDefaultAttributeModifiers(slot);
+
+		if (slot == this.type.getSlot()) {
+			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+			builder.putAll(base);
+			builder.putAll(extraModifiers);
+			return builder.build();
 		}
-		for (ItemAttributeModifiers.Entry entry : extraModifiers.get().modifiers()) {
-			builder.add(entry.attribute(), entry.modifier(), entry.slot());
+
+		return base;
+	}
+
+	@Override
+	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+		super.inventoryTick(stack, level, entity, slot, selected);
+
+		if (!level.isClientSide && level.getGameTime() % 20 == 0) {
+			if (this.getType() == ArmorItem.Type.CHESTPLATE) {
+				stack.getOrCreateTag().putInt("AccessorySlotCount", 2);
+			}
 		}
-		return builder.build();
 	}
 }
