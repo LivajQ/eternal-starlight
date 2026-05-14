@@ -649,13 +649,13 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> RAGE_OF_STARS = registerItem("rage_of_stars", () -> new RageOfStarsItem(ESItemTiers.AETHERSENT, new Item.Properties().attributes(SwordItem.createAttributes(ESItemTiers.AETHERSENT, 3, -2.4F))));
 	public static final RegistryObject<Item, Item> STARFALL_LONGBOW = registerItem("starfall_longbow", () -> new StarfallLongbowItem(new Item.Properties().durability(2000)));
 	public static final RegistryObject<Item, Item> AETHERSENT_HOOD = registerItem("aethersent_hood",
-			() -> new AethersentArmorItem(ESArmorMaterials.AETHERSENT.asHolder(), ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.AETHERSENT.get().getDurabilityForType(ArmorItem.Type.HELMET))));
+			() -> new AethersentArmorItem(ESArmorMaterials.AETHERSENT, ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.AETHERSENT.getDurabilityForType(ArmorItem.Type.HELMET))));
 	public static final RegistryObject<Item, Item> AETHERSENT_CAPE = registerItem("aethersent_cape",
-			() -> new AethersentArmorItem(ESArmorMaterials.AETHERSENT.asHolder(), ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.AETHERSENT.get().getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
+			() -> new AethersentArmorItem(ESArmorMaterials.AETHERSENT, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.AETHERSENT.getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
 	public static final RegistryObject<Item, Item> AETHERSENT_BOTTOMS = registerItem("aethersent_bottoms",
-			() -> new AethersentArmorItem(ESArmorMaterials.AETHERSENT.asHolder(), ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.AETHERSENT.get().getDurabilityForType(ArmorItem.Type.LEGGINGS))));
+			() -> new AethersentArmorItem(ESArmorMaterials.AETHERSENT, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.AETHERSENT.getDurabilityForType(ArmorItem.Type.LEGGINGS))));
 	public static final RegistryObject<Item, Item> AETHERSENT_BOOTS = registerItem("aethersent_boots",
-			() -> new AethersentArmorItem(ESArmorMaterials.AETHERSENT.asHolder(), ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.AETHERSENT.get().getDurabilityForType(ArmorItem.Type.BOOTS))));
+			() -> new AethersentArmorItem(ESArmorMaterials.AETHERSENT, ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.AETHERSENT.getDurabilityForType(ArmorItem.Type.BOOTS))));
 	public static final RegistryObject<Item, Item> GALACTIC_QUIVER = registerItem("galactic_quiver", () -> new GalacticQuiverItem(new Item.Properties().stacksTo(1)));
 	public static final RegistryObject<Item, Item> AETHERSTRIKE_ROCKET = registerItem("aetherstrike_rocket", () -> new AetherstrikeRocketItem(new Item.Properties()));
 
@@ -697,13 +697,13 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> THERMAL_SPRINGSTONE_HAMMER = registerItem("thermal_springstone_hammer",
 		() -> ESPlatform.INSTANCE.createHammer(ESItemTiers.THERMAL_SPRINGSTONE, () -> null, Holder.direct(SoundEvents.MACE_SMASH_GROUND_HEAVY), new Item.Properties().attributes(DiggerItem.createAttributes(ESItemTiers.THERMAL_SPRINGSTONE, 7, -3F))));
 	public static final RegistryObject<Item, Item> THERMAL_SPRINGSTONE_HELMET = registerItem("thermal_springstone_helmet",
-		() -> ESPlatform.INSTANCE.createThermalSpringstoneArmor(ESArmorMaterials.THERMAL_SPRINGSTONE.asHolder(), ArmorItem.Type.HELMET, new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(15))));
+		() -> ESPlatform.INSTANCE.createThermalSpringstoneArmor(ESArmorMaterials.THERMAL_SPRINGSTONE, ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.THERMAL_SPRINGSTONE.getDurabilityForType(ArmorItem.Type.HELMET))));
 	public static final RegistryObject<Item, Item> THERMAL_SPRINGSTONE_CHESTPLATE = registerItem("thermal_springstone_chestplate",
-		() -> ESPlatform.INSTANCE.createThermalSpringstoneArmor(ESArmorMaterials.THERMAL_SPRINGSTONE.asHolder(), ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(15))));
+		() -> ESPlatform.INSTANCE.createThermalSpringstoneArmor(ESArmorMaterials.THERMAL_SPRINGSTONE, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.THERMAL_SPRINGSTONE.getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
 	public static final RegistryObject<Item, Item> THERMAL_SPRINGSTONE_LEGGINGS = registerItem("thermal_springstone_leggings",
-		() -> ESPlatform.INSTANCE.createThermalSpringstoneArmor(ESArmorMaterials.THERMAL_SPRINGSTONE.asHolder(), ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ArmorItem.Type.LEGGINGS.getDurability(15))));
+		() -> ESPlatform.INSTANCE.createThermalSpringstoneArmor(ESArmorMaterials.THERMAL_SPRINGSTONE, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.THERMAL_SPRINGSTONE.getDurabilityForType(ArmorItem.Type.LEGGINGS))));
 	public static final RegistryObject<Item, Item> THERMAL_SPRINGSTONE_BOOTS = registerItem("thermal_springstone_boots",
-		() -> ESPlatform.INSTANCE.createThermalSpringstoneArmor(ESArmorMaterials.THERMAL_SPRINGSTONE.asHolder(), ArmorItem.Type.BOOTS, new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(15))));
+		() -> ESPlatform.INSTANCE.createThermalSpringstoneArmor(ESArmorMaterials.THERMAL_SPRINGSTONE, ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.THERMAL_SPRINGSTONE.getDurabilityForType(ArmorItem.Type.BOOTS))));
 
 	// glacite
 	public static final RegistryObject<Item, Item> GLACITE = registerItem("glacite", () -> new BlockItem(ESBlocks.GLACITE.get(), new Item.Properties()));
@@ -723,13 +723,13 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> GLACITE_SCYTHE = registerItem("glacite_scythe",
 		() -> ESPlatform.INSTANCE.createScythe(ESItemTiers.GLACITE, false, new Item.Properties().attributes(ScytheItem.createAttributes(ESItemTiers.GLACITE, 4, -2.7F, 0.5F, 0.3F))));
 	public static final RegistryObject<Item, Item> GLACITE_HELMET = registerItem("glacite_helmet",
-			() -> new GlaciteArmorItem(ESArmorMaterials.GLACITE.asHolder(), ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.GLACITE.get().getDurabilityForType(ArmorItem.Type.HELMET))));
+			() -> new GlaciteArmorItem(ESArmorMaterials.GLACITE, ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.GLACITE.getDurabilityForType(ArmorItem.Type.HELMET))));
 	public static final RegistryObject<Item, Item> GLACITE_CHESTPLATE = registerItem("glacite_chestplate",
-			() -> new GlaciteArmorItem(ESArmorMaterials.GLACITE.asHolder(), ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.GLACITE.get().getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
+			() -> new GlaciteArmorItem(ESArmorMaterials.GLACITE, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.GLACITE.getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
 	public static final RegistryObject<Item, Item> GLACITE_LEGGINGS = registerItem("glacite_leggings",
-			() -> new GlaciteArmorItem(ESArmorMaterials.GLACITE.asHolder(), ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.GLACITE.get().getDurabilityForType(ArmorItem.Type.LEGGINGS))));
+			() -> new GlaciteArmorItem(ESArmorMaterials.GLACITE, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.GLACITE.getDurabilityForType(ArmorItem.Type.LEGGINGS))));
 	public static final RegistryObject<Item, Item> GLACITE_BOOTS = registerItem("glacite_boots",
-			() -> new GlaciteArmorItem(ESArmorMaterials.GLACITE.asHolder(), ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.GLACITE.get().getDurabilityForType(ArmorItem.Type.BOOTS))));
+			() -> new GlaciteArmorItem(ESArmorMaterials.GLACITE, ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.GLACITE.getDurabilityForType(ArmorItem.Type.BOOTS))));
 	public static final RegistryObject<Item, Item> GLACITE_SHIELD = registerItem("glacite_shield",
 		() -> new GlaciteShieldItem(new Item.Properties().durability(500)));
 
@@ -751,13 +751,13 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> STARLIT_DIAMOND_SHOVEL = registerItem("starlit_diamond_shovel",
 		() -> new ShovelItem(ESItemTiers.STARLIT_DIAMOND, new Item.Properties().attributes(ShovelItem.createAttributes(ESItemTiers.STARLIT_DIAMOND, 1.5F, -3.2F))));
 	public static final RegistryObject<Item, Item> STARLIT_DIAMOND_HELMET = registerItem("starlit_diamond_helmet",
-			() -> ESPlatform.INSTANCE.createStarlitDiamondArmor(ESArmorMaterials.STARLIT_DIAMOND.asHolder(), ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.STARLIT_DIAMOND.get().getDurabilityForType(ArmorItem.Type.HELMET))));
+			() -> ESPlatform.INSTANCE.createStarlitDiamondArmor(ESArmorMaterials.STARLIT_DIAMOND, ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.STARLIT_DIAMOND.getDurabilityForType(ArmorItem.Type.HELMET))));
 	public static final RegistryObject<Item, Item> STARLIT_DIAMOND_CHESTPLATE = registerItem("starlit_diamond_chestplate",
-			() -> ESPlatform.INSTANCE.createStarlitDiamondArmor(ESArmorMaterials.STARLIT_DIAMOND.asHolder(), ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.STARLIT_DIAMOND.get().getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
+			() -> ESPlatform.INSTANCE.createStarlitDiamondArmor(ESArmorMaterials.STARLIT_DIAMOND, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.STARLIT_DIAMOND.getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
 	public static final RegistryObject<Item, Item> STARLIT_DIAMOND_LEGGINGS = registerItem("starlit_diamond_leggings",
-			() -> ESPlatform.INSTANCE.createStarlitDiamondArmor(ESArmorMaterials.STARLIT_DIAMOND.asHolder(), ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.STARLIT_DIAMOND.get().getDurabilityForType(ArmorItem.Type.LEGGINGS))));
+			() -> ESPlatform.INSTANCE.createStarlitDiamondArmor(ESArmorMaterials.STARLIT_DIAMOND, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.STARLIT_DIAMOND.getDurabilityForType(ArmorItem.Type.LEGGINGS))));
 	public static final RegistryObject<Item, Item> STARLIT_DIAMOND_BOOTS = registerItem("starlit_diamond_boots",
-			() -> ESPlatform.INSTANCE.createStarlitDiamondArmor(ESArmorMaterials.STARLIT_DIAMOND.asHolder(), ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.STARLIT_DIAMOND.get().getDurabilityForType(ArmorItem.Type.BOOTS))));
+			() -> ESPlatform.INSTANCE.createStarlitDiamondArmor(ESArmorMaterials.STARLIT_DIAMOND, ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.STARLIT_DIAMOND.getDurabilityForType(ArmorItem.Type.BOOTS))));
 
 	// deepsilver
 	public static final RegistryObject<Item, Item> GRIMSTONE_DEEPSILVER_ORE = registerItem("grimstone_deepsilver_ore", () -> new BlockItem(ESBlocks.GRIMSTONE_DEEPSILVER_ORE.get(), new Item.Properties()));
@@ -787,13 +787,13 @@ public class ESItems {
 		() -> ESPlatform.INSTANCE.createScythe(ESItemTiers.DEEPSILVER, true, new Item.Properties().attributes(DiggerItem.createAttributes(ESItemTiers.DEEPSILVER, 1, -1.5F))));
 	public static final RegistryObject<Item, Item> DEEPSILVER_BRUSH = registerItem("deepsilver_brush", () -> new BrushItem(new Item.Properties().durability(256)));
 	public static final RegistryObject<Item, Item> DEEPSILVER_HELMET = registerItem("deepsilver_helmet",
-			() -> new DeepsilverArmorItem(ESArmorMaterials.DEEPSILVER.asHolder(), ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.DEEPSILVER.get().getDurabilityForType(ArmorItem.Type.HELMET))));
+			() -> new DeepsilverArmorItem(ESArmorMaterials.DEEPSILVER, ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.DEEPSILVER.getDurabilityForType(ArmorItem.Type.HELMET))));
 	public static final RegistryObject<Item, Item> DEEPSILVER_CHESTPLATE = registerItem("deepsilver_chestplate",
-			() -> new DeepsilverArmorItem(ESArmorMaterials.DEEPSILVER.asHolder(), ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.DEEPSILVER.get().getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
+			() -> new DeepsilverArmorItem(ESArmorMaterials.DEEPSILVER, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.DEEPSILVER.getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
 	public static final RegistryObject<Item, Item> DEEPSILVER_LEGGINGS = registerItem("deepsilver_leggings",
-			() -> new DeepsilverArmorItem(ESArmorMaterials.DEEPSILVER.asHolder(), ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.DEEPSILVER.get().getDurabilityForType(ArmorItem.Type.LEGGINGS))));
+			() -> new DeepsilverArmorItem(ESArmorMaterials.DEEPSILVER, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.DEEPSILVER.getDurabilityForType(ArmorItem.Type.LEGGINGS))));
 	public static final RegistryObject<Item, Item> DEEPSILVER_BOOTS = registerItem("deepsilver_boots",
-			() -> new DeepsilverArmorItem(ESArmorMaterials.DEEPSILVER.asHolder(), ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.DEEPSILVER.get().getDurabilityForType(ArmorItem.Type.BOOTS))));
+			() -> new DeepsilverArmorItem(ESArmorMaterials.DEEPSILVER, ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.DEEPSILVER.getDurabilityForType(ArmorItem.Type.BOOTS))));
 
 	// unrealium
 	public static final RegistryObject<Item, Item> UNREALIUM_INGOT = registerItem("unrealium_ingot", () -> new Item(new Item.Properties()));
@@ -814,13 +814,13 @@ public class ESItems {
 		() -> ESPlatform.INSTANCE.createScythe(ESItemTiers.UNREALIUM, true, new Item.Properties().attributes(createUnrealiumAttributes(ESItemTiers.UNREALIUM, 1, -1.5F))));
 	public static final RegistryObject<Item, Item> UNREALIUM_CROSSBOW = registerItem("unrealium_crossbow", () -> new UnrealiumCrossbowItem(new Item.Properties().durability(1200)));
 	public static final RegistryObject<Item, Item> UNREALIUM_HELMET = registerItem("unrealium_helmet",
-			() -> ESPlatform.INSTANCE.createUnrealiumArmor(ESArmorMaterials.UNREALIUM.asHolder(), ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.UNREALIUM.get().getDurabilityForType(ArmorItem.Type.HELMET))));
+			() -> ESPlatform.INSTANCE.createUnrealiumArmor(ESArmorMaterials.UNREALIUM, ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.UNREALIUM.getDurabilityForType(ArmorItem.Type.HELMET))));
 	public static final RegistryObject<Item, Item> UNREALIUM_CHESTPLATE = registerItem("unrealium_chestplate",
-			() -> ESPlatform.INSTANCE.createUnrealiumArmor(ESArmorMaterials.UNREALIUM.asHolder(), ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.UNREALIUM.get().getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
+			() -> ESPlatform.INSTANCE.createUnrealiumArmor(ESArmorMaterials.UNREALIUM, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.UNREALIUM.getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
 	public static final RegistryObject<Item, Item> UNREALIUM_LEGGINGS = registerItem("unrealium_leggings",
-			() -> ESPlatform.INSTANCE.createUnrealiumArmor(ESArmorMaterials.UNREALIUM.asHolder(), ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.UNREALIUM.get().getDurabilityForType(ArmorItem.Type.LEGGINGS))));
+			() -> ESPlatform.INSTANCE.createUnrealiumArmor(ESArmorMaterials.UNREALIUM, ArmorItem.Type.LEGGINGS, new Item.Properties().durability(ESArmorMaterials.UNREALIUM.getDurabilityForType(ArmorItem.Type.LEGGINGS))));
 	public static final RegistryObject<Item, Item> UNREALIUM_BOOTS = registerItem("unrealium_boots",
-			() -> ESPlatform.INSTANCE.createUnrealiumArmor(ESArmorMaterials.UNREALIUM.asHolder(), ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.UNREALIUM.get().getDurabilityForType(ArmorItem.Type.BOOTS))));
+			() -> ESPlatform.INSTANCE.createUnrealiumArmor(ESArmorMaterials.UNREALIUM, ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.UNREALIUM.getDurabilityForType(ArmorItem.Type.BOOTS))));
 
 	public static final RegistryObject<Item, Item> GRIMSTONE_MALARITE_ORE = registerItem("grimstone_malarite_ore", () -> new BlockItem(ESBlocks.GRIMSTONE_MALARITE_ORE.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> VOIDSTONE_MALARITE_ORE = registerItem("voidstone_malarite_ore", () -> new BlockItem(ESBlocks.VOIDSTONE_MALARITE_ORE.get(), new Item.Properties()));
@@ -996,9 +996,9 @@ public class ESItems {
 		() -> ESPlatform.INSTANCE.createScythe(ESItemTiers.AMARAMBER, true, new Item.Properties().attributes(DiggerItem.createAttributes(ESItemTiers.AMARAMBER, 1, -1.5F))));
 	public static final RegistryObject<Item, Item> CANDLASH = registerItem("candlash", () -> new CandlashItem(ESItemTiers.AMARAMBER, new Item.Properties().attributes(WhipItem.createAttributes(ESItemTiers.AMARAMBER, 2.8F, -3.0F))));
 	public static final RegistryObject<Item, Item> AMARAMBER_MASK = registerItem("amaramber_mask",
-		() -> new ArmorItem(ESArmorMaterials.AMARAMBER.asHolder(), ArmorItem.Type.HELMET, new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(15))));
+		() -> new ArmorItem(ESArmorMaterials.AMARAMBER, ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.AMARAMBER.getDurabilityForType(ArmorItem.Type.HELMET))));
 	public static final RegistryObject<Item, Item> AMARAMBER_CHESTPLATE = registerItem("amaramber_chestplate",
-		() -> new ArmorItem(ESArmorMaterials.AMARAMBER.asHolder(), ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(15))));
+		() -> new ArmorItem(ESArmorMaterials.AMARAMBER, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.AMARAMBER.getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
 
 	// ether
 	public static final RegistryObject<Item, Item> ETHER_BUCKET = registerItem("ether_bucket", () -> new BucketItem(ESFluids.ETHER_STILL.get(), new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
@@ -1022,9 +1022,9 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> POLISHED_TOXITE_WALL = registerItem("polished_toxite_wall", () -> new BlockItem(ESBlocks.POLISHED_TOXITE_WALL.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> CHISELED_TOXITE = registerItem("chiseled_toxite", () -> new BlockItem(ESBlocks.CHISELED_TOXITE.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> ALCHEMIST_MASK = registerItem("alchemist_mask",
-			() -> ESPlatform.INSTANCE.createAlchemistArmor(ESArmorMaterials.ALCHEMIST.asHolder(), ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.ALCHEMIST.get().getDurabilityForType(ArmorItem.Type.HELMET))));
+			() -> ESPlatform.INSTANCE.createAlchemistArmor(ESArmorMaterials.ALCHEMIST, ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.ALCHEMIST.getDurabilityForType(ArmorItem.Type.HELMET))));
 	public static final RegistryObject<Item, Item> ALCHEMIST_ROBE = registerItem("alchemist_robe",
-			() -> ESPlatform.INSTANCE.createAlchemistArmor(ESArmorMaterials.ALCHEMIST.asHolder(), ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.ALCHEMIST.get().getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
+			() -> ESPlatform.INSTANCE.createAlchemistArmor(ESArmorMaterials.ALCHEMIST, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ESArmorMaterials.ALCHEMIST.getDurabilityForType(ArmorItem.Type.CHESTPLATE))));
 
 	public static final RegistryObject<Item, Item> GRIMSTONE_REDSTONE_ORE = registerItem("grimstone_redstone_ore", () -> new BlockItem(ESBlocks.GRIMSTONE_REDSTONE_ORE.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> VOIDSTONE_REDSTONE_ORE = registerItem("voidstone_redstone_ore", () -> new BlockItem(ESBlocks.VOIDSTONE_REDSTONE_ORE.get(), new Item.Properties()));
@@ -1039,9 +1039,9 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> ROOKFISH_AIR_SAC = registerItem("rookfish_air_sac", () -> new Item(new Item.Properties()));
 	public static final RegistryObject<Item, Item> AIR_SAC_ARROW = registerItem("air_sac_arrow", () -> new AirSacArrowItem(new Item.Properties()));
 	public static final RegistryObject<Item, Item> AIR_SAC_MASK = registerItem("air_sac_mask",
-		() -> new ArmorItem(ESArmorMaterials.AIR_SAC.asHolder(), ArmorItem.Type.HELMET, new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(15))));
+		() -> new ArmorItem(ESArmorMaterials.AIR_SAC, ArmorItem.Type.HELMET, new Item.Properties().durability(ESArmorMaterials.AIR_SAC.getDurabilityForType(ArmorItem.Type.HELMET))));
 	public static final RegistryObject<Item, Item> AIR_SAC_BOOTS = registerItem("air_sac_boots",
-		() -> new AirSacArmorItem(ESArmorMaterials.AIR_SAC.asHolder(), ArmorItem.Type.BOOTS, new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(15))));
+		() -> new AirSacArmorItem(ESArmorMaterials.AIR_SAC, ArmorItem.Type.BOOTS, new Item.Properties().durability(ESArmorMaterials.AIR_SAC.getDurabilityForType(ArmorItem.Type.BOOTS))));
 
 	public static final RegistryObject<Item, Item> LUMINOFISH_BUCKET = registerItem("luminofish_bucket", () -> new MobBucketItem(ESEntities.LUMINOFISH.get(), Fluids.WATER, SoundEvents.BUCKET_EMPTY_FISH, new Item.Properties().stacksTo(1).component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY)));
 	public static final RegistryObject<Item, Item> LUMINOFISH = registerItem("luminofish", () -> new Item(new Item.Properties().food(ESFoods.LUMINOFISH.get())));

@@ -2,7 +2,6 @@ package cn.leolezury.eternalstarlight.common.item.armor;
 
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -17,8 +16,8 @@ import java.util.List;
 
 public class GlaciteArmorItem extends ArmorItem {
 
-	public GlaciteArmorItem(Holder<ArmorMaterial> holder, Type type, Properties properties) {
-		super(holder.value(), type, properties);
+	public GlaciteArmorItem(ArmorMaterial material, Type type, Properties properties) {
+		super(material, type, properties);
 	}
 
 	@Override

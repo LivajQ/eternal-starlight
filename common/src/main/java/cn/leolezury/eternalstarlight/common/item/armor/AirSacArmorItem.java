@@ -15,8 +15,8 @@ import java.util.function.Supplier;
 public class AirSacArmorItem extends ArmorItem {
 	private final Supplier<ItemAttributeModifiers> extraModifiers;
 
-	public AirSacArmorItem(Holder<ArmorMaterial> materialHolder, Type type, Properties properties) {
-		super(materialHolder, type, properties);
+	public AirSacArmorItem(ArmorMaterial material, Type type, Properties properties) {
+		super(material, type, properties);
 		this.extraModifiers = Suppliers.memoize(() -> {
 			ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder();
 			EquipmentSlotGroup equipmentSlotGroup = EquipmentSlotGroup.bySlot(type.getSlot());

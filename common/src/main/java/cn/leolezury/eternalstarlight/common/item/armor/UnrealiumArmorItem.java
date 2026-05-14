@@ -5,7 +5,6 @@ import cn.leolezury.eternalstarlight.common.registry.ESAttributes;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -26,8 +25,8 @@ public class UnrealiumArmorItem extends ArmorItem {
 
 	private final Multimap<Attribute, AttributeModifier> extraModifiers;
 
-	public UnrealiumArmorItem(Holder<ArmorMaterial> materialHolder, Type type, Properties properties) {
-		super(materialHolder.value(), type, properties);
+	public UnrealiumArmorItem(ArmorMaterial material, Type type, Properties properties) {
+		super(material, type, properties);
 
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 

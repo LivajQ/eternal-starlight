@@ -28,8 +28,8 @@ public class AlchemistArmorItem extends ArmorItem {
 
 	private final Multimap<Attribute, AttributeModifier> extraModifiers;
 
-	public AlchemistArmorItem(Holder<ArmorMaterial> holder, Type type, Properties properties) {
-		super(holder.value(), type, properties);
+	public AlchemistArmorItem(ArmorMaterial material, Type type, Properties properties) {
+		super(material, type, properties);
 
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 

@@ -108,16 +108,16 @@ public interface ESPlatform {
 		return new CrescentSpearItem(properties);
 	}
 
-	default ThermalSpringstoneArmorItem createThermalSpringstoneArmor(Holder<ArmorMaterial> material, ArmorItem.Type type, Item.Properties properties) {
+	default ThermalSpringstoneArmorItem createThermalSpringstoneArmor(ArmorMaterial material, ArmorItem.Type type, Item.Properties properties) {
 		return new ThermalSpringstoneArmorItem(material, type, properties);
 	}
 
-	default AlchemistArmorItem createAlchemistArmor(Holder<ArmorMaterial> material, ArmorItem.Type type, Item.Properties properties) {
+	default AlchemistArmorItem createAlchemistArmor(ArmorMaterial material, ArmorItem.Type type, Item.Properties properties) {
 		return new AlchemistArmorItem(material, type, properties);
 	}
 
-	default ArmorItem createStarlitDiamondArmor(Holder<ArmorMaterial> material, ArmorItem.Type type, Item.Properties properties) {
-		return new ArmorItem(material.value(), type, properties) {
+	default ArmorItem createStarlitDiamondArmor(ArmorMaterial material, ArmorItem.Type type, Item.Properties properties) {
+		return new ArmorItem(material, type, properties) {
 			@Override
 			public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
 				super.inventoryTick(stack, level, entity, slot, selected);
@@ -129,7 +129,7 @@ public interface ESPlatform {
 		};
 	}
 
-	default UnrealiumArmorItem createUnrealiumArmor(Holder<ArmorMaterial> material, ArmorItem.Type type, Item.Properties properties) {
+	default UnrealiumArmorItem createUnrealiumArmor(ArmorMaterial material, ArmorItem.Type type, Item.Properties properties) {
 		return new UnrealiumArmorItem(material, type, properties);
 	}
 

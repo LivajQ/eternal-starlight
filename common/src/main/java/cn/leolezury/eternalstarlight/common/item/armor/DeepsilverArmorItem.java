@@ -6,7 +6,6 @@ import cn.leolezury.eternalstarlight.common.util.ESTags;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -26,8 +25,8 @@ public class DeepsilverArmorItem extends ArmorItem implements TickableArmor {
 
 	private final Multimap<Attribute, AttributeModifier> extraModifiers;
 
-	public DeepsilverArmorItem(Holder<ArmorMaterial> materialHolder, Type type, Item.Properties properties) {
-		super(materialHolder.value(), type, properties);
+	public DeepsilverArmorItem(ArmorMaterial material, Type type, Item.Properties properties) {
+		super(material, type, properties);
 
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 

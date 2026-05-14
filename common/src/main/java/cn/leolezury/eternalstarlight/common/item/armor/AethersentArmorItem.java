@@ -3,7 +3,6 @@ package cn.leolezury.eternalstarlight.common.item.armor;
 import cn.leolezury.eternalstarlight.common.registry.ESAttributes;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.core.Holder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -17,8 +16,8 @@ public class AethersentArmorItem extends ArmorItem {
 
 	private final Multimap<Attribute, AttributeModifier> extraModifiers;
 
-	public AethersentArmorItem(Holder<ArmorMaterial> material, Type type, Properties properties) {
-		super(material.value(), type, properties);
+	public AethersentArmorItem(ArmorMaterial material, Type type, Properties properties) {
+		super(material, type, properties);
 
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 
