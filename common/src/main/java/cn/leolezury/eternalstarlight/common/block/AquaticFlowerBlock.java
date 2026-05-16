@@ -2,7 +2,6 @@ package cn.leolezury.eternalstarlight.common.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -21,8 +20,8 @@ public class AquaticFlowerBlock extends FlowerBlock implements SimpleWaterlogged
 
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
-	public AquaticFlowerBlock(Holder<MobEffect> effect, int duration, Properties properties) {
-		super(effect.value(), duration, properties);
+	public AquaticFlowerBlock(MobEffect effect, int duration, Properties properties) {
+		super(effect, duration, properties);
 		this.registerDefaultState(this.getStateDefinition().any().setValue(WATERLOGGED, false));
 	}
 

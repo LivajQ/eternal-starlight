@@ -191,6 +191,11 @@ public class ThirstWalker extends Monster implements MultiBehaviorUser, NeutralM
 	}
 
 	@Override
+	public double getPassengersRidingOffset() {
+		return -0.125F;
+	}
+
+	@Override
 	public void tick() {
 		super.tick();
 		if (!level().isClientSide && level() instanceof ServerLevel serverLevel) {

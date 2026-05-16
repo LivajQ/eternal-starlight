@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.resources.ResourceKey;
@@ -133,7 +133,7 @@ public class ESPlacedFeatures {
 	public static final ResourceKey<PlacedFeature> SWAMP_WATER = create("swamp_water");
 	public static final ResourceKey<PlacedFeature> HOT_SPRING = create("hot_spring");
 
-	public static void bootstrap(BootstrapContext<PlacedFeature> context) {
+	public static void bootstrap(BootstapContext<PlacedFeature> context) {
 		HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
 		HolderGetter<Structure> structures = context.lookup(Registries.STRUCTURE);
 		BlockPredicate snowPredicate = BlockPredicate.matchesBlocks(Direction.DOWN.getNormal(), Blocks.SNOW_BLOCK, Blocks.POWDER_SNOW);

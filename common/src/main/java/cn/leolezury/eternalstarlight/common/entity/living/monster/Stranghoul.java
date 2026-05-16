@@ -281,6 +281,11 @@ public class Stranghoul extends Monster implements NeutralMob, OwnableEntity, Ra
 		}
 	}
 
+	@Override
+	public double getPassengersRidingOffset() {
+		return -0.7F;
+	}
+
 	private class SeedsLauncherAttackGoal extends RangedAttackGoal {
 		public SeedsLauncherAttackGoal() {
 			super(Stranghoul.this, 1.0, 30, 5.0F);
@@ -303,6 +308,12 @@ public class Stranghoul extends Monster implements NeutralMob, OwnableEntity, Ra
 			Stranghoul.this.setAggressive(false);
 		}
 	}
+
+	@Override
+	public float getEyeHeight(Pose pose, EntityDimensions size) {
+		return 1.74F;
+	}
+
 
 	private class SpearAttackGoal extends RangedAttackGoal {
 		public SpearAttackGoal() {
@@ -981,7 +992,7 @@ public class Stranghoul extends Monster implements NeutralMob, OwnableEntity, Ra
 			setPersistenceRequired();
 			stack.consume(1, player);
 			if (player instanceof ServerPlayer serverPlayer) {
-				ESCriteriaTriggers.HIRE_STRANGHOUL.get().trigger(serverPlayer);
+				ESCriteriaTriggers.HIRE_STRANGHOUL.trigger(serverPlayer);
 			}
 			return InteractionResult.sidedSuccess(level().isClientSide);
 		}

@@ -20,8 +20,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.animal.Bucketable;
 import net.minecraft.world.entity.animal.Squid;
 import net.minecraft.world.entity.player.Player;
@@ -89,6 +91,12 @@ public class Rookfish extends Squid implements Bucketable {
 		super.addAdditionalSaveData(compoundTag);
 		compoundTag.putBoolean(TAG_FROM_BUCKET, this.fromBucket());
 	}
+
+	@Override
+	public float getEyeHeight(Pose pose, EntityDimensions size) {
+		return 0.4F;
+	}
+
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag compoundTag) {

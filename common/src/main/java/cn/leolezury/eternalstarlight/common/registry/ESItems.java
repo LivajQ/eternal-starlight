@@ -32,13 +32,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluids;
 
 import java.util.*;
@@ -502,7 +505,25 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> BOULDERSHROOM_BLOCK = registerItem("bouldershroom_block", () -> new BlockItem(ESBlocks.BOULDERSHROOM_BLOCK.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> BOULDERSHROOM_STEM = registerItem("bouldershroom_stem", () -> new BlockItem(ESBlocks.BOULDERSHROOM_STEM.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> BOULDERSHROOM_ROOTS = registerItem("bouldershroom_roots", () -> new BlockItem(ESBlocks.BOULDERSHROOM_ROOTS.get(), new Item.Properties()));
-	public static final RegistryObject<Item, Item> BOULDERSHROOM_STEW = registerItem("bouldershroom_stew", () -> new Item(new Item.Properties().stacksTo(1).food(ESFoods.BOULDERSHROOM_STEW.get())));
+	public static final RegistryObject<Item, Item> BOULDERSHROOM_STEW =
+		registerItem("bouldershroom_stew", () ->
+			new Item(new Item.Properties().stacksTo(1).food(ESFoods.BOULDERSHROOM_STEW.get())) {
+
+				@Override
+				public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+					ItemStack result = super.finishUsingItem(stack, level, entity);
+
+					if (!level.isClientSide && entity instanceof Player player && !player.getAbilities().instabuild) {
+						ItemStack bowl = new ItemStack(Items.BOWL);
+
+						if (!player.getInventory().add(bowl)) {
+							player.drop(bowl, false);
+						}
+					}
+
+					return result;
+				}
+			});
 
 	// swamp plant
 	public static final RegistryObject<Item, Item> SWAMP_ROSE = registerItem("swamp_rose", () -> new BlockItem(ESBlocks.SWAMP_ROSE.get(), new Item.Properties()));
@@ -633,7 +654,27 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> CRINOA = registerItem("crinoa", () -> new Item(new Item.Properties()));
 	public static final RegistryObject<Item, Item> CRINOA_BALE = registerItem("crinoa_bale", () -> new BlockItem(ESBlocks.CRINOA_BALE.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> CRINOA_BALL = registerItem("crinoa_ball", () -> new Item(new Item.Properties().food(ESFoods.CRINOA_BALL.get())));
-	public static final RegistryObject<Item, Item> CRINOA_PORRIDGE = registerItem("crinoa_porridge", () -> new Item(new Item.Properties().stacksTo(1).food(ESFoods.CRINOA_PORRIDGE.get())));
+	public static final RegistryObject<Item, Item> CRINOA_PORRIDGE =
+		registerItem("crinoa_porridge", () ->
+			new Item(new Item.Properties()
+				.stacksTo(1)
+				.food(ESFoods.CRINOA_PORRIDGE.get())) {
+
+				@Override
+				public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+					ItemStack result = super.finishUsingItem(stack, level, entity);
+
+					if (!level.isClientSide && entity instanceof Player player && !player.getAbilities().instabuild) {
+						ItemStack bowl = new ItemStack(Items.BOWL);
+
+						if (!player.getInventory().add(bowl)) {
+							player.drop(bowl, false);
+						}
+					}
+
+					return result;
+				}
+			});
 	public static final RegistryObject<Item, Item> NOCTURNAL_MILLET_SEEDS = registerItem("nocturnal_millet_seeds", () -> new ItemNameBlockItem(ESBlocks.NOCTURNAL_MILLET_STALK.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> NOCTURNAL_MILLET = registerItem("nocturnal_millet", () -> new Item(new Item.Properties()));
 	public static final RegistryObject<Item, Item> FORGOTTEN_NOCTURNAL_MILLET = registerItem("forgotten_nocturnal_millet", () -> new Item(new Item.Properties()));
@@ -846,7 +887,27 @@ public class ESItems {
 
 	public static final RegistryObject<Item, Item> PUNGENCY_FRUIT_SEEDS = registerItem("pungency_fruit_seeds", () -> new PungencyFruitSeedsItem(ESBlocks.PUNGENCY_FRUIT_VINES.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> PUNGENCY_FRUIT = registerItem("pungency_fruit", () -> new Item(new Item.Properties().food(ESFoods.PUNGENCY_FRUIT.get())));
-	public static final RegistryObject<Item, Item> PUNGENCY_STEW = registerItem("pungency_stew", () -> new Item(new Item.Properties().stacksTo(1).food(ESFoods.PUNGENCY_STEW.get())));
+	public static final RegistryObject<Item, Item> PUNGENCY_STEW =
+		registerItem("pungency_stew", () ->
+			new Item(new Item.Properties()
+				.stacksTo(1)
+				.food(ESFoods.PUNGENCY_STEW.get())) {
+
+				@Override
+				public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+					ItemStack result = super.finishUsingItem(stack, level, entity);
+
+					if (!level.isClientSide && entity instanceof Player player && !player.getAbilities().instabuild) {
+						ItemStack bowl = new ItemStack(Items.BOWL);
+
+						if (!player.getInventory().add(bowl)) {
+							player.drop(bowl, false);
+						}
+					}
+
+					return result;
+				}
+			});
 	public static final RegistryObject<Item, Item> SILVER_PUNGENCY_FRUIT = registerItem("silver_pungency_fruit", () -> new Item(new Item.Properties().rarity(Rarity.RARE).food(ESFoods.SILVER_PUNGENCY_FRUIT.get())));
 	public static final RegistryObject<Item, Item> TEAR_BOMB = registerItem("tear_bomb", () -> new BlockItem(ESBlocks.TEAR_BOMB.get(), new Item.Properties()));
 	public static final RegistryObject<Item, Item> TEAR_BOMB_MINECART = registerItem("tear_bomb_minecart", () -> new TearBombMinecartItem(new Item.Properties().stacksTo(1)));
@@ -1035,7 +1096,27 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> ROOKFISH_BUCKET = registerItem("rookfish_bucket", () -> new MobBucketItem(ESEntities.ROOKFISH.get(), Fluids.WATER, SoundEvents.BUCKET_EMPTY_FISH, new Item.Properties().stacksTo(1).component(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY)));
 	public static final RegistryObject<Item, Item> ROOKFISH = registerItem("rookfish", () -> new Item(new Item.Properties().food(ESFoods.ROOKFISH.get())));
 	public static final RegistryObject<Item, Item> COOKED_ROOKFISH = registerItem("cooked_rookfish", () -> new Item(new Item.Properties().food(ESFoods.COOKED_ROOKFISH.get())));
-	public static final RegistryObject<Item, Item> ROOKFISH_SKEWER = registerItem("rookfish_skewer", () -> new Item(new Item.Properties().food(ESFoods.ROOKFISH_SKEWER.get())));
+	public static final RegistryObject<Item, Item> ROOKFISH_SKEWER =
+		registerItem("rookfish_skewer", () ->
+			new Item(new Item.Properties()
+				.stacksTo(1)
+				.food(ESFoods.ROOKFISH_SKEWER.get())) {
+
+				@Override
+				public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+					ItemStack result = super.finishUsingItem(stack, level, entity);
+
+					if (!level.isClientSide && entity instanceof Player player && !player.getAbilities().instabuild) {
+						ItemStack stick = new ItemStack(Items.STICK);
+
+						if (!player.getInventory().add(stick)) {
+							player.drop(stick, false);
+						}
+					}
+
+					return result;
+				}
+			});
 	public static final RegistryObject<Item, Item> ROOKFISH_AIR_SAC = registerItem("rookfish_air_sac", () -> new Item(new Item.Properties()));
 	public static final RegistryObject<Item, Item> AIR_SAC_ARROW = registerItem("air_sac_arrow", () -> new AirSacArrowItem(new Item.Properties()));
 	public static final RegistryObject<Item, Item> AIR_SAC_MASK = registerItem("air_sac_mask",
@@ -1098,8 +1179,26 @@ public class ESItems {
 	public static final RegistryObject<Item, Item> SHADOW_SNAIL_SHELL = registerItem("shadow_snail_shell", () -> new Item(new Item.Properties()));
 	public static final RegistryObject<Item, Item> SHADOW_SNAIL_SHELL_POWDER = registerItem("shadow_snail_shell_powder", () -> new BoneMealItem(new Item.Properties()));
 	public static final RegistryObject<Item, Item> SHADOW_SNAIL_PIE = registerItem("shadow_snail_pie", () -> new Item(new Item.Properties().food(ESFoods.SHADOW_SNAIL_PIE.get())));
-	public static final RegistryObject<Item, Item> SHADOW_ESCARGOT = registerItem("shadow_escargot", () -> new Item(new Item.Properties().food(ESFoods.SHADOW_ESCARGOT.get())));
+	public static final RegistryObject<Item, Item> SHADOW_ESCARGOT =
+		registerItem("shadow_escargot", () ->
+			new Item(new Item.Properties()
+				.food(ESFoods.SHADOW_ESCARGOT.get())) {
 
+				@Override
+				public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+					ItemStack result = super.finishUsingItem(stack, level, entity);
+
+					if (!level.isClientSide && entity instanceof Player player && !player.getAbilities().instabuild) {
+						ItemStack shell = new ItemStack(ESItems.SHADOW_SNAIL_SHELL.get());
+
+						if (!player.getInventory().add(shell)) {
+							player.drop(shell, false);
+						}
+					}
+
+					return result;
+				}
+			});
 	public static final RegistryObject<Item, Item> FROZEN_TUBE = registerItem("frozen_tube", () -> new FrozenTubeItem(new Item.Properties()));
 
 	public static final RegistryObject<Item, Item> SHIVERING_GEL = registerItem("shivering_gel", () -> new Item(new Item.Properties()));

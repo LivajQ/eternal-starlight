@@ -35,7 +35,7 @@ public class EnergyBlock extends Block {
 			level.setBlockAndUpdate(blockHitResult.getBlockPos(), blockState.setValue(LIT, false));
 		}
 		if (projectile.getOwner() instanceof ServerPlayer serverPlayer) {
-			ESCriteriaTriggers.DEACTIVATE_ENERGY_BLOCK.get().trigger(serverPlayer);
+			ESCriteriaTriggers.DEACTIVATE_ENERGY_BLOCK.trigger(serverPlayer);
 		}
 	}
 
@@ -46,7 +46,7 @@ public class EnergyBlock extends Block {
 				level.setBlockAndUpdate(pos, state.setValue(LIT, false));
 
 				if (player instanceof ServerPlayer serverPlayer) {
-					ESCriteriaTriggers.DEACTIVATE_ENERGY_BLOCK.get().trigger(serverPlayer);
+					ESCriteriaTriggers.DEACTIVATE_ENERGY_BLOCK.trigger(serverPlayer);
 				}
 			}
 

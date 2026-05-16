@@ -494,7 +494,7 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 	}
 
 	private static void permitPlayer(ServerPlayer player) {
-		ESCriteriaTriggers.CHALLENGED_GATEKEEPER.get().trigger(player);
+		ESCriteriaTriggers.CHALLENGED_GATEKEEPER.trigger(player);
 		ESBookUtil.unlock(player, EternalStarlight.id("permitted_by_gatekeeper"));
 	}
 
@@ -753,6 +753,12 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 		permitPlayer(player);
 		ESCrestUtil.upgradeCrest(player, ESCrests.GUIDANCE_OF_STARS);
 	}
+
+	@Override
+	public float getEyeHeight(Pose pose, EntityDimensions size) {
+		return 1.74F;
+	}
+
 
 	@Override
 	protected void modifyBossLootChest(LootChestBlockEntity blockEntity) {

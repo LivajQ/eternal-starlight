@@ -40,7 +40,7 @@ public class DaggerOfHungerItem extends DualWieldingSwordItem {
 		tag.putFloat("HungerLevel", newHungerLevel);
 
 		if (newHungerLevel == 1f && attacker instanceof ServerPlayer player) {
-			ESCriteriaTriggers.SATURATE_DAGGER_OF_HUNGER.get().trigger(player);
+			ESCriteriaTriggers.SATURATE_DAGGER_OF_HUNGER.trigger(player);
 		}
 
 		return result;

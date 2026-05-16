@@ -10,6 +10,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
@@ -80,6 +81,11 @@ public class ESBoat extends Boat {
 		if (compound.contains(TAG_TYPE, CompoundTag.TAG_STRING)) {
 			this.setStarlightBoatType(ESBoat.Type.getTypeFromString(compound.getString(TAG_TYPE)));
 		}
+	}
+
+	@Override
+	public float getEyeHeight(Pose pose, EntityDimensions size) {
+		return 0.5625F;
 	}
 
 	public enum Type {

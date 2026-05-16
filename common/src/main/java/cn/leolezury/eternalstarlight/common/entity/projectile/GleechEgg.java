@@ -40,7 +40,7 @@ public class GleechEgg extends ThrowableItemProjectile {
 		entityHitResult.getEntity().hurt(this.damageSources().thrown(this, this.getOwner()), 0.0F);
 		if (!level().isClientSide && entityHitResult.getEntity() instanceof LivingEntity livingEntity && !livingEntity.getType().is(ESTags.EntityTypes.GLEECH_IMMUNE)) {
 			if (getOwner() instanceof ServerPlayer serverPlayer) {
-				ESCriteriaTriggers.THROW_GLEECH_EGG.get().trigger(serverPlayer);
+				ESCriteriaTriggers.THROW_GLEECH_EGG.trigger(serverPlayer);
 			}
 			Gleech gleech = ESEntities.GLEECH.get().create(level());
 			if (gleech != null) {

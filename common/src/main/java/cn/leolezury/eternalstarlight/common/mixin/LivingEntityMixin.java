@@ -278,7 +278,7 @@ public abstract class LivingEntityMixin {
 			List<Player> players = livingEntity.level().getNearbyPlayers(TargetingConditions.forNonCombat(), livingEntity, livingEntity.getBoundingBox().inflate(20));
 			for (Player player : players) {
 				if (player instanceof ServerPlayer serverPlayer) {
-					ESCriteriaTriggers.WITNESS_STRANGHOUL_HUNT.get().trigger(serverPlayer);
+					ESCriteriaTriggers.WITNESS_STRANGHOUL_HUNT.trigger(serverPlayer);
 				}
 			}
 		}

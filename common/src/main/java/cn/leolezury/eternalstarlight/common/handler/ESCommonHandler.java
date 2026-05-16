@@ -145,7 +145,7 @@ public class ESCommonHandler {
 				if (gameTime % 80 == 0) {
 					for (ServerPlayer player : serverLevel.players()) {
 						if (serverLevel.canSeeSky(BlockPos.containing(player.getEyePosition()))) {
-							ESCriteriaTriggers.WITNESS_WEATHER.get().trigger(player);
+							ESCriteriaTriggers.WITNESS_WEATHER.trigger(player);
 						}
 					}
 				}

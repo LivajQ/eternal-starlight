@@ -281,7 +281,7 @@ public class TangledSkull extends Monster {
 	public void die(DamageSource source) {
 		super.die(source);
 		if (!this.level().isClientSide() && source.getEntity() instanceof TangledSkull killer && killer.getKillCredit() instanceof ServerPlayer player) {
-			ESCriteriaTriggers.CHAIN_TANGLED_SKULL_EXPLOSION.get().trigger(player);
+			ESCriteriaTriggers.CHAIN_TANGLED_SKULL_EXPLOSION.trigger(player);
 		}
 	}
 

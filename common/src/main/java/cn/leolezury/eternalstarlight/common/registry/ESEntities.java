@@ -22,7 +22,6 @@ import cn.leolezury.eternalstarlight.common.platform.registry.RegistryObject;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.player.Player;
 
 public class ESEntities {
 	public static final RegistrationProvider<EntityType<?>> ENTITIES = RegistrationProvider.get(Registries.ENTITY_TYPE, EternalStarlight.ID);
@@ -62,7 +61,6 @@ public class ESEntities {
 		"boat",
 		() -> EntityType.Builder.<ESBoat>of(ESBoat::new, MobCategory.MISC)
 			.sized(1.375F, 0.5625F)
-			.eyeHeight(0.5625F)
 			.clientTrackingRange(10)
 			.build("boat")
 	);
@@ -70,7 +68,6 @@ public class ESEntities {
 		"chest_boat",
 		() -> EntityType.Builder.<ESChestBoat>of(ESChestBoat::new, MobCategory.MISC)
 			.sized(1.375F, 0.5625F)
-			.eyeHeight(0.5625F)
 			.clientTrackingRange(10)
 			.build("chest_boat")
 	);
@@ -85,16 +82,13 @@ public class ESEntities {
 		"astral_golem",
 		() -> EntityType.Builder.of(AstralGolem::new, MobCategory.CREATURE)
 			.sized(0.5F, 1.25F)
-			.ridingOffset(-0.625F)
 			.build(EternalStarlight.id("astral_golem").toString())
 	);
 	public static final RegistryObject<EntityType<?>, EntityType<Gleech>> GLEECH = ENTITIES.register(
 		"gleech",
 		() -> EntityType.Builder.of(Gleech::new, MobCategory.MONSTER)
 			.sized(0.5F, 0.4F)
-			.eyeHeight(0.13F)
-			.passengerAttachments(0.2375F)
-			.ridingOffset(-0.0625F)
+			//.passengerAttachments(0.2375F)
 			.clientTrackingRange(8)
 			.build(EternalStarlight.id("gleech").toString())
 	);
@@ -110,8 +104,6 @@ public class ESEntities {
 		"lonestar_skeleton",
 		() -> EntityType.Builder.of(LonestarSkeleton::new, MobCategory.MONSTER)
 			.sized(0.6F, 1.99F)
-			.eyeHeight(1.74F)
-			.ridingOffset(-0.7F)
 			.clientTrackingRange(8)
 			.build(EternalStarlight.id("lonestar_skeleton").toString())
 	);
@@ -134,7 +126,6 @@ public class ESEntities {
 		"thirst_walker",
 		() -> EntityType.Builder.of(ThirstWalker::new, MobCategory.MONSTER)
 			.sized(0.6F, 2.5F)
-			.ridingOffset(-0.125F)
 			.clientTrackingRange(8)
 			.build(EternalStarlight.id("thirst_walker").toString())
 	);
@@ -156,8 +147,6 @@ public class ESEntities {
 		"stranghoul",
 		() -> EntityType.Builder.of(Stranghoul::new, MobCategory.MONSTER)
 			.sized(0.6F, 1.99F)
-			.eyeHeight(1.74F)
-			.ridingOffset(-0.7F)
 			.clientTrackingRange(8)
 			.build(EternalStarlight.id("stranghoul").toString())
 	);
@@ -165,7 +154,7 @@ public class ESEntities {
 		"ent",
 		() -> EntityType.Builder.of(Ent::new, MobCategory.CREATURE)
 			.sized(0.5F, 0.6875F)
-			.passengerAttachments(0.35F)
+			//.passengerAttachments(0.35F)
 			.clientTrackingRange(8)
 			.build(EternalStarlight.id("ent").toString())
 	);
@@ -187,9 +176,7 @@ public class ESEntities {
 		"shadow_snail",
 		() -> EntityType.Builder.of(ShadowSnail::new, MobCategory.CREATURE)
 			.sized(0.5F, 0.4F)
-			.eyeHeight(0.13F)
-			.passengerAttachments(0.2375F)
-			.ridingOffset(-0.0625F)
+			//.passengerAttachments(0.2375F)  TODO should check how to replace that properly
 			.clientTrackingRange(8)
 			.build(EternalStarlight.id("shadow_snail").toString())
 	);
@@ -204,7 +191,7 @@ public class ESEntities {
 		"aurora_deer",
 		() -> EntityType.Builder.of(AuroraDeer::new, MobCategory.CREATURE)
 			.sized(0.9F, 1.75F)
-			.passengerAttachments(1F)
+			//.passengerAttachments(1F)
 			.clientTrackingRange(8)
 			.build(EternalStarlight.id("aurora_deer").toString())
 	);
@@ -247,7 +234,6 @@ public class ESEntities {
 		"rookfish",
 		() -> EntityType.Builder.of(Rookfish::new, MobCategory.WATER_CREATURE)
 			.sized(0.6F, 0.6F)
-			.eyeHeight(0.4F)
 			.clientTrackingRange(8)
 			.build(EternalStarlight.id("rookfish").toString())
 	);
@@ -293,7 +279,6 @@ public class ESEntities {
 		() -> EntityType.Builder.of(TheGatekeeper::new, MobCategory.MONSTER)
 			.sized(0.75f, 1.99f)
 			.clientTrackingRange(32)
-			.eyeHeight(1.74F)
 			.fireImmune()
 			.build(EternalStarlight.id("the_gatekeeper").toString())
 	);
@@ -411,8 +396,6 @@ public class ESEntities {
 		"tangled",
 		() -> EntityType.Builder.of(Tangled::new, MobCategory.MONSTER)
 			.sized(0.6F, 1.99F)
-			.eyeHeight(1.74F)
-			.ridingOffset(-0.7F)
 			.clientTrackingRange(8)
 			.build(EternalStarlight.id("tangled").toString())
 	);
@@ -435,8 +418,7 @@ public class ESEntities {
 		"tangled_husk",
 		() -> EntityType.Builder.of(TangledHusk::new, MobCategory.MISC)
 			.sized(0.6F, 1.8F)
-			.eyeHeight(1.62F)
-			.vehicleAttachment(Player.DEFAULT_VEHICLE_ATTACHMENT)
+			//.vehicleAttachment(Player.DEFAULT_VEHICLE_ATTACHMENT)
 			.clientTrackingRange(32)
 			.updateInterval(2)
 			.build(EternalStarlight.id("tangled_husk").toString())
@@ -462,7 +444,6 @@ public class ESEntities {
 		() -> EntityType.Builder.<TearBomb>of(TearBomb::new, MobCategory.MISC)
 			.fireImmune()
 			.sized(0.98F, 0.98F)
-			.eyeHeight(0.15F)
 			.clientTrackingRange(10)
 			.updateInterval(10)
 			.build(EternalStarlight.id("tear_bomb").toString())
@@ -471,7 +452,7 @@ public class ESEntities {
 		"tear_bomb_minecart",
 		() -> EntityType.Builder.<TearBombMinecart>of(TearBombMinecart::new, MobCategory.MISC)
 			.sized(0.98F, 0.7F)
-			.passengerAttachments(0.1875F)
+			//.passengerAttachments(0.1875F)
 			.clientTrackingRange(8)
 			.build(EternalStarlight.id("tear_bomb_minecart").toString())
 	);

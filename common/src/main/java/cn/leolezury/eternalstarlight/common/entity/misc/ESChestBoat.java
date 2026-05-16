@@ -9,10 +9,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.HasCustomInventoryScreen;
-import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -143,6 +140,11 @@ public class ESChestBoat extends ESBoat implements HasCustomInventoryScreen, Con
 	@Override
 	public SlotAccess getSlot(int index) {
 		return this.getChestVehicleSlot(index);
+	}
+
+	@Override
+	public float getEyeHeight(Pose pose, EntityDimensions size) {
+		return 0.5625F;
 	}
 
 	@Override

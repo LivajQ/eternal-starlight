@@ -287,6 +287,11 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 	}
 
 	@Override
+	public double getPassengersRidingOffset() {
+		return -0.625F;
+	}
+
+	@Override
 	public void handleEntityEvent(byte event) {
 		if (event == 4) {
 			this.attackAnimationTick = 10;

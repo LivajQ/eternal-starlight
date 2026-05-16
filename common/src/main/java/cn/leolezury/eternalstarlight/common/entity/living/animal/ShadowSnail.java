@@ -150,6 +150,17 @@ public class ShadowSnail extends Animal {
 		}
 	}
 
+	@Override
+	public double getPassengersRidingOffset() {
+		return -0.0625F;
+	}
+
+	@Override
+	public float getEyeHeight(Pose pose, EntityDimensions size) {
+		return 0.13F;
+	}
+
+
 	public static boolean checkShadowSnailSpawnRules(EntityType<? extends ShadowSnail> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
 		return level.getBlockState(pos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON) && ESConfig.INSTANCE.mobsConfig.shadowSnail.canSpawn();
 	}

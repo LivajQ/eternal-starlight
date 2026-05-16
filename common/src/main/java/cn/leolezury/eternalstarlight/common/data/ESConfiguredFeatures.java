@@ -19,7 +19,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.data.worldgen.features.FeatureUtils;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
@@ -158,7 +158,7 @@ public class ESConfiguredFeatures {
 	public static final ResourceKey<ConfiguredFeature<?, ?>> SWAMP_WATER = create("swamp_water");
 	public static final ResourceKey<ConfiguredFeature<?, ?>> HOT_SPRING = create("hot_spring");
 
-	public static void bootstrap(BootstrapContext<ConfiguredFeature<?, ?>> context) {
+	public static void bootstrap(BootstapContext<ConfiguredFeature<?, ?>> context) {
 		HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
 		HolderGetter<PlacedFeature> placedFeatures = context.lookup(Registries.PLACED_FEATURE);
 
@@ -173,7 +173,7 @@ public class ESConfiguredFeatures {
 
 		FeatureUtils.register(context, FINAL_MODIFICATION, ESFeatures.FINAL_MODIFICATION.get());
 		FeatureUtils.register(context, STONE_SPIKE, ESFeatures.SPIKE.get(), new SpikeFeature.Configuration(new WeightedStateProvider(SimpleWeightedRandomList.<BlockState>builder().add(ESBlocks.GRIMSTONE.get().defaultBlockState(), 8).add(ESBlocks.GLOWING_GRIMSTONE.get().defaultBlockState(), 1).build()), UniformInt.of(10, 32), UniformInt.of(4, 7), UniformInt.of(1, 6), UniformInt.of(5, 17), UniformInt.of(3, 5)));
-		FeatureUtils.register(context, MONOLITH, ESFeatures.PILLAR.get(), new PillarFeature.Configuration(new WeightedStateProvider(SimpleWeightedRandomList.<BlockState>builder().add(ESBlocks.GRIMSTONE.get().defaultBlockState(), 8).add(ESBlocks.GLOWING_GRIMSTONE.get().defaultBlockState(), 1).build()), UniformInt.of(15, 25), UniformInt.of(3, 5), UniformInt.of(15, 30), HolderSet.empty(), 0));
+		FeatureUtils.register(context, MONOLITH, ESFeatures.PILLAR.get(), new PillarFeature.Configuration(new WeightedStateProvider(SimpleWeightedRandomList.<BlockState>builder().add(ESBlocks.GRIMSTONE.get().defaultBlockState(), 8).add(ESBlocks.GLOWING_GRIMSTONE.get().defaultBlockState(), 1).build()), UniformInt.of(15, 25), UniformInt.of(3, 5), UniformInt.of(15, 30), HolderSet.direct(), 0));
 		FeatureUtils.register(context, LUSH_MONOLITH, ESFeatures.PILLAR.get(), new PillarFeature.Configuration(new WeightedStateProvider(SimpleWeightedRandomList.<BlockState>builder().add(ESBlocks.GRIMSTONE.get().defaultBlockState(), 8).add(ESBlocks.GLOWING_GRIMSTONE.get().defaultBlockState(), 1).build()), UniformInt.of(15, 25), UniformInt.of(3, 5), UniformInt.of(15, 30), HolderSet.direct(PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(CAVE_VINE), EnvironmentScanPlacement.scanningFor(Direction.UP, BlockPredicate.hasSturdyFace(Direction.DOWN), BlockPredicate.ONLY_IN_AIR_PREDICATE, 12), RandomOffsetPlacement.vertical(ConstantInt.of(-1))), PlacementUtils.inlinePlaced(configuredFeatures.getOrThrow(CAVE_MOSS), EnvironmentScanPlacement.scanningFor(Direction.UP, BlockPredicate.hasSturdyFace(Direction.DOWN), BlockPredicate.ONLY_IN_AIR_PREDICATE, 12), RandomOffsetPlacement.vertical(ConstantInt.of(-1)))), 0.2f));
 		FeatureUtils.register(context, GLACITE, ESFeatures.GLACITE.get());
 		FeatureUtils.register(context, ICICLE, ESFeatures.ICICLE.get());

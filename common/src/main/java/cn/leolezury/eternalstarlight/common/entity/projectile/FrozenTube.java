@@ -69,7 +69,7 @@ public class FrozenTube extends ThrowableProjectile implements TrailOwner {
 						golem.setAttackEnergy(Math.max(golem.getAttackEnergy() - 5, 0));
 						Int2IntArrayMap cooldowns = golem.getBehaviorManager().getCooldowns();
 						cooldowns.put(StarlightGolemChargeStartPhase.ID, Math.max(cooldowns.getOrDefault(StarlightGolemChargeStartPhase.ID, 0) - 60, 0));
-						ESCriteriaTriggers.FREEZE_STARLIGHT_GOLEM.get().trigger(serverPlayer);
+						ESCriteriaTriggers.FREEZE_STARLIGHT_GOLEM.trigger(serverPlayer);
 					}
 				}
 			}

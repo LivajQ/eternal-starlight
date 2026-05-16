@@ -176,6 +176,16 @@ public class Tangled extends Monster implements MultiBehaviorUser {
 	}
 
 	@Override
+	public double getPassengersRidingOffset() {
+		return -0.7F;
+	}
+
+	@Override
+	public float getEyeHeight(Pose pose, EntityDimensions size) {
+		return 1.74F;
+	}
+
+	@Override
 	protected void tickDeath() {
 		if (!level().isClientSide && this.deathTime == 0 && getRandom().nextBoolean() && ESConfig.INSTANCE.mobsConfig.tangledSkull.canSpawn()) {
 			TangledSkull skull = new TangledSkull(ESEntities.TANGLED_SKULL.get(), level());

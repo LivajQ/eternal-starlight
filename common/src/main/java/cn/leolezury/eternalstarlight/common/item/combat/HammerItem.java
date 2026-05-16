@@ -48,7 +48,7 @@ public class HammerItem extends TieredItem {
 
 	public void performCriticalAttack(Player player, Entity target) {
 		if (player instanceof ServerPlayer serverPlayer) {
-			ESCriteriaTriggers.HAMMER_CRITICAL_HIT.get().trigger(serverPlayer);
+			ESCriteriaTriggers.HAMMER_CRITICAL_HIT.trigger(serverPlayer);
 		}
 		Level level = player.level();
 		for (LivingEntity entity : level.getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, player, new AABB(target.blockPosition()).inflate(2))) {

@@ -2,27 +2,52 @@ package cn.leolezury.eternalstarlight.common.registry;
 
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.critereon.WitnessWeatherTrigger;
-import cn.leolezury.eternalstarlight.common.platform.registry.RegistrationProvider;
-import cn.leolezury.eternalstarlight.common.platform.registry.RegistryObject;
 import net.minecraft.advancements.CriterionTrigger;
 import net.minecraft.advancements.critereon.PlayerTrigger;
-import net.minecraft.core.registries.Registries;
 
-public class ESCriteriaTriggers {
-	public static final RegistrationProvider<CriterionTrigger<?>> TRIGGERS = RegistrationProvider.get(Registries.TRIGGER_TYPE, EternalStarlight.ID);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> CHALLENGED_GATEKEEPER = TRIGGERS.register("challenged_gatekeeper", PlayerTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, WitnessWeatherTrigger> WITNESS_WEATHER = TRIGGERS.register("witness_weather", WitnessWeatherTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> THROW_GLEECH_EGG = TRIGGERS.register("throw_gleech_egg", PlayerTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> DEACTIVATE_ENERGY_BLOCK = TRIGGERS.register("deactivate_energy_block", PlayerTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> FREEZE_STARLIGHT_GOLEM = TRIGGERS.register("freeze_starlight_golem", PlayerTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> CHAIN_TANGLED_SKULL_EXPLOSION = TRIGGERS.register("chain_tangled_skull_explosion", PlayerTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> SATURATE_DAGGER_OF_HUNGER = TRIGGERS.register("saturate_dagger_of_hunger", PlayerTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> IGNITE_TEAR_BOMB = TRIGGERS.register("ignite_tear_bomb", PlayerTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> WITNESS_STRANGHOUL_HUNT = TRIGGERS.register("witness_stranghoul_hunt", PlayerTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> HIRE_STRANGHOUL = TRIGGERS.register("hire_stranghoul", PlayerTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> HAMMER_CRITICAL_HIT = TRIGGERS.register("hammer_critical_hit", PlayerTrigger::new);
-	public static final RegistryObject<CriterionTrigger<?>, PlayerTrigger> PUT_SEEDS_INTO_STARFIRE_BIRD_NEST = TRIGGERS.register("put_seeds_into_starfire_bird_nest", PlayerTrigger::new);
+import net.minecraft.advancements.CriteriaTriggers;
 
-	public static void loadClass() {
+public  class ESCriteriaTriggers {
+
+	public static final PlayerTrigger CHALLENGED_GATEKEEPER =
+		register(new PlayerTrigger(EternalStarlight.id("challenged_gatekeeper")));
+
+	public static final WitnessWeatherTrigger WITNESS_WEATHER =
+		register(new WitnessWeatherTrigger());
+
+	public static final PlayerTrigger THROW_GLEECH_EGG =
+		register(new PlayerTrigger(EternalStarlight.id("throw_gleech_egg")));
+
+	public static final PlayerTrigger DEACTIVATE_ENERGY_BLOCK =
+		register(new PlayerTrigger(EternalStarlight.id("deactivate_energy_block")));
+
+	public static final PlayerTrigger FREEZE_STARLIGHT_GOLEM =
+		register(new PlayerTrigger(EternalStarlight.id("freeze_starlight_golem")));
+
+	public static final PlayerTrigger CHAIN_TANGLED_SKULL_EXPLOSION =
+		register(new PlayerTrigger(EternalStarlight.id("chain_tangled_skull_explosion")));
+
+	public static final PlayerTrigger SATURATE_DAGGER_OF_HUNGER =
+		register(new PlayerTrigger(EternalStarlight.id("saturate_dagger_of_hunger")));
+
+	public static final PlayerTrigger IGNITE_TEAR_BOMB =
+		register(new PlayerTrigger(EternalStarlight.id("ignite_tear_bomb")));
+
+	public static final PlayerTrigger WITNESS_STRANGHOUL_HUNT =
+		register(new PlayerTrigger(EternalStarlight.id("witness_stranghoul_hunt")));
+
+	public static final PlayerTrigger HIRE_STRANGHOUL =
+		register(new PlayerTrigger(EternalStarlight.id("hire_stranghoul")));
+
+	public static final PlayerTrigger HAMMER_CRITICAL_HIT =
+		register(new PlayerTrigger(EternalStarlight.id("hammer_critical_hit")));
+
+	public static final PlayerTrigger PUT_SEEDS_INTO_STARFIRE_BIRD_NEST =
+		register(new PlayerTrigger(EternalStarlight.id("put_seeds_into_starfire_bird_nest")));
+
+	private static <T extends CriterionTrigger<?>> T register(T trigger) {
+		return CriteriaTriggers.register(trigger);
 	}
+
+	public static void loadClass() {}
 }

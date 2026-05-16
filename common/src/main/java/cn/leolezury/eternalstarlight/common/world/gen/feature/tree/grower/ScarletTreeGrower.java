@@ -1,0 +1,18 @@
+package cn.leolezury.eternalstarlight.common.world.gen.feature.tree.grower;
+
+import cn.leolezury.eternalstarlight.common.data.ESConfiguredFeatures;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.grower.AbstractTreeGrower;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+
+import javax.annotation.Nullable;
+
+public class ScarletTreeGrower extends AbstractTreeGrower {
+
+	@Nullable
+	@Override
+	protected ResourceKey<ConfiguredFeature<?, ?>> getConfiguredFeature(RandomSource random, boolean bees) {
+		return ESConfiguredFeatures.SCARLET;
+	}
+}

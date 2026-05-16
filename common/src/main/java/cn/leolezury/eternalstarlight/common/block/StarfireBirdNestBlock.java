@@ -74,7 +74,7 @@ public class StarfireBirdNestBlock extends BaseEntityBlock {
 				nest.setLastSeedPlayer(player);
 
 				if (player instanceof ServerPlayer serverPlayer) {
-					ESCriteriaTriggers.PUT_SEEDS_INTO_STARFIRE_BIRD_NEST.get().trigger(serverPlayer);
+					ESCriteriaTriggers.PUT_SEEDS_INTO_STARFIRE_BIRD_NEST.trigger(serverPlayer);
 				}
 
 				stack.shrink(1);

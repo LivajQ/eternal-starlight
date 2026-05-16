@@ -10,6 +10,7 @@ import cn.leolezury.eternalstarlight.common.data.ESConfiguredFeatures;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import cn.leolezury.eternalstarlight.common.platform.registry.RegistrationProvider;
 import cn.leolezury.eternalstarlight.common.platform.registry.RegistryObject;
+import cn.leolezury.eternalstarlight.common.world.gen.feature.tree.grower.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -24,8 +25,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-
-import java.util.Optional;
 
 public class ESBlocks {
 	public static final RegistrationProvider<Block> BLOCKS = RegistrationProvider.get(Registries.BLOCK, EternalStarlight.ID);
@@ -67,7 +66,9 @@ public class ESBlocks {
 		() -> new CeilingHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_HANGING_SIGN).mapColor(MapColor.COLOR_BLACK), ESWoodTypes.LUNAR));
 	public static final RegistryObject<Block, WallHangingSignBlock> LUNAR_WALL_HANGING_SIGN = BLOCKS.register("lunar_wall_hanging_sign",
 		() -> new WallHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(MapColor.COLOR_BLACK), ESWoodTypes.LUNAR));
-	public static final RegistryObject<Block, SaplingBlock> LUNAR_SAPLING = BLOCKS.register("lunar_sapling", () -> new SaplingBlock(new TreeGrower("lunar", Optional.of(ESConfiguredFeatures.LUNAR_HUGE), Optional.of(ESConfiguredFeatures.LUNAR), Optional.empty()), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING).mapColor(MapColor.COLOR_LIGHT_BLUE)));
+	public static final RegistryObject<Block, SaplingBlock> LUNAR_SAPLING = BLOCKS.register("lunar_sapling",
+		() -> new SaplingBlock(new LunarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING).mapColor(MapColor.COLOR_LIGHT_BLUE)));
+
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_LUNAR_SAPLING = BLOCKS.register("potted_lunar_sapling", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, LUNAR_SAPLING, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_LIGHT_BLUE)));
 
 	// lunar extras: desert
@@ -115,7 +116,8 @@ public class ESBlocks {
 		() -> new CeilingHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_HANGING_SIGN).mapColor(MapColor.COLOR_BROWN), ESWoodTypes.NORTHLAND));
 	public static final RegistryObject<Block, WallHangingSignBlock> NORTHLAND_WALL_HANGING_SIGN = BLOCKS.register("northland_wall_hanging_sign",
 		() -> new WallHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(MapColor.COLOR_BROWN), ESWoodTypes.NORTHLAND));
-	public static final RegistryObject<Block, SaplingBlock> NORTHLAND_SAPLING = BLOCKS.register("northland_sapling", () -> new SaplingBlock(new TreeGrower("northland", Optional.of(ESConfiguredFeatures.NORTHLAND), Optional.empty(), Optional.empty()), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING).mapColor(MapColor.COLOR_LIGHT_BLUE)));
+	public static final RegistryObject<Block, SaplingBlock> NORTHLAND_SAPLING = BLOCKS.register("northland_sapling",
+		() -> new SaplingBlock(new NorthlandTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING).mapColor(MapColor.COLOR_LIGHT_BLUE)));
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_NORTHLAND_SAPLING = BLOCKS.register("potted_northland_sapling", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, NORTHLAND_SAPLING, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_LIGHT_BLUE)));
 
 	// banyin wood
@@ -155,7 +157,8 @@ public class ESBlocks {
 		() -> new CeilingHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_HANGING_SIGN).mapColor(MapColor.COLOR_RED), ESWoodTypes.BANYIN));
 	public static final RegistryObject<Block, WallHangingSignBlock> BANYIN_WALL_HANGING_SIGN = BLOCKS.register("banyin_wall_hanging_sign",
 		() -> new WallHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(MapColor.COLOR_RED), ESWoodTypes.BANYIN));
-	public static final RegistryObject<Block, SaplingBlock> BANYIN_SAPLING = BLOCKS.register("banyin_sapling", () -> new SaplingBlock(new TreeGrower("banyin", Optional.of(ESConfiguredFeatures.BANYIN_HUGE), Optional.of(ESConfiguredFeatures.BANYIN), Optional.empty()), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, SaplingBlock> BANYIN_SAPLING = BLOCKS.register("banyin_sapling",
+		() -> new SaplingBlock(new BanyinTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_BANYIN_SAPLING = BLOCKS.register("potted_banyin_sapling", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, BANYIN_SAPLING, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, MangroveRootsBlock> BANYIN_ROOTS = BLOCKS.register("banyin_roots", () -> new MangroveRootsBlock(BlockBehaviour.Properties.copy(Blocks.MANGROVE_ROOTS)));
 	public static final RegistryObject<Block, RotatedPillarBlock> MUDDY_BANYIN_ROOTS = BLOCKS.register("muddy_banyin_roots", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.MUDDY_MANGROVE_ROOTS)));
@@ -199,7 +202,8 @@ public class ESBlocks {
 		() -> new CeilingHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_HANGING_SIGN).mapColor(MapColor.COLOR_RED), ESWoodTypes.SCARLET));
 	public static final RegistryObject<Block, WallHangingSignBlock> SCARLET_WALL_HANGING_SIGN = BLOCKS.register("scarlet_wall_hanging_sign",
 		() -> new WallHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(MapColor.COLOR_RED), ESWoodTypes.SCARLET));
-	public static final RegistryObject<Block, SaplingBlock> SCARLET_SAPLING = BLOCKS.register("scarlet_sapling", () -> new SaplingBlock(new TreeGrower("scarlet", Optional.empty(), Optional.of(ESConfiguredFeatures.SCARLET), Optional.empty()), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING).mapColor(MapColor.COLOR_RED)));
+	public static final RegistryObject<Block, SaplingBlock> SCARLET_SAPLING = BLOCKS.register("scarlet_sapling",
+		() -> new SaplingBlock(new ScarletTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING).mapColor(MapColor.COLOR_RED)));
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_SCARLET_SAPLING = BLOCKS.register("potted_scarlet_sapling", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, SCARLET_SAPLING, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_RED)));
 
 	// torreya wood
@@ -239,7 +243,8 @@ public class ESBlocks {
 		() -> new CeilingHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_HANGING_SIGN).mapColor(MapColor.COLOR_BLACK), ESWoodTypes.TORREYA));
 	public static final RegistryObject<Block, WallHangingSignBlock> TORREYA_WALL_HANGING_SIGN = BLOCKS.register("torreya_wall_hanging_sign",
 		() -> new WallHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(MapColor.COLOR_BLACK), ESWoodTypes.TORREYA));
-	public static final RegistryObject<Block, SaplingBlock> TORREYA_SAPLING = BLOCKS.register("torreya_sapling", () -> new SaplingBlock(new TreeGrower("torreya", Optional.of(ESConfiguredFeatures.TORREYA), Optional.empty(), Optional.empty()), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING).mapColor(MapColor.COLOR_RED)));
+	public static final RegistryObject<Block, SaplingBlock> TORREYA_SAPLING = BLOCKS.register("torreya_sapling",
+		() -> new SaplingBlock(new TorreyaTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING).mapColor(MapColor.COLOR_RED)));
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_TORREYA_SAPLING = BLOCKS.register("potted_torreya_sapling", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, TORREYA_SAPLING, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_RED)));
 	public static final RegistryObject<Block, TorreyaVinesBlock> TORREYA_VINES = BLOCKS.register("torreya_vines", () -> new TorreyaVinesBlock(BlockBehaviour.Properties.copy(Blocks.CAVE_VINES).lightLevel(state -> 15).mapColor(MapColor.COLOR_YELLOW)));
 	public static final RegistryObject<Block, TorreyaVinesPlantBlock> TORREYA_VINES_PLANT = BLOCKS.register("torreya_vines_plant", () -> new TorreyaVinesPlantBlock(BlockBehaviour.Properties.copy(Blocks.CAVE_VINES_PLANT).lightLevel(state -> 0).mapColor(MapColor.COLOR_BLACK)));
@@ -397,7 +402,7 @@ public class ESBlocks {
 	public static final RegistryObject<Block, StairBlock> HAZE_ICE_BRICK_STAIRS = BLOCKS.register("haze_ice_brick_stairs", () -> new StairBlock(HAZE_ICE_BRICKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_BRICK_STAIRS).sound(SoundType.GLASS).mapColor(MapColor.ICE)));
 	public static final RegistryObject<Block, WallBlock> HAZE_ICE_BRICK_WALL = BLOCKS.register("haze_ice_brick_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_BRICK_WALL).sound(SoundType.GLASS).mapColor(MapColor.ICE)));
 	public static final RegistryObject<Block, HazeIceLanternBlock> HAZE_ICE_LANTERN = BLOCKS.register("haze_ice_lantern", () -> new HazeIceLanternBlock(BlockBehaviour.Properties.copy(Blocks.LANTERN).sound(SoundType.GLASS).mapColor(MapColor.ICE)));
-	public static final RegistryObject<Block, TransparentBlock> REINFORCED_ICE = BLOCKS.register("reinforced_ice", () -> new TransparentBlock(BlockBehaviour.Properties.copy(Blocks.GLASS)));
+	public static final RegistryObject<Block, HalfTransparentBlock> REINFORCED_ICE = BLOCKS.register("reinforced_ice", () -> new HalfTransparentBlock(BlockBehaviour.Properties.copy(Blocks.GLASS)));
 	public static final RegistryObject<Block, IronBarsBlock> REINFORCED_ICE_PANE = BLOCKS.register("reinforced_ice_pane", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.GLASS_PANE)));
 	public static final RegistryObject<Block, IcicleBlock> ICICLE = BLOCKS.register("icicle", () -> new IcicleBlock(BlockBehaviour.Properties.copy(Blocks.POINTED_DRIPSTONE).sound(SoundType.GLASS).mapColor(MapColor.ICE)));
 	public static final RegistryObject<Block, AshenSnowBlock> ASHEN_SNOW = BLOCKS.register("ashen_snow", () -> new AshenSnowBlock(BlockBehaviour.Properties.copy(Blocks.SNOW).noCollission()));
@@ -414,10 +419,10 @@ public class ESBlocks {
 	public static final RegistryObject<Block, StarcoreBlock> STARCORE_BLOCK = BLOCKS.register("starcore_block", () -> new StarcoreBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK).mapColor(MapColor.COLOR_ORANGE).lightLevel(state -> 10)));
 	public static final RegistryObject<Block, BlazingStarcoreBlock> BLAZING_STARCORE_BLOCK = BLOCKS.register("blazing_starcore_block", () -> new BlazingStarcoreBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK).mapColor(MapColor.COLOR_ORANGE).lightLevel(state -> 12)));
 	public static final RegistryObject<Block, Block> STARCORE_LIGHT = BLOCKS.register("starcore_light", () -> new Block(BlockBehaviour.Properties.copy(Blocks.OCHRE_FROGLIGHT).sound(SoundType.STONE).lightLevel(state -> 15)));
-	public static final RegistryObject<Block, DropExperienceBlock> GRIMSTONE_STARCORE_ORE = BLOCKS.register("grimstone_starcore_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.COAL_ORE).lightLevel(state -> 8)));
-	public static final RegistryObject<Block, DropExperienceBlock> VOIDSTONE_STARCORE_ORE = BLOCKS.register("voidstone_starcore_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE).lightLevel(state -> 4)));
-	public static final RegistryObject<Block, DropExperienceBlock> ETERNAL_ICE_STARCORE_ORE = BLOCKS.register("eternal_ice_starcore_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.COAL_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS).lightLevel(state -> 3)));
-	public static final RegistryObject<Block, DropExperienceBlock> HAZE_ICE_STARCORE_ORE = BLOCKS.register("haze_ice_starcore_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS).lightLevel(state -> 2)));
+	public static final RegistryObject<Block, DropExperienceBlock> GRIMSTONE_STARCORE_ORE = BLOCKS.register("grimstone_starcore_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.COAL_ORE).lightLevel(state -> 8), UniformInt.of(0, 2)));
+	public static final RegistryObject<Block, DropExperienceBlock> VOIDSTONE_STARCORE_ORE = BLOCKS.register("voidstone_starcore_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE).lightLevel(state -> 4), UniformInt.of(0, 2)));
+	public static final RegistryObject<Block, DropExperienceBlock> ETERNAL_ICE_STARCORE_ORE = BLOCKS.register("eternal_ice_starcore_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.COAL_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS).lightLevel(state -> 3), UniformInt.of(0, 2)));
+	public static final RegistryObject<Block, DropExperienceBlock> HAZE_ICE_STARCORE_ORE = BLOCKS.register("haze_ice_starcore_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS).lightLevel(state -> 2), UniformInt.of(0, 2)));
 	public static final RegistryObject<Block, Block> RADIANITE = BLOCKS.register("radianite", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE).mapColor(MapColor.SNOW)));
 	public static final RegistryObject<Block, SlabBlock> RADIANITE_SLAB = BLOCKS.register("radianite_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.STONE_BRICK_SLAB).mapColor(MapColor.SNOW)));
 	public static final RegistryObject<Block, StairBlock> RADIANITE_STAIRS = BLOCKS.register("radianite_stairs", () -> new StairBlock(RADIANITE.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STONE_BRICK_STAIRS).mapColor(MapColor.SNOW)));
@@ -517,7 +522,7 @@ public class ESBlocks {
 	public static final RegistryObject<Block, WallBlock> NIGHTFALL_MUD_BRICK_WALL = BLOCKS.register("nightfall_mud_brick_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(Blocks.MUD_BRICK_WALL)));
 
 	// sand
-	public static final RegistryObject<Block, FallingBlock> TWILIGHT_SAND = BLOCKS.register("twilight_sand", () -> new ColoredFallingBlock(new ColorRGBA(0x907e9b), BlockBehaviour.Properties.copy(Blocks.SAND).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, FallingBlock> TWILIGHT_SAND = BLOCKS.register("twilight_sand", () -> new FallingBlock(BlockBehaviour.Properties.copy(Blocks.SAND).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, Block> TWILIGHT_SANDSTONE = BLOCKS.register("twilight_sandstone", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SANDSTONE).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, SlabBlock> TWILIGHT_SANDSTONE_SLAB = BLOCKS.register("twilight_sandstone_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE_SLAB).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, StairBlock> TWILIGHT_SANDSTONE_STAIRS = BLOCKS.register("twilight_sandstone_stairs", () -> new StairBlock(TWILIGHT_SANDSTONE.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.SANDSTONE_STAIRS).mapColor(MapColor.COLOR_PURPLE)));
@@ -529,18 +534,18 @@ public class ESBlocks {
 	public static final RegistryObject<Block, Block> CHISELED_TWILIGHT_SANDSTONE = BLOCKS.register("chiseled_twilight_sandstone", () -> new Block(BlockBehaviour.Properties.copy(Blocks.CHISELED_SANDSTONE).mapColor(MapColor.COLOR_PURPLE)));
 
 	// gravel
-	public static final RegistryObject<Block, FallingBlock> DUSTED_GRAVEL = BLOCKS.register("dusted_gravel", () -> new ColoredFallingBlock(new ColorRGBA(0x53415e), BlockBehaviour.Properties.copy(Blocks.GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, FallingBlock> DUSTED_GRAVEL = BLOCKS.register("dusted_gravel", () -> new FallingBlock(BlockBehaviour.Properties.copy(Blocks.GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, Block> DUSTED_BRICKS = BLOCKS.register("dusted_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.SMOOTH_SANDSTONE).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, SlabBlock> DUSTED_BRICK_SLAB = BLOCKS.register("dusted_brick_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE_SLAB).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, StairBlock> DUSTED_BRICK_STAIRS = BLOCKS.register("dusted_brick_stairs", () -> new StairBlock(DUSTED_BRICKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.SANDSTONE_STAIRS).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, WallBlock> DUSTED_BRICK_WALL = BLOCKS.register("dusted_brick_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(Blocks.SANDSTONE_WALL).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, Block> MOSSY_DUSTED_GRAVEL = BLOCKS.register("mossy_dusted_gravel", () -> new Block(BlockBehaviour.Properties.copy(Blocks.GRAVEL).mapColor(MapColor.GRASS)));
 	public static final RegistryObject<Block, Block> GLOWING_MOSSY_DUSTED_GRAVEL = BLOCKS.register("glowing_mossy_dusted_gravel", () -> new Block(BlockBehaviour.Properties.copy(Blocks.GRAVEL).mapColor(MapColor.GRASS).lightLevel(state -> 15)));
-	public static final RegistryObject<Block, ESBrushableBlock> SUSPICIOUS_DUSTED_GRAVEL = BLOCKS.register("suspicious_dusted_gravel", () -> new ESBrushableBlock(DUSTED_GRAVEL.get(), SoundEvents.BRUSH_GRAVEL, SoundEvents.BRUSH_GRAVEL_COMPLETED, BlockBehaviour.Properties.copy(Blocks.SUSPICIOUS_GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, ESBrushableBlock> SUSPICIOUS_DUSTED_GRAVEL = BLOCKS.register("suspicious_dusted_gravel", () -> new ESBrushableBlock(DUSTED_GRAVEL.get(), BlockBehaviour.Properties.copy(Blocks.SUSPICIOUS_GRAVEL).mapColor(MapColor.COLOR_PURPLE), SoundEvents.BRUSH_GRAVEL, SoundEvents.BRUSH_GRAVEL_COMPLETED));
 
 	// slag
-	public static final RegistryObject<Block, FallingBlock> DIMSLAG = BLOCKS.register("dimslag", () -> new ColoredFallingBlock(new ColorRGBA(0x514c5d), BlockBehaviour.Properties.copy(Blocks.GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
-	public static final RegistryObject<Block, ESBrushableBlock> SUSPICIOUS_DIMSLAG = BLOCKS.register("suspicious_dimslag", () -> new ESBrushableBlock(DIMSLAG.get(), SoundEvents.BRUSH_GRAVEL, SoundEvents.BRUSH_GRAVEL_COMPLETED, BlockBehaviour.Properties.copy(Blocks.SUSPICIOUS_GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, FallingBlock> DIMSLAG = BLOCKS.register("dimslag", () -> new FallingBlock(BlockBehaviour.Properties.copy(Blocks.GRAVEL).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, ESBrushableBlock> SUSPICIOUS_DIMSLAG = BLOCKS.register("suspicious_dimslag", () -> new ESBrushableBlock(DIMSLAG.get(), BlockBehaviour.Properties.copy(Blocks.SUSPICIOUS_GRAVEL).mapColor(MapColor.COLOR_PURPLE), SoundEvents.BRUSH_GRAVEL, SoundEvents.BRUSH_GRAVEL_COMPLETED));
 
 	// common plant
 	public static final RegistryObject<Block, FlowerBlock> STARLIGHT_FLOWER = BLOCKS.register("starlight_flower", () -> new FlowerBlock(MobEffects.DAMAGE_RESISTANCE, 10, BlockBehaviour.Properties.copy(Blocks.POPPY).mapColor(MapColor.COLOR_BLUE).lightLevel(state -> 15)));
@@ -584,7 +589,7 @@ public class ESBlocks {
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_VIVIDSTALK = BLOCKS.register("potted_vividstalk", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, VIVIDSTALK, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_RED)));
 	public static final RegistryObject<Block, DoublePlantBlock> TALL_GLADESPIKE = BLOCKS.register("tall_gladespike", () -> new DoublePlantBlock(BlockBehaviour.Properties.copy(Blocks.LARGE_FERN).mapColor(MapColor.COLOR_YELLOW)));
 	public static final RegistryObject<Block, ESShortBushBlock> MOONLIGHT_BUSH = BLOCKS.register("moonlight_bush", () -> new MoonlightBushBlock(BlockBehaviour.Properties.copy(Blocks.FERN).mapColor(MapColor.COLOR_BLUE).randomTicks().lightLevel(state -> state.getValue(MoonlightBushBlock.BERRIES) ? 15 : 0)));
-	public static final RegistryObject<Block, MushroomBlock> GLOWING_MUSHROOM = BLOCKS.register("glowing_mushroom", () -> new MushroomBlock(ESConfiguredFeatures.HUGE_GLOWING_MUSHROOM, BlockBehaviour.Properties.copy(Blocks.RED_MUSHROOM).mapColor(MapColor.COLOR_LIGHT_BLUE).lightLevel(state -> 15)));
+	public static final RegistryObject<Block, MushroomBlock> GLOWING_MUSHROOM = BLOCKS.register("glowing_mushroom", () -> new MushroomBlock(BlockBehaviour.Properties.copy(Blocks.RED_MUSHROOM).mapColor(MapColor.COLOR_LIGHT_BLUE).lightLevel(state -> 15), ESConfiguredFeatures.HUGE_GLOWING_MUSHROOM));
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_GLOWING_MUSHROOM = BLOCKS.register("potted_glowing_mushroom", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, GLOWING_MUSHROOM, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_LIGHT_BLUE).lightLevel(state -> 15)));
 	public static final RegistryObject<Block, HugeMushroomBlock> GLOWING_MUSHROOM_BLOCK = BLOCKS.register("glowing_mushroom_block", () -> new HugeMushroomBlock(BlockBehaviour.Properties.copy(Blocks.RED_MUSHROOM_BLOCK).mapColor(MapColor.COLOR_LIGHT_BLUE).lightLevel(state -> 15)));
 	public static final RegistryObject<Block, HugeMushroomBlock> GLOWING_MUSHROOM_STEM = BLOCKS.register("glowing_mushroom_stem", () -> new HugeMushroomBlock(BlockBehaviour.Properties.copy(Blocks.MUSHROOM_STEM).mapColor(MapColor.COLOR_BLUE)));
@@ -639,9 +644,9 @@ public class ESBlocks {
 	public static final RegistryObject<Block, Block> BLUE_STARLIGHT_CRYSTAL_LANTERN = BLOCKS.register("blue_starlight_crystal_lantern", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).strength(1.5F).requiresCorrectToolForDrops().lightLevel(state -> 15).sound(SoundType.AMETHYST)));
 	public static final RegistryObject<Block, DeadBushBlock> DEAD_LUNAR_BUSH = BLOCKS.register("dead_lunar_bush", () -> new DeadBushBlock(BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH)));
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_DEAD_LUNAR_BUSH = BLOCKS.register("potted_dead_lunar_bush", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, DEAD_LUNAR_BUSH, BlockBehaviour.Properties.copy(Blocks.POTTED_DEAD_BUSH)));
-	public static final RegistryObject<Block, DesertFlowerBlock> DESERT_AMETHYSIA = BLOCKS.register("desert_amethysia", () -> new DesertFlowerBlock(ESMobEffects.CRYSTAL_INFECTION.asHolder(), 4f, BlockBehaviour.Properties.copy(Blocks.POPPY).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, DesertFlowerBlock> DESERT_AMETHYSIA = BLOCKS.register("desert_amethysia", () -> new DesertFlowerBlock(ESMobEffects.CRYSTAL_INFECTION.asHolder(), 80, BlockBehaviour.Properties.copy(Blocks.POPPY).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_DESERT_AMETHYSIA = BLOCKS.register("potted_desert_amethysia", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, DESERT_AMETHYSIA, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_PURPLE)));
-	public static final RegistryObject<Block, DesertFlowerBlock> WITHERED_DESERT_AMETHYSIA = BLOCKS.register("withered_desert_amethysia", () -> new DesertFlowerBlock(ESMobEffects.CRYSTAL_INFECTION.asHolder(), 4f, BlockBehaviour.Properties.copy(Blocks.POPPY).mapColor(MapColor.COLOR_PURPLE)));
+	public static final RegistryObject<Block, DesertFlowerBlock> WITHERED_DESERT_AMETHYSIA = BLOCKS.register("withered_desert_amethysia", () -> new DesertFlowerBlock(ESMobEffects.CRYSTAL_INFECTION.asHolder(), 80, BlockBehaviour.Properties.copy(Blocks.POPPY).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_WITHERED_DESERT_AMETHYSIA = BLOCKS.register("potted_withered_desert_amethysia", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, WITHERED_DESERT_AMETHYSIA, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, DesertBushBlock> SUNSET_THORNBLOOM = BLOCKS.register("sunset_thornbloom", () -> new DesertBushBlock(10, BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH).mapColor(MapColor.COLOR_ORANGE)));
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_SUNSET_THORNBLOOM = BLOCKS.register("potted_sunset_thornbloom", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, SUNSET_THORNBLOOM, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_ORANGE)));
@@ -718,13 +723,13 @@ public class ESBlocks {
 	public static final RegistryObject<Block, VelvetumossVilliBlock> VELVETUMOSS_VILLI = BLOCKS.register("velvetumoss_villi", () -> new VelvetumossVilliBlock(VELVETUMOSS.asHolder(), BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK).noCollission().randomTicks()));
 	public static final RegistryObject<Block, RedVelvetumossBlock> RED_VELVETUMOSS = BLOCKS.register("red_velvetumoss", () -> new RedVelvetumossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK).randomTicks().mapColor(MapColor.COLOR_RED)));
 	public static final RegistryObject<Block, VelvetumossVilliBlock> RED_VELVETUMOSS_VILLI = BLOCKS.register("red_velvetumoss_villi", () -> new VelvetumossVilliBlock(RED_VELVETUMOSS.asHolder(), BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK).noCollission().randomTicks().mapColor(MapColor.COLOR_RED)));
-	public static final RegistryObject<Block, AquaticFlowerBlock> RED_VELVETUMOSS_FLOWER = BLOCKS.register("red_velvetumoss_flower", () -> new AquaticFlowerBlock(MobEffects.WATER_BREATHING, 30, BlockBehaviour.Properties.copy(Blocks.POPPY).mapColor(MapColor.COLOR_RED)));
+	public static final RegistryObject<Block, AquaticFlowerBlock> RED_VELVETUMOSS_FLOWER = BLOCKS.register("red_velvetumoss_flower", () -> new AquaticFlowerBlock(MobEffects.WATER_BREATHING, 600, BlockBehaviour.Properties.copy(Blocks.POPPY).mapColor(MapColor.COLOR_RED)));
 	public static final RegistryObject<Block, FlowerPotBlock> POTTED_RED_VELVETUMOSS_FLOWER = BLOCKS.register("potted_red_velvetumoss_flower", () -> ESPlatform.INSTANCE.createFlowerPot(() -> (FlowerPotBlock) Blocks.FLOWER_POT, RED_VELVETUMOSS_FLOWER, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).mapColor(MapColor.COLOR_RED)));
 
 	// crystal caves plant
-	public static final RegistryObject<Block, DesertBushBlock> CRYSTALLIZED_LUNAR_GRASS = BLOCKS.register("crystallized_lunar_grass", () -> new DesertBushBlock(8, BlockBehaviour.Properties.copy(Blocks.SHORT_GRASS).mapColor(DyeColor.RED)));
-	public static final RegistryObject<Block, DesertBushBlock> RED_CRYSTAL_ROOTS = BLOCKS.register("red_crystal_roots", () -> new DesertBushBlock(BlockBehaviour.Properties.copy(Blocks.SHORT_GRASS).mapColor(DyeColor.RED)));
-	public static final RegistryObject<Block, DesertBushBlock> BLUE_CRYSTAL_ROOTS = BLOCKS.register("blue_crystal_roots", () -> new DesertBushBlock(BlockBehaviour.Properties.copy(Blocks.SHORT_GRASS).mapColor(DyeColor.BLUE)));
+	public static final RegistryObject<Block, DesertBushBlock> CRYSTALLIZED_LUNAR_GRASS = BLOCKS.register("crystallized_lunar_grass", () -> new DesertBushBlock(8, BlockBehaviour.Properties.copy(Blocks.GRASS).mapColor(DyeColor.RED)));
+	public static final RegistryObject<Block, DesertBushBlock> RED_CRYSTAL_ROOTS = BLOCKS.register("red_crystal_roots", () -> new DesertBushBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).mapColor(DyeColor.RED)));
+	public static final RegistryObject<Block, DesertBushBlock> BLUE_CRYSTAL_ROOTS = BLOCKS.register("blue_crystal_roots", () -> new DesertBushBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).mapColor(DyeColor.BLUE)));
 	public static final RegistryObject<Block, DoublePlantOnStoneBlock> TWILVEWRYM_HERB = BLOCKS.register("twilvewyrm_herb", () -> new DoublePlantOnStoneBlock(BlockBehaviour.Properties.copy(Blocks.LARGE_FERN).mapColor(DyeColor.BLUE)));
 	public static final RegistryObject<Block, DoublePlantOnStoneBlock> STELLAFLY_BUSH = BLOCKS.register("stellafly_bush", () -> new DoublePlantOnStoneBlock(BlockBehaviour.Properties.copy(Blocks.LARGE_FERN).mapColor(DyeColor.BLUE)));
 	public static final RegistryObject<Block, DoublePlantOnStoneBlock> GLIMMERFLY_BUSH = BLOCKS.register("glimmerfly_bush", () -> new DoublePlantOnStoneBlock(BlockBehaviour.Properties.copy(Blocks.LARGE_FERN).mapColor(DyeColor.RED).lightLevel(state -> 10)));
@@ -778,27 +783,40 @@ public class ESBlocks {
 	public static final RegistryObject<Block, WallBlock> THERMAL_SPRINGSTONE_BRICK_WALL = BLOCKS.register("thermal_springstone_brick_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(Blocks.STONE_BRICK_WALL).mapColor(MapColor.COLOR_BROWN).strength(3.0F, 3.0F)));
 
 	// glacite
-	public static final RegistryObject<Block, DropExperienceBlock> GLACITE = BLOCKS.register("glacite", () -> new DropExperienceBlock(UniformInt.of(3, 7), BlockBehaviour.Properties.copy(Blocks.DIAMOND_ORE).mapColor(MapColor.SNOW).sound(SoundType.GLASS)));
+	public static final RegistryObject<Block, DropExperienceBlock> GLACITE = BLOCKS.register("glacite", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_ORE).mapColor(MapColor.SNOW).sound(SoundType.GLASS), UniformInt.of(3, 7)));
 	public static final RegistryObject<Block, Block> GLACITE_BLOCK = BLOCKS.register("glacite_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK).mapColor(MapColor.SNOW).sound(SoundType.GLASS)));
 
 	// starlit diamond
-	public static final RegistryObject<Block, DropExperienceBlock> GRIMSTONE_STARLIT_DIAMOND_ORE = BLOCKS.register("grimstone_starlit_diamond_ore", () -> new DropExperienceBlock(UniformInt.of(3, 7), BlockBehaviour.Properties.copy(Blocks.DIAMOND_ORE)));
-	public static final RegistryObject<Block, DropExperienceBlock> VOIDSTONE_STARLIT_DIAMOND_ORE = BLOCKS.register("voidstone_starlit_diamond_ore", () -> new DropExperienceBlock(UniformInt.of(3, 7), BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_DIAMOND_ORE)));
-	public static final RegistryObject<Block, DropExperienceBlock> ETERNAL_ICE_STARLIT_DIAMOND_ORE = BLOCKS.register("eternal_ice_starlit_diamond_ore", () -> new DropExperienceBlock(UniformInt.of(3, 7), BlockBehaviour.Properties.copy(Blocks.DIAMOND_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS)));
-	public static final RegistryObject<Block, DropExperienceBlock> HAZE_ICE_STARLIT_DIAMOND_ORE = BLOCKS.register("haze_ice_starlit_diamond_ore", () -> new DropExperienceBlock(UniformInt.of(3, 7), BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_DIAMOND_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS)));
+	public static final RegistryObject<Block, DropExperienceBlock> GRIMSTONE_STARLIT_DIAMOND_ORE = BLOCKS.register("grimstone_starlit_diamond_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_ORE), UniformInt.of(3, 7)));
+	public static final RegistryObject<Block, DropExperienceBlock> VOIDSTONE_STARLIT_DIAMOND_ORE = BLOCKS.register("voidstone_starlit_diamond_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_DIAMOND_ORE), UniformInt.of(3, 7)));
+	public static final RegistryObject<Block, DropExperienceBlock> ETERNAL_ICE_STARLIT_DIAMOND_ORE = BLOCKS.register("eternal_ice_starlit_diamond_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DIAMOND_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS), UniformInt.of(3, 7)));
+	public static final RegistryObject<Block, DropExperienceBlock> HAZE_ICE_STARLIT_DIAMOND_ORE = BLOCKS.register("haze_ice_starlit_diamond_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_DIAMOND_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS), UniformInt.of(3, 7)));
 	public static final RegistryObject<Block, Block> STARLIT_DIAMOND_BLOCK = BLOCKS.register("starlit_diamond_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.DIAMOND_BLOCK).mapColor(MapColor.COLOR_PURPLE)));
+
+	// deepsilver
+	public static final RegistryObject<Block, Block> GRIMSTONE_DEEPSILVER_ORE = BLOCKS.register("grimstone_deepsilver_ore", () -> new Block(BlockBehaviour.Properties.copy(Blocks.COAL_ORE)));
+	public static final RegistryObject<Block, Block> VOIDSTONE_DEEPSILVER_ORE = BLOCKS.register("voidstone_deepsilver_ore", () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE)));
+	public static final RegistryObject<Block, Block> ETERNAL_ICE_DEEPSILVER_ORE = BLOCKS.register("eternal_ice_deepsilver_ore", () -> new Block(BlockBehaviour.Properties.copy(Blocks.COAL_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS)));
+	public static final RegistryObject<Block, Block> HAZE_ICE_DEEPSILVER_ORE = BLOCKS.register("haze_ice_deepsilver_ore", () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS)));
+	public static final RegistryObject<Block, Block> NIGHTFALL_MUD_DEEPSILVER_ORE = BLOCKS.register("nightfall_mud_deepsilver_ore", () -> new Block(BlockBehaviour.Properties.copy(Blocks.MUD).strength(3.0F).requiresCorrectToolForDrops()));
+	public static final RegistryObject<Block, Block> PACKED_NIGHTFALL_MUD_DEEPSILVER_ORE = BLOCKS.register("packed_nightfall_mud_deepsilver_ore", () -> new Block(BlockBehaviour.Properties.copy(Blocks.PACKED_MUD).strength(4.0F).requiresCorrectToolForDrops()));
+	public static final RegistryObject<Block, Block> RAW_DEEPSILVER_BLOCK = BLOCKS.register("raw_deepsilver_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.RAW_IRON_BLOCK).strength(5.0F, 3.5F)));
+	public static final RegistryObject<Block, Block> DEEPSILVER_BLOCK = BLOCKS.register("deepsilver_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(5.0F, 3.5F)));
+	//public static final RegistryObject<Block, WaterloggedTransparentBlock> DEEPSILVER_GRATE = BLOCKS.register("deepsilver_grate", () -> new WaterloggedTransparentBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_GRATE).strength(5.0F, 3.5F).mapColor(MapColor.METAL)));
+	public static final RegistryObject<Block, IronBarsBlock> DEEPSILVER_BARS = BLOCKS.register("deepsilver_bars", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).strength(5.0F, 3.5F)));
 
 	public static final RegistryObject<Block, Block> UNREALIUM_BLOCK = BLOCKS.register("unrealium_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(5.0F, 3.5F).noCollission()));
 	public static final RegistryObject<Block, IronBarsBlock> UNREALIUM_BARS = BLOCKS.register("unrealium_bars", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).strength(5.0F, 3.5F)));
-
-	public static final RegistryObject<Block, DropExperienceBlock> GRIMSTONE_MALARITE_ORE = BLOCKS.register("grimstone_malarite_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.COAL_ORE)));
-	public static final RegistryObject<Block, DropExperienceBlock> VOIDSTONE_MALARITE_ORE = BLOCKS.register("voidstone_malarite_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE)));
-	public static final RegistryObject<Block, DropExperienceBlock> NIGHTFALL_MUD_MALARITE_ORE = BLOCKS.register("nightfall_mud_malarite_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.MUD).strength(3.0F).requiresCorrectToolForDrops()));
-	public static final RegistryObject<Block, DropExperienceBlock> PACKED_NIGHTFALL_MUD_MALARITE_ORE = BLOCKS.register("packed_nightfall_mud_malarite_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.PACKED_MUD).strength(4.0F).requiresCorrectToolForDrops()));
+	public static final RegistryObject<Block, DropExperienceBlock> GRIMSTONE_MALARITE_ORE = BLOCKS.register("grimstone_malarite_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.COAL_ORE), UniformInt.of(0, 2)));
+	public static final RegistryObject<Block, DropExperienceBlock> VOIDSTONE_MALARITE_ORE = BLOCKS.register("voidstone_malarite_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE), UniformInt.of(0, 2)));
+	public static final RegistryObject<Block, DropExperienceBlock> NIGHTFALL_MUD_MALARITE_ORE = BLOCKS.register("nightfall_mud_malarite_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.MUD).strength(3.0F).requiresCorrectToolForDrops(), UniformInt.of(0, 2)));
+	public static final RegistryObject<Block, DropExperienceBlock> PACKED_NIGHTFALL_MUD_MALARITE_ORE = BLOCKS.register("packed_nightfall_mud_malarite_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.PACKED_MUD).strength(4.0F).requiresCorrectToolForDrops(), UniformInt.of(0, 2)));
 	public static final RegistryObject<Block, Block> MALARITE_BLOCK = BLOCKS.register("malarite_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.GOLD_BLOCK).mapColor(MapColor.COLOR_PURPLE).strength(2.0F, 3.5F)));
 
 	public static final RegistryObject<Block, PungencyFruitVinesBlock> PUNGENCY_FRUIT_VINES = BLOCKS.register("pungency_fruit_vines", () -> new PungencyFruitVinesBlock(BlockBehaviour.Properties.copy(Blocks.BEETROOTS).mapColor(MapColor.COLOR_PURPLE)));
 	public static final RegistryObject<Block, TearBombBlock> TEAR_BOMB = BLOCKS.register("tear_bomb", () -> ESPlatform.INSTANCE.createTearBombBlock(BlockBehaviour.Properties.copy(Blocks.TNT).mapColor(MapColor.COLOR_PURPLE)));
+
+	public static final RegistryObject<Block, DryingRackBlock> DRYING_RACK = BLOCKS.register("drying_rack", () -> new DryingRackBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK).noOcclusion().sound(SoundType.WOOD)));
 
 	public static final RegistryObject<Block, StarfireBirdNestBlock> STARFIRE_BIRD_NEST = BLOCKS.register("starfire_bird_nest", () -> new StarfireBirdNestBlock(BlockBehaviour.Properties.copy(Blocks.BEEHIVE).strength(0.2F).noOcclusion()));
 	public static final RegistryObject<Block, StarfireBirdAviaryBlock> OAK_STARFIRE_BIRD_AVIARY = BLOCKS.register("oak_starfire_bird_aviary", () -> new StarfireBirdAviaryBlock(BlockSetType.OAK, BlockBehaviour.Properties.copy(Blocks.BEEHIVE).mapColor(MapColor.WOOD).noOcclusion()));
@@ -820,17 +838,16 @@ public class ESBlocks {
 	public static final RegistryObject<Block, StarfireBirdAviaryBlock> JINGLESTEM_STARFIRE_BIRD_AVIARY = BLOCKS.register("jinglestem_starfire_bird_aviary", () -> new StarfireBirdAviaryBlock(ESWoodTypes.JINGLESTEM_SET, BlockBehaviour.Properties.copy(Blocks.BEEHIVE).mapColor(MapColor.COLOR_GREEN).noOcclusion()));
 	public static final RegistryObject<Block, StarfireBirdAviaryBlock> CRADLEWOOD_STARFIRE_BIRD_AVIARY = BLOCKS.register("cradlewood_starfire_bird_aviary", () -> new StarfireBirdAviaryBlock(ESWoodTypes.CRADLEWOOD_SET, BlockBehaviour.Properties.copy(Blocks.BEEHIVE).mapColor(MapColor.TERRACOTTA_WHITE).noOcclusion()));
 
-	public static final RegistryObject<Block, TransparentBlock> FLOWGLAZE = BLOCKS.register("flowglaze", () -> new TransparentBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).lightLevel(state -> 10)));
+	public static final RegistryObject<Block, HalfTransparentBlock> FLOWGLAZE = BLOCKS.register("flowglaze", () -> new HalfTransparentBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).lightLevel(state -> 10)));
 	public static final RegistryObject<Block, IronBarsBlock> FLOWGLAZE_PANE = BLOCKS.register("flowglaze_pane", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.GLASS_PANE).lightLevel(state -> 10)));
 	public static final RegistryObject<Block, Block> FLOWGLAZE_BRICKS = BLOCKS.register("flowglaze_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE_BRICKS).sound(SoundType.GLASS).mapColor(MapColor.TERRACOTTA_CYAN)));
 	public static final RegistryObject<Block, SlabBlock> FLOWGLAZE_BRICK_SLAB = BLOCKS.register("flowglaze_brick_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.STONE_BRICK_SLAB).sound(SoundType.GLASS).mapColor(MapColor.TERRACOTTA_CYAN)));
 	public static final RegistryObject<Block, StairBlock> FLOWGLAZE_BRICK_STAIRS = BLOCKS.register("flowglaze_brick_stairs", () -> new StairBlock(FLOWGLAZE_BRICKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STONE_BRICK_STAIRS).sound(SoundType.GLASS).mapColor(MapColor.TERRACOTTA_CYAN)));
 	public static final RegistryObject<Block, WallBlock> FLOWGLAZE_BRICK_WALL = BLOCKS.register("flowglaze_brick_wall", () -> new WallBlock(BlockBehaviour.Properties.copy(Blocks.STONE_BRICK_WALL).sound(SoundType.GLASS).mapColor(MapColor.TERRACOTTA_CYAN)));
-
-	public static final RegistryObject<Block, DropExperienceBlock> GRIMSTONE_SALTPETER_ORE = BLOCKS.register("grimstone_saltpeter_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.COAL_ORE)));
-	public static final RegistryObject<Block, DropExperienceBlock> VOIDSTONE_SALTPETER_ORE = BLOCKS.register("voidstone_saltpeter_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE)));
-	public static final RegistryObject<Block, DropExperienceBlock> ETERNAL_ICE_SALTPETER_ORE = BLOCKS.register("eternal_ice_saltpeter_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.COAL_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS)));
-	public static final RegistryObject<Block, DropExperienceBlock> HAZE_ICE_SALTPETER_ORE = BLOCKS.register("haze_ice_saltpeter_ore", () -> new DropExperienceBlock(UniformInt.of(0, 2), BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS)));
+	public static final RegistryObject<Block, DropExperienceBlock> GRIMSTONE_SALTPETER_ORE = BLOCKS.register("grimstone_saltpeter_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.COAL_ORE), UniformInt.of(0, 2)));
+	public static final RegistryObject<Block, DropExperienceBlock> VOIDSTONE_SALTPETER_ORE = BLOCKS.register("voidstone_saltpeter_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE), UniformInt.of(0, 2)));
+	public static final RegistryObject<Block, DropExperienceBlock> ETERNAL_ICE_SALTPETER_ORE = BLOCKS.register("eternal_ice_saltpeter_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.COAL_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS), UniformInt.of(0, 2)));
+	public static final RegistryObject<Block, DropExperienceBlock> HAZE_ICE_SALTPETER_ORE = BLOCKS.register("haze_ice_saltpeter_ore", () -> new DropExperienceBlock(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_COAL_ORE).mapColor(MapColor.ICE).sound(SoundType.GLASS), UniformInt.of(0, 2)));
 	public static final RegistryObject<Block, Block> SALTPETER_BLOCK = BLOCKS.register("saltpeter_block", () -> new Block(BlockBehaviour.Properties.copy(Blocks.COAL_BLOCK).mapColor(MapColor.COLOR_YELLOW)));
 
 	public static final RegistryObject<Block, RawAmaramberBlock> RAW_AMARAMBER_BLOCK = BLOCKS.register("raw_amaramber_block", () -> new RawAmaramberBlock(BlockBehaviour.Properties.copy(Blocks.COAL_BLOCK).mapColor(MapColor.COLOR_RED)));
@@ -946,9 +963,9 @@ public class ESBlocks {
 	public static final RegistryObject<Block, WeatheringGolemSteelStairBlock> GOLEM_STEEL_TILE_STAIRS = BLOCKS.register("golem_steel_tile_stairs", () -> new WeatheringGolemSteelStairBlock(GOLEM_STEEL_TILES.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.CUT_COPPER_STAIRS).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_BLUE)));
 	public static final RegistryObject<Block, WeatheringGolemSteelStairBlock> WAXED_GOLEM_STEEL_TILE_STAIRS = BLOCKS.register("waxed_golem_steel_tile_stairs", () -> new WeatheringGolemSteelStairBlock(WAXED_GOLEM_STEEL_TILES.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.WAXED_CUT_COPPER_STAIRS).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_BLUE)));
 	public static final RegistryObject<Block, WeatheringGolemSteelStairBlock> OXIDIZED_GOLEM_STEEL_TILE_STAIRS = BLOCKS.register("oxidized_golem_steel_tile_stairs", () -> new WeatheringGolemSteelStairBlock(OXIDIZED_GOLEM_STEEL_TILES.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.CUT_COPPER_STAIRS).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_GRAY)));
-	public static final RegistryObject<Block, WeatheringGolemSteelGrateBlock> GOLEM_STEEL_GRATE = BLOCKS.register("golem_steel_grate", () -> new WeatheringGolemSteelGrateBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_GRATE).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_BLUE)));
-	public static final RegistryObject<Block, WeatheringGolemSteelGrateBlock> WAXED_GOLEM_STEEL_GRATE = BLOCKS.register("waxed_golem_steel_grate", () -> new WeatheringGolemSteelGrateBlock(BlockBehaviour.Properties.copy(Blocks.WAXED_COPPER_GRATE).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_BLUE)));
-	public static final RegistryObject<Block, WeatheringGolemSteelGrateBlock> OXIDIZED_GOLEM_STEEL_GRATE = BLOCKS.register("oxidized_golem_steel_grate", () -> new WeatheringGolemSteelGrateBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_GRATE).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_GRAY)));
+	//public static final RegistryObject<Block, WeatheringGolemSteelGrateBlock> GOLEM_STEEL_GRATE = BLOCKS.register("golem_steel_grate", () -> new WeatheringGolemSteelGrateBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_GRATE).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_BLUE)));
+	//public static final RegistryObject<Block, WeatheringGolemSteelGrateBlock> WAXED_GOLEM_STEEL_GRATE = BLOCKS.register("waxed_golem_steel_grate", () -> new WeatheringGolemSteelGrateBlock(BlockBehaviour.Properties.copy(Blocks.WAXED_COPPER_GRATE).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_BLUE)));
+	//public static final RegistryObject<Block, WeatheringGolemSteelGrateBlock> OXIDIZED_GOLEM_STEEL_GRATE = BLOCKS.register("oxidized_golem_steel_grate", () -> new WeatheringGolemSteelGrateBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_GRATE).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_GRAY)));
 	public static final RegistryObject<Block, WeatheringGolemSteelPillarBlock> GOLEM_STEEL_PILLAR = BLOCKS.register("golem_steel_pillar", () -> new WeatheringGolemSteelPillarBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_LIGHT_BLUE).lightLevel(state -> 10)));
 	public static final RegistryObject<Block, WeatheringGolemSteelPillarBlock> WAXED_GOLEM_STEEL_PILLAR = BLOCKS.register("waxed_golem_steel_pillar", () -> new WeatheringGolemSteelPillarBlock(BlockBehaviour.Properties.copy(Blocks.WAXED_COPPER_BLOCK).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_LIGHT_BLUE).lightLevel(state -> 10)));
 	public static final RegistryObject<Block, WeatheringGolemSteelPillarBlock> OXIDIZED_GOLEM_STEEL_PILLAR = BLOCKS.register("oxidized_golem_steel_pillar", () -> new WeatheringGolemSteelPillarBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).strength(4.0F, 1200.0F).mapColor(MapColor.COLOR_LIGHT_BLUE).lightLevel(state -> 10)));
@@ -978,11 +995,11 @@ public class ESBlocks {
 	public static final RegistryObject<Block, SlabBlock> LUNAR_MOSAIC_SLAB = BLOCKS.register("lunar_mosaic_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.STONE_BRICK_SLAB).mapColor(MapColor.COLOR_BLUE)));
 	public static final RegistryObject<Block, StairBlock> LUNAR_MOSAIC_STAIRS = BLOCKS.register("lunar_mosaic_stairs", () -> new StairBlock(LUNAR_MOSAIC.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STONE_BRICK_STAIRS).mapColor(MapColor.COLOR_BLUE)));
 	public static final RegistryObject<Block, FenceBlock> LUNAR_MOSAIC_FENCE = BLOCKS.register("lunar_mosaic_fence", () -> new FenceBlock(BlockBehaviour.Properties.copy(Blocks.OAK_FENCE).mapColor(MapColor.COLOR_BLUE)));
-	public static final RegistryObject<Block, FenceGateBlock> LUNAR_MOSAIC_FENCE_GATE = BLOCKS.register("lunar_mosaic_fence_gate", () -> new FenceGateBlock(ESWoodTypes.LUNAR_MOSAIC, BlockBehaviour.Properties.copy(Blocks.OAK_FENCE_GATE).mapColor(MapColor.COLOR_BLUE)));
+	public static final RegistryObject<Block, FenceGateBlock> LUNAR_MOSAIC_FENCE_GATE = BLOCKS.register("lunar_mosaic_fence_gate", () -> new FenceGateBlock(BlockBehaviour.Properties.copy(Blocks.OAK_FENCE_GATE).mapColor(MapColor.COLOR_BLUE), ESWoodTypes.LUNAR_MOSAIC));
 	public static final RegistryObject<Block, CarpetBlock> LUNAR_MAT = BLOCKS.register("lunar_mat", () -> new CarpetBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).mapColor(MapColor.COLOR_BLUE)));
 
 	// solar creeper
-	public static final RegistryObject<Block, TransparentBlock> DUSK_GLASS = BLOCKS.register("dusk_glass", () -> new TransparentBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).lightLevel(state -> 12)));
+	public static final RegistryObject<Block, HalfTransparentBlock> DUSK_GLASS = BLOCKS.register("dusk_glass", () -> new HalfTransparentBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).lightLevel(state -> 12)));
 	public static final RegistryObject<Block, DuskLightBlock> DUSK_LIGHT = BLOCKS.register("dusk_light", () -> new DuskLightBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(50.0F, 1200.0F).mapColor(MapColor.COLOR_ORANGE).lightLevel(state -> 15)));
 	public static final RegistryObject<Block, ReinforcedDuskLightBlock> REINFORCED_DUSK_LIGHT = BLOCKS.register("reinforced_dusk_light", () -> new ReinforcedDuskLightBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(50.0F, 1200.0F).mapColor(MapColor.COLOR_ORANGE).lightLevel(state -> 15)));
 	public static final RegistryObject<Block, DuskEmitterBlock> DUSK_EMITTER = BLOCKS.register("dusk_emitter", () -> new DuskEmitterBlock(BlockBehaviour.Properties.copy(Blocks.STONE).strength(50.0F, 1200.0F).mapColor(MapColor.COLOR_BROWN).lightLevel(state -> 15)));
@@ -991,8 +1008,8 @@ public class ESBlocks {
 	public static final RegistryObject<Block, EclipseCoreBlock> ECLIPSE_CORE = BLOCKS.register("eclipse_core", () -> new EclipseCoreBlock(BlockBehaviour.Properties.of().strength(-1F).mapColor(MapColor.COLOR_YELLOW).lightLevel(state -> 15)));
 
 	// doomeden
-	public static final RegistryObject<Block, TorchBlock> DOOMED_TORCH = BLOCKS.register("doomed_torch", () -> new TorchBlock(ParticleTypes.FLAME, BlockBehaviour.Properties.copy(Blocks.TORCH)));
-	public static final RegistryObject<Block, WallTorchBlock> WALL_DOOMED_TORCH = BLOCKS.register("wall_doomed_torch", () -> new WallTorchBlock(ParticleTypes.FLAME, BlockBehaviour.Properties.copy(Blocks.WALL_TORCH)));
+	public static final RegistryObject<Block, TorchBlock> DOOMED_TORCH = BLOCKS.register("doomed_torch", () -> new TorchBlock(BlockBehaviour.Properties.copy(Blocks.TORCH), ParticleTypes.FLAME));
+	public static final RegistryObject<Block, WallTorchBlock> WALL_DOOMED_TORCH = BLOCKS.register("wall_doomed_torch", () -> new WallTorchBlock(BlockBehaviour.Properties.copy(Blocks.WALL_TORCH), ParticleTypes.FLAME));
 	public static final RegistryObject<Block, DoomedenRedstoneTorchBlock> DOOMED_REDSTONE_TORCH = BLOCKS.register("doomed_redstone_torch", () -> new DoomedenRedstoneTorchBlock(BlockBehaviour.Properties.copy(Blocks.REDSTONE_TORCH)));
 	public static final RegistryObject<Block, DoomedenRedstoneWallTorchBlock> WALL_DOOMED_REDSTONE_TORCH = BLOCKS.register("wall_doomed_redstone_torch", () -> new DoomedenRedstoneWallTorchBlock(BlockBehaviour.Properties.copy(Blocks.REDSTONE_WALL_TORCH)));
 	public static final RegistryObject<Block, Block> DOOMEDEN_BRICKS = BLOCKS.register("doomeden_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE_BRICKS).mapColor(MapColor.COLOR_GREEN)));

@@ -10,10 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
@@ -76,6 +73,12 @@ public class LonestarSkeleton extends Skeleton {
 	}
 
 	@Override
+	public double getPassengersRidingOffset() {
+		return -0.7F;
+	}
+
+
+	@Override
 	protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource damageSource, boolean bl) {
 		if (getMainHandItem().is(ESItems.SHATTERED_SWORD.get())) {
 			ShatteredSwordItem.setHasBlade(getMainHandItem(), true);
@@ -92,6 +95,12 @@ public class LonestarSkeleton extends Skeleton {
 	public void reassessWeaponGoal() {
 
 	}
+
+	@Override
+	public float getEyeHeight(Pose pose, EntityDimensions size) {
+		return 1.74F;
+	}
+
 
 	public void onSwitchWeapon() {
 		this.goalSelector.removeGoal(this.bladeGoal);

@@ -22,7 +22,7 @@ public abstract class TntBlockMixin {
 	private static void explode(Level level, BlockPos blockPos, LivingEntity livingEntity, CallbackInfo ci) {
 		if (level.getBlockState(blockPos).is(ESBlocks.TEAR_BOMB.get())) {
 			if (livingEntity instanceof ServerPlayer serverPlayer) {
-				ESCriteriaTriggers.IGNITE_TEAR_BOMB.get().trigger(serverPlayer);
+				ESCriteriaTriggers.IGNITE_TEAR_BOMB.trigger(serverPlayer);
 			}
 			ci.cancel();
 			if (!level.isClientSide) {

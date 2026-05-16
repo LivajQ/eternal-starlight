@@ -125,6 +125,16 @@ public class Gleech extends Monster {
 	}
 
 	@Override
+	public float getEyeHeight(Pose pose, EntityDimensions size) {
+		return 0.13F;
+	}
+
+	@Override
+	public double getPassengersRidingOffset() {
+		return -0.0625F;
+	}
+
+	@Override
 	public void tick() {
 		this.yBodyRot = this.getYRot();
 		super.tick();
