@@ -13,34 +13,39 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public enum ESItemTiers implements Tier {
-	AETHERSENT(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 1750, 12.0F, 1.0F, 22, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_AETHERSENT)),
-	THERMAL_SPRINGSTONE(BlockTags.INCORRECT_FOR_IRON_TOOL, 400, 7.0F, 2.0F, 10, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_THERMAL_SPRINGSTONE)),
-	GLACITE(BlockTags.INCORRECT_FOR_IRON_TOOL, 500, 7.0F, 2.5F, 10, () -> Ingredient.of(ESConventionalTags.Items.GEMS_GLACITE)),
-	STARLIT_DIAMOND(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 2500, 9.0F, 4.0F, 20, () -> Ingredient.of(ESConventionalTags.Items.GEMS_STARLIT_DIAMOND)),
-	DEEPSILVER(BlockTags.INCORRECT_FOR_IRON_TOOL, 800, 12.0F, 2.0F, 10, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_DEEPSILVER)),
-	UNREALIUM(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 1200, 15.0F, 4.0F, 22, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_UNREALIUM)),
-	MALARITE(BlockTags.INCORRECT_FOR_IRON_TOOL, 400, 6.0F, 2.0F, 10, () -> Ingredient.of(ESConventionalTags.Items.GEMS_MALARITE)),
-	PUNGENCY_FRUIT(BlockTags.INCORRECT_FOR_IRON_TOOL, 600, 8.0F, 2.5F, 12, () -> Ingredient.of(ESItems.PUNGENCY_FRUIT.get())),
-	STARFIRE(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 1000, 8.5F, 2.5F, 15, () -> Ingredient.of(ESItems.STARFIRE.get())),
-	FLOWGLAZE(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 1000, 8.5F, 2.5F, 15, () -> Ingredient.of(ESItems.FLOWGLAZE.get())),
-	AMARAMBER(BlockTags.INCORRECT_FOR_IRON_TOOL, 250, 6.0F, 2.0F, 14, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_AMARAMBER)),
-	AURORA_DEER_ANTLER(BlockTags.INCORRECT_FOR_IRON_TOOL, 400, 6.0F, 1.0F, 22, () -> Ingredient.EMPTY),
-	TENTACLE_SPIKE(BlockTags.INCORRECT_FOR_IRON_TOOL, 200, 6.0F, 1.5F, 14, () -> Ingredient.EMPTY),
-	TOOTH_OF_HUNGER(BlockTags.INCORRECT_FOR_IRON_TOOL, 250, 6.0F, 2.5F, 14, () -> Ingredient.of(ESItems.TOOTH_OF_HUNGER.get())),
-	GLISTERING(BlockTags.INCORRECT_FOR_IRON_TOOL, 8000, 6.0F, 2.0F, 14, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_DEEPSILVER)),
-	GOLEM_STEEL(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 1000, 7.5F, 3.0F, 22, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_GOLEM_STEEL)),
-	PETAL(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 1500, 7.5F, 3.5F, 22, () -> Ingredient.of(ESItems.TENACIOUS_PETAL.get(), ESItems.TENACIOUS_VINE.get())),
-	DOOMEDEN(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 2000, 7.5F, 2.5F, 10, () -> Ingredient.of(ESItems.BROKEN_DOOMEDEN_BONE.get()));
+	AETHERSENT(3, 1750, 12.0F, 1.0F, 22, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_AETHERSENT)),
+	THERMAL_SPRINGSTONE(2, 400, 7.0F, 2.0F, 10, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_THERMAL_SPRINGSTONE)),
+	GLACITE(2, 500, 7.0F, 2.5F, 10, () -> Ingredient.of(ESConventionalTags.Items.GEMS_GLACITE)),
+	STARLIT_DIAMOND(3, 2500, 9.0F, 4.0F, 20, () -> Ingredient.of(ESConventionalTags.Items.GEMS_STARLIT_DIAMOND)),
+	DEEPSILVER(2, 800, 12.0F, 2.0F, 10, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_DEEPSILVER)),
+	UNREALIUM(3, 1200, 15.0F, 4.0F, 22, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_UNREALIUM)),
+	MALARITE(2, 400, 6.0F, 2.0F, 10, () -> Ingredient.of(ESConventionalTags.Items.GEMS_MALARITE)),
+	PUNGENCY_FRUIT(2, 600, 8.0F, 2.5F, 12, () -> Ingredient.of(ESItems.PUNGENCY_FRUIT.get())),
+	STARFIRE(3, 1000, 8.5F, 2.5F, 15, () -> Ingredient.of(ESItems.STARFIRE.get())),
+	FLOWGLAZE(3, 1000, 8.5F, 2.5F, 15, () -> Ingredient.of(ESItems.FLOWGLAZE.get())),
+	AMARAMBER(2, 250, 6.0F, 2.0F, 14, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_AMARAMBER)),
+	AURORA_DEER_ANTLER(2, 400, 6.0F, 1.0F, 22, () -> Ingredient.EMPTY),
+	TENTACLE_SPIKE(2, 200, 6.0F, 1.5F, 14, () -> Ingredient.EMPTY),
+	TOOTH_OF_HUNGER(2, 250, 6.0F, 2.5F, 14, () -> Ingredient.of(ESItems.TOOTH_OF_HUNGER.get())),
+	GLISTERING(2, 8000, 6.0F, 2.0F, 14, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_DEEPSILVER)),
+	GOLEM_STEEL(3, 1000, 7.5F, 3.0F, 22, () -> Ingredient.of(ESConventionalTags.Items.INGOTS_GOLEM_STEEL)),
+	PETAL(3, 1500, 7.5F, 3.5F, 22, () -> Ingredient.of(ESItems.TENACIOUS_PETAL.get(), ESItems.TENACIOUS_VINE.get())),
+	DOOMEDEN(3, 2000, 7.5F, 2.5F, 10, () -> Ingredient.of(ESItems.BROKEN_DOOMEDEN_BONE.get()));
 
-	private final TagKey<Block> incorrectBlocksForDrops;
+	private final int level;
 	private final int uses;
 	private final float speed;
 	private final float damage;
 	private final int enchantmentValue;
 	private final Supplier<Ingredient> repairIngredient;
 
-	ESItemTiers(final TagKey<Block> incorrect, final int uses, final float speed, final float damage, final int enchantmentValue, final Supplier<Ingredient> supplier) {
-		this.incorrectBlocksForDrops = incorrect;
+	ESItemTiers(int level,
+				int uses,
+				float speed,
+				float damage,
+				int enchantmentValue,
+				Supplier<Ingredient> supplier) {
+		this.level = level;
 		this.uses = uses;
 		this.speed = speed;
 		this.damage = damage;
@@ -65,8 +70,8 @@ public enum ESItemTiers implements Tier {
 	}
 
 	@Override
-	public TagKey<Block> getIncorrectBlocksForDrops() {
-		return this.incorrectBlocksForDrops;
+	public int getLevel() {
+		return this.level;
 	}
 
 	@Override

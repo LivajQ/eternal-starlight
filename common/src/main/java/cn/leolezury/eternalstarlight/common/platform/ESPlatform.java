@@ -93,19 +93,19 @@ public interface ESPlatform {
 	}
 
 	default ScytheItem createScythe(Tier tier, boolean canTill, Item.Properties properties) {
-		return new ScytheItem(tier, canTill, properties);
+		return new ScytheItem(tier, canTill, 4, -2.7F, 0.0F, 0.0F, properties);
 	}
 
-	default ScytheItem createPetalScythe(Tier tier, boolean canTill, Item.Properties properties) {
-		return new PetalScytheItem(tier, canTill, properties);
+	default ScytheItem createPetalScythe(Tier tier, boolean canTill, Item.Properties props) {
+		return new PetalScytheItem(tier, canTill, 4, -2.7F, 0.5F, 0.45F, props);
 	}
 
 	default HammerItem createHammer(Tier tier, Supplier<ParticleOptions> smashParticle, Holder<SoundEvent> smashSound, Item.Properties properties) {
-		return new HammerItem(tier, smashParticle, smashSound, properties);
+		return new HammerItem(tier, smashParticle, smashSound, 7, -3.0F, properties);
 	}
 
-	default CrescentSpearItem createCrescentSpear(Item.Properties properties) {
-		return new CrescentSpearItem(properties);
+	default CrescentSpearItem createCrescentSpear(Tier tier, Item.Properties props) {
+		return new CrescentSpearItem(tier, 7.5F, -2.7F, props);
 	}
 
 	default ThermalSpringstoneArmorItem createThermalSpringstoneArmor(ArmorMaterial material, ArmorItem.Type type, Item.Properties properties) {

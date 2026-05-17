@@ -8,8 +8,9 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.Level;
 
 public class TentacleSpikeItem extends WhipItem {
-	public TentacleSpikeItem(Tier tier, Properties properties) {
-		super(tier, properties);
+
+	public TentacleSpikeItem(Tier tier, float attackDamage, float attackSpeed, Properties properties) {
+		super(tier, attackDamage, attackSpeed, properties);
 	}
 
 	@Override

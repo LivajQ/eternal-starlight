@@ -27,6 +27,7 @@ import org.joml.Vector3f;
 import java.util.List;
 
 public class ColdsnapItem extends WhipItem {
+
 	private static final List<Vector3f> PARTICLE_COLORS = List.of(
 		new Vector3f(255, 255, 255),
 		new Vector3f(155, 244, 244),
@@ -35,34 +36,34 @@ public class ColdsnapItem extends WhipItem {
 		new Vector3f(69, 114, 185)
 	);
 
-	public ColdsnapItem(Tier tier, Properties properties) {
-		super(tier, properties);
+	public ColdsnapItem(Tier tier, float damage, float speed, Properties props) {
+		super(tier, damage, speed, props);
 	}
 
 	@Override
 	public void doPostHurtEffects(@Nullable Whip whip, Entity entity) {
 		if (whip != null) {
-			whip.playSound(ESSoundEvents.FROZEN_TUBE_BREAK.get(), 1.0F, 1.0F / (entity.getRandom().nextFloat() * 0.4F + 0.8F));
+			whip.playSound(ESSoundEvents.FROZEN_TUBE_BREAK.get(), 1.0F, 1.0F / (entity.level().getRandom().nextFloat() * 0.4F + 0.8F));
 		}
 		if (entity.level() instanceof ServerLevel serverLevel) {
-			double x = entity.getX() + (entity.getRandom().nextFloat() - 0.5) * entity.getBbWidth();
-			double y = entity.getY() + entity.getRandom().nextFloat() * entity.getBbHeight();
-			double z = entity.getZ() + (entity.getRandom().nextFloat() - 0.5) * entity.getBbWidth();
-			serverLevel.sendParticles(ESExplosionParticleOptions.fromIntColor(ESParticles.BLAST.get(), PARTICLE_COLORS.get(entity.getRandom().nextInt(PARTICLE_COLORS.size())), PARTICLE_COLORS.get(entity.getRandom().nextInt(PARTICLE_COLORS.size())), 0.4f), x, y, z, 1, 0.2, 0.2, 0.2, 0.0);
+			double x = entity.getX() + (entity.level().getRandom().nextFloat() - 0.5) * entity.getBbWidth();
+			double y = entity.getY() + entity.level().getRandom().nextFloat() * entity.getBbHeight();
+			double z = entity.getZ() + (entity.level().getRandom().nextFloat() - 0.5) * entity.getBbWidth();
+			serverLevel.sendParticles(ESExplosionParticleOptions.fromIntColor(ESParticles.BLAST.get(), PARTICLE_COLORS.get(entity.level().getRandom().nextInt(PARTICLE_COLORS.size())), PARTICLE_COLORS.get(entity.level().getRandom().nextInt(PARTICLE_COLORS.size())), 0.4f), x, y, z, 1, 0.2, 0.2, 0.2, 0.0);
 			for (int i = 0; i < 4; i++) {
-				Vec3 speed = new Vec3((entity.getRandom().nextFloat() - entity.getRandom().nextFloat()) * 0.1F, entity.getRandom().nextFloat() * 0.05F, (entity.getRandom().nextFloat() - entity.getRandom().nextFloat()) * 0.1F).normalize();
-				ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ExplosionShockParticleOptions.fromIntColor(PARTICLE_COLORS.get(entity.getRandom().nextInt(PARTICLE_COLORS.size())), PARTICLE_COLORS.get(entity.getRandom().nextInt(PARTICLE_COLORS.size())), 0.3f, 0.06f, 0.5f), x + speed.x * 0.6, y + speed.y * 0.6, z + speed.z * 0.6, speed.x, speed.y, speed.z));
+				Vec3 speed = new Vec3((entity.level().getRandom().nextFloat() - entity.level().getRandom().nextFloat()) * 0.1F, entity.level().getRandom().nextFloat() * 0.05F, (entity.level().getRandom().nextFloat() - entity.level().getRandom().nextFloat()) * 0.1F).normalize();
+				ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ExplosionShockParticleOptions.fromIntColor(PARTICLE_COLORS.get(entity.level().getRandom().nextInt(PARTICLE_COLORS.size())), PARTICLE_COLORS.get(entity.level().getRandom().nextInt(PARTICLE_COLORS.size())), 0.3f, 0.06f, 0.5f), x + speed.x * 0.6, y + speed.y * 0.6, z + speed.z * 0.6, speed.x, speed.y, speed.z));
 			}
 		}
 		if (entity.canFreeze() && entity instanceof LivingEntity living) {
 			entity.setTicksFrozen(Math.min(entity.getTicksFrozen() + 40, 300));
-			MobEffectInstance brittle = living.getEffect(ESMobEffects.BRITTLE.asHolder());
-			if (living.hasEffect(ESMobEffects.BRITTLE.asHolder()) && brittle != null) {
-				if (entity.getRandom().nextFloat() < 0.5 && brittle.getAmplifier() < 2) {
-					living.addEffect(new MobEffectInstance(ESMobEffects.BRITTLE.asHolder(), 200, brittle.getAmplifier() + 1));
+			MobEffectInstance brittle = living.getEffect(ESMobEffects.BRITTLE.get());
+			if (living.hasEffect(ESMobEffects.BRITTLE.get()) && brittle != null) {
+				if (entity.level().getRandom().nextFloat() < 0.5 && brittle.getAmplifier() < 2) {
+					living.addEffect(new MobEffectInstance(ESMobEffects.BRITTLE.get(), 200, brittle.getAmplifier() + 1));
 				}
-			} else if (entity.getRandom().nextFloat() < 0.75) {
-				living.addEffect(new MobEffectInstance(ESMobEffects.BRITTLE.asHolder(), 200, 0));
+			} else if (entity.level().getRandom().nextFloat() < 0.75) {
+				living.addEffect(new MobEffectInstance(ESMobEffects.BRITTLE.get(), 200, 0));
 			}
 		}
 		if (whip instanceof Coldsnap coldsnap && !coldsnap.isCloudSpawned() && coldsnap.getOwner() instanceof LivingEntity living && !SpecialItemCooldown.isOnCooldown(living, this)) {

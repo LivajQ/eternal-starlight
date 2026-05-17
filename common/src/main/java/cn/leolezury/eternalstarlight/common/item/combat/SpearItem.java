@@ -1,42 +1,65 @@
 package cn.leolezury.eternalstarlight.common.item.combat;
 
 import cn.leolezury.eternalstarlight.common.entity.projectile.ThrownSpear;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+public abstract class SpearItem extends TieredItem {
 
-public abstract class SpearItem extends TieredItem implements ProjectileItem {
-	public SpearItem(Tier tier, Item.Properties properties) {
-		super(tier, properties.component(DataComponents.TOOL, createToolProperties()));
+	protected final int attackDamage;
+	protected final float attackSpeed;
+
+	public SpearItem(Tier tier, int attackDamage, float attackSpeed, Item.Properties properties) {
+		super(tier, properties);
+		this.attackDamage = attackDamage + (int) tier.getAttackDamageBonus();
+		this.attackSpeed = attackSpeed;
 	}
 
-	public static ItemAttributeModifiers createAttributes(Tier tier, float damage, float speed) {
-		return ItemAttributeModifiers.builder()
-			.add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, damage + tier.getAttackDamageBonus(), AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
-			.add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, speed, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
-			.build();
-	}
+	@Override
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+		if (slot == EquipmentSlot.MAINHAND) {
+			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 
-	public static Tool createToolProperties() {
-		return new Tool(List.of(), 1.0F, 2);
+			builder.put(
+				Attributes.ATTACK_DAMAGE,
+				new AttributeModifier(
+					BASE_ATTACK_DAMAGE_UUID,
+					"spear_damage",
+					this.attackDamage,
+					AttributeModifier.Operation.ADDITION
+				)
+			);
+
+			builder.put(
+				Attributes.ATTACK_SPEED,
+				new AttributeModifier(
+					BASE_ATTACK_SPEED_UUID,
+					"spear_speed",
+					this.attackSpeed,
+					AttributeModifier.Operation.ADDITION
+				)
+			);
+
+			return builder.build();
+		}
+
+		return super.getDefaultAttributeModifiers(slot);
 	}
 
 	@Override
@@ -50,29 +73,35 @@ public abstract class SpearItem extends TieredItem implements ProjectileItem {
 	}
 
 	@Override
-	public int getUseDuration(ItemStack stack, LivingEntity entity) {
+	public int getUseDuration(ItemStack stack) {
 		return 72000;
 	}
 
 	@Override
 	public void releaseUsing(ItemStack stack, Level level, LivingEntity living, int timeLeft) {
 		if (living instanceof Player player) {
-			int i = this.getUseDuration(stack, living) - timeLeft;
-			if (i >= 10) {
+			int used = this.getUseDuration(stack) - timeLeft;
+			if (used >= 10) {
 				if (!isTooDamagedToUse(stack)) {
 					if (!level.isClientSide) {
-						stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(living.getUsedItemHand()));
+
+						stack.hurtAndBreak(1, player, p -> LivingEntity.getEquipmentSlotForItem(stack));
+
 						Vec3 shootPos = player.getEyePosition();
 						ThrownSpear spear = createSpear(level, player, shootPos.x, shootPos.y, shootPos.z, stack);
 						spear.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 1.0F);
-						if (player.hasInfiniteMaterials()) {
+
+						if (player.getAbilities().instabuild) {
 							spear.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
 						}
+
 						level.addFreshEntity(spear);
-						if (!player.hasInfiniteMaterials()) {
+
+						if (!player.getAbilities().instabuild) {
 							player.getInventory().removeItem(stack);
 						}
 					}
+
 					player.awardStat(Stats.ITEM_USED.get(this));
 				}
 			}
@@ -98,12 +127,8 @@ public abstract class SpearItem extends TieredItem implements ProjectileItem {
 
 	@Override
 	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+		stack.hurtAndBreak(1, attacker, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
 		return true;
-	}
-
-	@Override
-	public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-		stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND);
 	}
 
 	@Override

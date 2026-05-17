@@ -8,37 +8,56 @@ import cn.leolezury.eternalstarlight.common.particle.ExplosionShockParticleOptio
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class WhipItem extends TieredItem implements SwingAttackWeapon {
-	public WhipItem(Tier tier, Properties properties) {
-		super(tier, properties);
+
+	protected final float attackDamage;
+	protected final float attackSpeed;
+
+	public WhipItem(Tier tier, float attackDamage, float attackSpeed, Properties props) {
+		super(tier, props);
+		this.attackDamage = attackDamage + tier.getAttackDamageBonus();
+		this.attackSpeed = attackSpeed;
 	}
 
-	public static ItemAttributeModifiers createAttributes(Tier tier, float damage, float speed) {
-		return ItemAttributeModifiers.builder()
-			.add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, damage + tier.getAttackDamageBonus(), AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
-			.add(Attributes.ATTACK_SPEED, new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, speed, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
-			.build();
+	@Override
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+		if (slot == EquipmentSlot.MAINHAND) {
+			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+
+			builder.put(
+				Attributes.ATTACK_DAMAGE,
+				new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "whip_damage", this.attackDamage, AttributeModifier.Operation.ADDITION)
+			);
+
+			builder.put(
+				Attributes.ATTACK_SPEED,
+				new AttributeModifier(BASE_ATTACK_SPEED_UUID, "whip_speed", this.attackSpeed, AttributeModifier.Operation.ADDITION)
+			);
+
+			return builder.build();
+		}
+		return super.getDefaultAttributeModifiers(slot);
 	}
 
 	@NotNull
@@ -46,7 +65,7 @@ public abstract class WhipItem extends TieredItem implements SwingAttackWeapon {
 		ItemStack stack = player.getItemInHand(hand);
 		if (hand == InteractionHand.MAIN_HAND && !(level.getEntity(ESDataAttachments.WHIP.getData(player)) instanceof Whip)) {
 			if (!level.isClientSide) {
-				stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
+				stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(EquipmentSlot.MAINHAND));
 				float strength = player.getAttackStrengthScale(0.5F);
 				float damageScale = 0.2F + strength * strength * 0.8F;
 				Whip whip = createWhip(level, player, stack, damageScale);
@@ -64,7 +83,7 @@ public abstract class WhipItem extends TieredItem implements SwingAttackWeapon {
 	public void performSwingAttack(ItemStack stack, Player player) {
 		Level level = player.level();
 		if (!level.isClientSide && !(level.getEntity(ESDataAttachments.WHIP.getData(player)) instanceof Whip)) {
-			stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
+			stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(EquipmentSlot.MAINHAND));
 			float strength = player.getAttackStrengthScale(0.5F);
 			float damageScale = 0.2F + strength * strength * 0.8F;
 			Whip whip = createWhip(level, player, stack, damageScale);
@@ -76,22 +95,18 @@ public abstract class WhipItem extends TieredItem implements SwingAttackWeapon {
 
 	@Override
 	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-		return true;
-	}
-
-	@Override
-	public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		doPostHurtEffects(null, target);
+		return true;
 	}
 
 	public void doPostHurtEffects(@Nullable Whip whip, Entity entity) {
 		if (entity.level() instanceof ServerLevel serverLevel) {
-			double x = entity.getX() + (entity.getRandom().nextFloat() - 0.5) * entity.getBbWidth();
-			double y = entity.getY() + entity.getRandom().nextFloat() * entity.getBbHeight();
-			double z = entity.getZ() + (entity.getRandom().nextFloat() - 0.5) * entity.getBbWidth();
+			double x = entity.getX() + (entity.level().getRandom().nextFloat() - 0.5) * entity.getBbWidth();
+			double y = entity.getY() + entity.level().getRandom().nextFloat() * entity.getBbHeight();
+			double z = entity.getZ() + (entity.level().getRandom().nextFloat() - 0.5) * entity.getBbWidth();
 			serverLevel.sendParticles(ESExplosionParticleOptions.BLAST, x, y, z, 1, 0.2, 0.2, 0.2, 0.0);
 			for (int i = 0; i < 4; i++) {
-				Vec3 speed = new Vec3((entity.getRandom().nextFloat() - entity.getRandom().nextFloat()) * 0.1F, entity.getRandom().nextFloat() * 0.05F, (entity.getRandom().nextFloat() - entity.getRandom().nextFloat()) * 0.1F).normalize();
+				Vec3 speed = new Vec3((entity.level().getRandom().nextFloat() - entity.level().getRandom().nextFloat()) * 0.1F, entity.level().getRandom().nextFloat() * 0.05F, (entity.level().getRandom().nextFloat() - entity.level().getRandom().nextFloat()) * 0.1F).normalize();
 				ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ExplosionShockParticleOptions.BLAST, x + speed.x * 0.6, y + speed.y * 0.6, z + speed.z * 0.6, speed.x, speed.y, speed.z));
 			}
 		}

@@ -4,6 +4,7 @@ import cn.leolezury.eternalstarlight.common.config.ESConfig;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -126,4 +127,20 @@ public class Luminofish extends AbstractSchoolingFish {
 		int seaLevel = levelAccessor.getSeaLevel();
 		return blockPos.getY() <= seaLevel - 40 && levelAccessor.getFluidState(blockPos.below()).is(FluidTags.WATER) && levelAccessor.getBlockState(blockPos.above()).is(Blocks.WATER) && ESConfig.INSTANCE.mobsConfig.luminofish.canSpawn();
 	}
+
+	@Override
+	public void saveToBucketTag(ItemStack stack) {
+		super.saveToBucketTag(stack);
+		CompoundTag tag = stack.getOrCreateTag();
+		tag.putInt("SwellTicks", this.getSwellTicks());
+	}
+
+	@Override
+	public void loadFromBucketTag(CompoundTag tag) {
+		super.loadFromBucketTag(tag);
+		if (tag.contains("SwellTicks")) {
+			this.setSwellTicks(tag.getInt("SwellTicks"));
+		}
+	}
+
 }

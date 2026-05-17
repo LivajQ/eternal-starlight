@@ -11,8 +11,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class GolemSteelGreatswordItem extends GreatswordItem implements SwingAttackWeapon {
-	public GolemSteelGreatswordItem(Tier tier, Properties properties) {
-		super(tier, properties);
+
+	public GolemSteelGreatswordItem(Tier tier, int damage, float speed, float reach, Properties props) {
+		super(tier, damage, speed, reach, props);
 	}
 
 	private void performSpecialAttack(LivingEntity entity) {
@@ -20,24 +21,29 @@ public class GolemSteelGreatswordItem extends GreatswordItem implements SwingAtt
 		if (!level.isClientSide && !SpecialItemCooldown.isOnCooldown(entity, this)) {
 			Vec3 shootPos = entity.position().add(0, entity.getBbHeight() / 2, 0);
 			BallLightning lastBall = null;
+
 			for (int i = -1; i <= 1; i++) {
 				BallLightning lightning = new BallLightning(level, shootPos.x, shootPos.y, shootPos.z);
 				lightning.setOwner(entity);
 				lightning.shootFromRotation(entity, entity.getXRot(), entity.getYRot() + i * 15, 0.0F, 0.8F, 2.0F);
+
 				if (lastBall != null) {
 					lightning.setTarget(lastBall);
 				}
+
 				level.addFreshEntity(lightning);
 				lastBall = lightning;
 			}
+
 			SpecialItemCooldown.setCooldown(entity, this, 100);
 		}
 	}
 
 	@Override
-	public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-		super.postHurtEnemy(stack, target, attacker);
+	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+		boolean result = super.hurtEnemy(stack, target, attacker);
 		performSpecialAttack(attacker);
+		return result;
 	}
 
 	@Override

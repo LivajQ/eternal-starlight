@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 
@@ -838,6 +839,7 @@ public class ESBlocks {
 	public static final RegistryObject<Block, StarfireBirdAviaryBlock> JINGLESTEM_STARFIRE_BIRD_AVIARY = BLOCKS.register("jinglestem_starfire_bird_aviary", () -> new StarfireBirdAviaryBlock(ESWoodTypes.JINGLESTEM_SET, BlockBehaviour.Properties.copy(Blocks.BEEHIVE).mapColor(MapColor.COLOR_GREEN).noOcclusion()));
 	public static final RegistryObject<Block, StarfireBirdAviaryBlock> CRADLEWOOD_STARFIRE_BIRD_AVIARY = BLOCKS.register("cradlewood_starfire_bird_aviary", () -> new StarfireBirdAviaryBlock(ESWoodTypes.CRADLEWOOD_SET, BlockBehaviour.Properties.copy(Blocks.BEEHIVE).mapColor(MapColor.TERRACOTTA_WHITE).noOcclusion()));
 
+	public static final RegistryObject<Block, Block> RAW_FLOWGLAZE = BLOCKS.register("raw_flowglaze", () -> new Block(BlockBehaviour.Properties.of().instrument(NoteBlockInstrument.HAT).strength(0.3F).sound(SoundType.GLASS).lightLevel(state -> 10)));
 	public static final RegistryObject<Block, HalfTransparentBlock> FLOWGLAZE = BLOCKS.register("flowglaze", () -> new HalfTransparentBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).lightLevel(state -> 10)));
 	public static final RegistryObject<Block, IronBarsBlock> FLOWGLAZE_PANE = BLOCKS.register("flowglaze_pane", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.GLASS_PANE).lightLevel(state -> 10)));
 	public static final RegistryObject<Block, Block> FLOWGLAZE_BRICKS = BLOCKS.register("flowglaze_bricks", () -> new Block(BlockBehaviour.Properties.copy(Blocks.STONE_BRICKS).sound(SoundType.GLASS).mapColor(MapColor.TERRACOTTA_CYAN)));

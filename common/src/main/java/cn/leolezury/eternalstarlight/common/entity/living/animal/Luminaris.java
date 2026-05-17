@@ -6,6 +6,7 @@ import cn.leolezury.eternalstarlight.common.entity.living.goal.ChargeAttackGoal;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -155,4 +156,20 @@ public class Luminaris extends AbstractSchoolingFish implements Charger {
 		int seaLevel = levelAccessor.getSeaLevel();
 		return blockPos.getY() <= seaLevel - 40 && levelAccessor.getFluidState(blockPos.below()).is(FluidTags.WATER) && levelAccessor.getBlockState(blockPos.above()).is(Blocks.WATER) && ESConfig.INSTANCE.mobsConfig.luminaris.canSpawn();
 	}
+
+	@Override
+	public void saveToBucketTag(ItemStack stack) {
+		super.saveToBucketTag(stack);
+		CompoundTag tag = stack.getOrCreateTag();
+		tag.putBoolean("Charging", this.isCharging());
+	}
+
+	@Override
+	public void loadFromBucketTag(CompoundTag tag) {
+		super.loadFromBucketTag(tag);
+		if (tag.contains("Charging")) {
+			this.setCharging(tag.getBoolean("Charging"));
+		}
+	}
+
 }

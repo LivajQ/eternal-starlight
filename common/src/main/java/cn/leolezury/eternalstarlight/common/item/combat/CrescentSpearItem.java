@@ -3,23 +3,21 @@ package cn.leolezury.eternalstarlight.common.item.combat;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.component.Tool;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,77 +25,115 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.List;
+public class CrescentSpearItem extends TieredItem {
 
-public class CrescentSpearItem extends Item {
-	public CrescentSpearItem(Properties properties) {
-		super(properties);
-	}
+	private final float attackDamage;
+	private final float attackSpeed;
 
-	public static ItemAttributeModifiers createAttributes() {
-		return ItemAttributeModifiers.builder().add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, 7.5, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND).add(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_ID, -2.7, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND).build();
-	}
-
-	public static Tool createToolProperties() {
-		return new Tool(List.of(), 1.0F, 2);
+	public CrescentSpearItem(Tier tier, float damage, float speed, Properties props) {
+		super(tier, props);
+		this.attackDamage = damage + tier.getAttackDamageBonus();
+		this.attackSpeed = speed;
 	}
 
 	@Override
-	public boolean canAttackBlock(BlockState blockState, Level level, BlockPos blockPos, Player player) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+		if (slot == EquipmentSlot.MAINHAND) {
+			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+
+			builder.put(
+				Attributes.ATTACK_DAMAGE,
+				new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "crescent_spear_damage", this.attackDamage, AttributeModifier.Operation.ADDITION)
+			);
+
+			builder.put(
+				Attributes.ATTACK_SPEED,
+				new AttributeModifier(BASE_ATTACK_SPEED_UUID, "crescent_spear_speed", this.attackSpeed, AttributeModifier.Operation.ADDITION)
+			);
+
+			return builder.build();
+		}
+
+		return super.getDefaultAttributeModifiers(slot);
+	}
+
+	@Override
+	public boolean canAttackBlock(BlockState state, Level level, BlockPos pos, Player player) {
 		return !player.isCreative();
 	}
 
 	@Override
-	public UseAnim getUseAnimation(ItemStack itemStack) {
+	public UseAnim getUseAnimation(ItemStack stack) {
 		return UseAnim.SPEAR;
 	}
 
 	@Override
-	public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
+	public int getUseDuration(ItemStack stack) {
 		return 72000;
 	}
 
 	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
-		ItemStack itemStack = player.getItemInHand(interactionHand);
-		player.startUsingItem(interactionHand);
-		return InteractionResultHolder.consume(itemStack);
+	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+		ItemStack stack = player.getItemInHand(hand);
+		player.startUsingItem(hand);
+		return InteractionResultHolder.consume(stack);
 	}
 
 	@Override
-	public void releaseUsing(ItemStack itemStack, Level level, LivingEntity livingEntity, int i) {
-		if (livingEntity instanceof Player player) {
-			int useTime = this.getUseDuration(itemStack, livingEntity) - i;
-			BlockHitResult result = level.clip(new ClipContext(player.position(), player.position().add(0, -5, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, player));
-			if (useTime >= 10 && (result.getType() != HitResult.Type.MISS || player.isCreative())) {
-				float spinStrength = EnchantmentHelper.getTridentSpinAttackStrength(itemStack, player) + 1.75f;
+	public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeLeft) {
+		if (!(entity instanceof Player player)) return;
 
-				if (!level.isClientSide) {
-					itemStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(livingEntity.getUsedItemHand()));
-				}
+		int useTime = this.getUseDuration(stack) - timeLeft;
+		BlockHitResult result = level.clip(new ClipContext(
+			player.position(),
+			player.position().add(0, -5, 0),
+			ClipContext.Block.COLLIDER,
+			ClipContext.Fluid.ANY,
+			player
+		));
 
-				float yaw = player.getYRot();
-				float pitch = player.getXRot();
-				float xSpeed = -Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD);
-				float ySpeed = -Mth.sin(pitch * Mth.DEG_TO_RAD);
-				float zSpeed = Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD);
-				float length = Mth.sqrt(xSpeed * xSpeed + ySpeed * ySpeed + zSpeed * zSpeed);
-				xSpeed *= spinStrength / length;
-				ySpeed *= spinStrength / length;
-				zSpeed *= spinStrength / length;
-				player.push(xSpeed, ySpeed, zSpeed);
-				ESDataAttachments.CRESCENT_SPEAR_DASH.setData(player, true);
-				player.startAutoSpinAttack(20, player.getAttribute(Attributes.ATTACK_DAMAGE) != null ? (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5f : 8, itemStack);
-				player.getCooldowns().addCooldown(this, 20);
+		if (useTime >= 10 && (result.getType() != HitResult.Type.MISS || player.getAbilities().instabuild)) {
 
-				player.playSound(ESSoundEvents.CRESCENT_SPEAR_THROW.get());
+			//float spinStrength = EnchantmentHelper.getTridentSpinAttackStrength(stack, player) + 1.75f; TODO ?
+			float spinStrength = 2.0F;
 
-				if (player.onGround()) {
-					player.move(MoverType.SELF, new Vec3(0.0, 1.2, 0.0));
-				}
-
-				player.awardStat(Stats.ITEM_USED.get(this));
+			if (!level.isClientSide) {
+				stack.hurtAndBreak(1, player, p ->
+					p.broadcastBreakEvent(
+						entity.getUsedItemHand() == InteractionHand.MAIN_HAND
+							? EquipmentSlot.MAINHAND
+							: EquipmentSlot.OFFHAND
+					)
+				);
 			}
+
+			float yaw = player.getYRot();
+			float pitch = player.getXRot();
+
+			float xSpeed = -Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD);
+			float ySpeed = -Mth.sin(pitch * Mth.DEG_TO_RAD);
+			float zSpeed = Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD);
+
+			float len = Mth.sqrt(xSpeed * xSpeed + ySpeed * ySpeed + zSpeed * zSpeed);
+			xSpeed *= spinStrength / len;
+			ySpeed *= spinStrength / len;
+			zSpeed *= spinStrength / len;
+
+			player.push(xSpeed, ySpeed, zSpeed);
+
+			ESDataAttachments.CRESCENT_SPEAR_DASH.setData(player, true);
+
+			float damage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5f;
+			player.startAutoSpinAttack(20, damage, stack);
+
+			player.getCooldowns().addCooldown(this, 20);
+			player.playSound(ESSoundEvents.CRESCENT_SPEAR_THROW.get());
+
+			if (player.onGround()) {
+				player.move(MoverType.SELF, new Vec3(0.0, 1.2, 0.0));
+			}
+
+			player.awardStat(Stats.ITEM_USED.get(this));
 		}
 	}
 
@@ -108,6 +144,8 @@ public class CrescentSpearItem extends Item {
 
 	@Override
 	public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
-		return repairCandidate.is(ESItems.TENACIOUS_PETAL.get()) || repairCandidate.is(ESItems.TENACIOUS_VINE.get()) || super.isValidRepairItem(stack, repairCandidate);
+		return repairCandidate.is(ESItems.TENACIOUS_PETAL.get())
+			|| repairCandidate.is(ESItems.TENACIOUS_VINE.get())
+			|| super.isValidRepairItem(stack, repairCandidate);
 	}
 }
