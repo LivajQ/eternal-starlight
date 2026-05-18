@@ -10,8 +10,8 @@ import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
 
 public class ESStructurePlacementTypes {
 	public static final RegistrationProvider<StructurePlacementType<?>> STRUCTURE_PLACEMENT_TYPES = RegistrationProvider.get(Registries.STRUCTURE_PLACEMENT, EternalStarlight.ID);
-	public static final RegistryObject<StructurePlacementType<?>, StructurePlacementType<LandmarkStructurePlacement>> LANDMARK = STRUCTURE_PLACEMENT_TYPES.register("landmark", () -> () -> LandmarkStructurePlacement.CODEC);
-	public static final RegistryObject<StructurePlacementType<?>, StructurePlacementType<AvoidLandmarkStructurePlacement>> AVOID_LANDMARK = STRUCTURE_PLACEMENT_TYPES.register("avoid_landmark", () -> () -> AvoidLandmarkStructurePlacement.CODEC);
+	public static final RegistryObject<StructurePlacementType<?>, StructurePlacementType<LandmarkStructurePlacement>> LANDMARK = STRUCTURE_PLACEMENT_TYPES.register("landmark", () -> LandmarkStructurePlacement.CODEC::codec);
+	public static final RegistryObject<StructurePlacementType<?>, StructurePlacementType<AvoidLandmarkStructurePlacement>> AVOID_LANDMARK = STRUCTURE_PLACEMENT_TYPES.register("avoid_landmark", () -> AvoidLandmarkStructurePlacement.CODEC::codec);
 
 	public static void loadClass() {
 	}
