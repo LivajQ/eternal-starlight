@@ -5,7 +5,7 @@ import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
@@ -26,15 +26,15 @@ public class ESTrimPatterns {
 		TWINING
 	);
 
-	public static void bootstrap(BootstrapContext<TrimPattern> context) {
+	public static void bootstrap(BootstapContext<TrimPattern> context) {
 		register(context, ESItems.KEEPER_ARMOR_TRIM_SMITHING_TEMPLATE.get(), KEEPER);
 		register(context, ESItems.FORGE_ARMOR_TRIM_SMITHING_TEMPLATE.get(), FORGE);
 		register(context, ESItems.BLOOMING_ARMOR_TRIM_SMITHING_TEMPLATE.get(), BLOOMING);
 		register(context, ESItems.TWINING_ARMOR_TRIM_SMITHING_TEMPLATE.get(), TWINING);
 	}
 
-	private static void register(BootstrapContext<TrimPattern> context, Item item, ResourceKey<TrimPattern> resourceKey) {
-		TrimPattern trimPattern = new TrimPattern(resourceKey.location(), BuiltInRegistries.ITEM.wrapAsHolder(item), Component.translatable(Util.makeDescriptionId("trim_pattern", resourceKey.location())), false);
+	private static void register(BootstapContext<TrimPattern> context, Item item, ResourceKey<TrimPattern> resourceKey) {
+		TrimPattern trimPattern = new TrimPattern(resourceKey.location(), BuiltInRegistries.ITEM.wrapAsHolder(item), Component.translatable(Util.makeDescriptionId("trim_pattern", resourceKey.location())));
 		context.register(resourceKey, trimPattern);
 	}
 

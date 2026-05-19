@@ -4,7 +4,8 @@ import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.crest.Crest;
 import cn.leolezury.eternalstarlight.common.registry.ESSpells;
 import cn.leolezury.eternalstarlight.common.spell.ManaType;
-import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -26,22 +27,25 @@ public class ESCrests {
 	public static final ResourceKey<Crest> FROZEN_FOG = create("frozen_fog");
 	public static final ResourceKey<Crest> ICY_SPIKES = create("icy_spikes");
 
-	public static void bootstrap(BootstrapContext<Crest> context) {
+	public static void bootstrap(BootstapContext<Crest> context) {
 		context.register(BOULDERS_SHIELD, new Crest(
-				ManaType.TERRA,
-				2,
-				EternalStarlight.id("textures/crest/boulders_shield.png"),
-				null,
-				List.of(new Crest.MobEffectWithLevel(MobEffects.DAMAGE_RESISTANCE, 0, 1)),
-				List.of(new Crest.LevelBasedAttributeModifier(
-					Attributes.MOVEMENT_SPEED,
-					EternalStarlight.id("crest.boulders_shield.speed"),
-					-0.007,
-					-0.005,
-					AttributeModifier.Operation.ADD_VALUE)
-				)
-			)
-		);
+			ManaType.TERRA,
+			2,
+			EternalStarlight.id("textures/crest/boulders_shield.png"),
+			null,
+			List.of(new Crest.MobEffectWithLevel(
+				BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.DAMAGE_RESISTANCE),
+				0,
+				1
+			)),
+			List.of(new Crest.LevelBasedAttributeModifier(
+				BuiltInRegistries.ATTRIBUTE.wrapAsHolder(Attributes.MOVEMENT_SPEED),
+				EternalStarlight.id("crest.boulders_shield.speed"),
+				-0.007,
+				-0.005,
+				AttributeModifier.Operation.ADDITION
+			))
+		));
 		context.register(GUIDANCE_OF_STARS, new Crest(
 			ManaType.LUNAR,
 			1,

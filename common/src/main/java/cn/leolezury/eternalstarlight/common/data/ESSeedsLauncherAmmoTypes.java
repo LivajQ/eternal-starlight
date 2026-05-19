@@ -3,7 +3,7 @@ package cn.leolezury.eternalstarlight.common.data;
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.item.combat.SeedsLauncherAmmoType;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Items;
 
@@ -16,7 +16,7 @@ public class ESSeedsLauncherAmmoTypes {
 	public static final ResourceKey<SeedsLauncherAmmoType> CRINOA = create("crinoa");
 	public static final ResourceKey<SeedsLauncherAmmoType> PUNGENCY_FRUIT = create("pungency_fruit");
 
-	public static void bootstrap(BootstrapContext<SeedsLauncherAmmoType> context) {
+	public static void bootstrap(BootstapContext<SeedsLauncherAmmoType> context) {
 		context.register(WHEAT, new SeedsLauncherAmmoType(Items.WHEAT_SEEDS.builtInRegistryHolder(), 1, 1, 1));
 		context.register(TORCHFLOWER, new SeedsLauncherAmmoType(Items.TORCHFLOWER_SEEDS.builtInRegistryHolder(), 1.5f, 1, 1.2f));
 		context.register(BEETROOT, new SeedsLauncherAmmoType(Items.BEETROOT_SEEDS.builtInRegistryHolder(), 0.8f, 1.2f, 0.8f));

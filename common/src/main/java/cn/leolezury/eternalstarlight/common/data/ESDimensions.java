@@ -10,7 +10,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -92,7 +92,7 @@ public class ESDimensions {
 	private static final ResourceKey<DensityFunction> SHIFT_X = createDensityFunctionKey("shift_x");
 	private static final ResourceKey<DensityFunction> SHIFT_Z = createDensityFunctionKey("shift_z");
 
-	public static void bootstrapNoiseSettings(BootstrapContext<NoiseGeneratorSettings> context) {
+	public static void bootstrapNoiseSettings(BootstapContext<NoiseGeneratorSettings> context) {
 		HolderGetter<DensityFunction> densityFunctions = context.lookup(Registries.DENSITY_FUNCTION);
 		HolderGetter<NormalNoise.NoiseParameters> noiseParameters = context.lookup(Registries.NOISE);
 
@@ -145,14 +145,14 @@ public class ESDimensions {
 	}
 
 	private static ResourceKey<DensityFunction> createDensityFunctionKey(String location) {
-		return ResourceKey.create(Registries.DENSITY_FUNCTION, ResourceLocation.withDefaultNamespace(location));
+		return ResourceKey.create(Registries.DENSITY_FUNCTION, new ResourceLocation("minecraft", location));
 	}
 
 	private static DensityFunction getFunction(HolderGetter<DensityFunction> densityFunctions, ResourceKey<DensityFunction> key) {
 		return new DensityFunctions.HolderHolder(densityFunctions.getOrThrow(key));
 	}
 
-	public static void bootstrapLevelStem(BootstrapContext<LevelStem> context) {
+	public static void bootstrapLevelStem(BootstapContext<LevelStem> context) {
 		HolderGetter<BiomeData> biomeData = context.lookup(ESRegistries.BIOME_DATA);
 		HolderGetter<DimensionType> dimensionTypes = context.lookup(Registries.DIMENSION_TYPE);
 		HolderGetter<NoiseGeneratorSettings> noiseSettings = context.lookup(Registries.NOISE_SETTINGS);
@@ -181,7 +181,7 @@ public class ESDimensions {
 		context.register(STARLIGHT_LEVEL_STEM, levelStem);
 	}
 
-	public static void bootstrapDimType(BootstrapContext<DimensionType> context) {
+	public static void bootstrapDimType(BootstapContext<DimensionType> context) {
 		DimensionType type = new DimensionType(
 			OptionalLong.of(12900L), // fixed time
 			true, // has skylight

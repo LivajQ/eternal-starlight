@@ -6,7 +6,7 @@ import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 
@@ -16,7 +16,7 @@ public class ESEntVariants {
 	public static final ResourceKey<EntVariant> SCARLET = create("scarlet");
 	public static final ResourceKey<EntVariant> BANYIN = create("banyin");
 
-	public static void bootstrap(BootstrapContext<EntVariant> context) {
+	public static void bootstrap(BootstapContext<EntVariant> context) {
 		HolderGetter<Biome> biomes = context.lookup(Registries.BIOME);
 		context.register(LUNAR, new EntVariant(ESItems.LUNAR_LEAVES.asHolder(), EternalStarlight.id("entity/ent/lunar"), HolderSet.direct(biomes.getOrThrow(ESBiomes.STARLIGHT_FOREST), biomes.getOrThrow(ESBiomes.STARLIGHT_DENSE_FOREST))));
 		context.register(NORTHLAND, new EntVariant(ESItems.NORTHLAND_LEAVES.asHolder(), EternalStarlight.id("entity/ent/northland"), HolderSet.direct(biomes.getOrThrow(ESBiomes.STARLIGHT_PERMAFROST_FOREST), biomes.getOrThrow(ESBiomes.PERMAFROST_PEAKS))));

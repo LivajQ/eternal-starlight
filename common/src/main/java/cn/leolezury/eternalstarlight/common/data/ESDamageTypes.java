@@ -2,7 +2,7 @@ package cn.leolezury.eternalstarlight.common.data;
 
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageSource;
@@ -52,7 +52,7 @@ public class ESDamageTypes {
 		return new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(type), attacker, indirectAttacker);
 	}
 
-	public static void bootstrap(BootstrapContext<DamageType> context) {
+	public static void bootstrap(BootstapContext<DamageType> context) {
 		context.register(ETHER, new DamageType(name("ether"), 0.1F));
 		context.register(METEOR, new DamageType(name("meteor"), 0.1F));
 		context.register(CRYSTAL_INFECTION, new DamageType(name("crystal_infection"), 0.1F));

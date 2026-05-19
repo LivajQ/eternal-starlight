@@ -5,7 +5,7 @@ import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
@@ -54,7 +54,7 @@ public class ESTrimMaterials {
 		DOOMEDEN_BONE
 	);
 
-	public static void bootstrap(BootstrapContext<TrimMaterial> context) {
+	public static void bootstrap(BootstapContext<TrimMaterial> context) {
 		register(context, RED_STARLIGHT_CRYSTAL, ESItems.RED_STARLIGHT_CRYSTAL_SHARD.asHolder(), 0xb63070, 1.0f);
 		register(context, BLUE_STARLIGHT_CRYSTAL, ESItems.BLUE_STARLIGHT_CRYSTAL_SHARD.asHolder(), 0x308fb6, 0.8f);
 		register(context, STARCORE, ESItems.STARCORE.asHolder(), 0xe0683e, 0.5f);
@@ -74,7 +74,7 @@ public class ESTrimMaterials {
 		register(context, DOOMEDEN_BONE, ESItems.BROKEN_DOOMEDEN_BONE.asHolder(), 0x978182, 0.1f);
 	}
 
-	private static void register(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> key, Holder<Item> trimItem, int color, float itemModelIndex) {
+	private static void register(BootstapContext<TrimMaterial> context, ResourceKey<TrimMaterial> key, Holder<Item> trimItem, int color, float itemModelIndex) {
 		TrimMaterial material = new TrimMaterial(key.location().getPath(), trimItem, itemModelIndex, Map.of(), Component.translatable(Util.makeDescriptionId("trim_material", key.location())).withStyle(Style.EMPTY.withColor(color)));
 		context.register(key, material);
 	}

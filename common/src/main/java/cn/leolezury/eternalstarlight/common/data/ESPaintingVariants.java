@@ -2,7 +2,7 @@ package cn.leolezury.eternalstarlight.common.data;
 
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 
@@ -39,7 +39,7 @@ public class ESPaintingVariants {
 	public static final ResourceKey<PaintingVariant> EXTINGUISHED_SUN = create("extinguished_sun");
 	public static final ResourceKey<PaintingVariant> NOVUS_SOL = create("novus_sol");
 
-	public static void bootstrap(BootstrapContext<PaintingVariant> context) {
+	public static void bootstrap(BootstapContext<PaintingVariant> context) {
 		register(context, GUARDIAN, 2, 2);
 		register(context, ENERGIZED, 2, 2);
 		register(context, ENERGIZED_SPECIAL, 2, 2);
@@ -73,8 +73,8 @@ public class ESPaintingVariants {
 		register(context, NOVUS_SOL, 2, 1);
 	}
 
-	private static void register(BootstrapContext<PaintingVariant> context, ResourceKey<PaintingVariant> key, int xSize, int ySize) {
-		context.register(key, new PaintingVariant(xSize, ySize, key.location()));
+	private static void register(BootstapContext<PaintingVariant> context, ResourceKey<PaintingVariant> key, int xSize, int ySize) {
+		context.register(key, new PaintingVariant(xSize, ySize));
 	}
 
 	public static ResourceKey<PaintingVariant> create(String name) {
