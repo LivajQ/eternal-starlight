@@ -1,28 +1,9 @@
 package cn.leolezury.eternalstarlight.common.item.combat;
 
-import cn.leolezury.eternalstarlight.common.entity.projectile.ShotSeeds;
-import cn.leolezury.eternalstarlight.common.registry.ESParticles;
-import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
-import cn.leolezury.eternalstarlight.common.util.ESMathUtil;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileWeaponItem;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Predicate;
 
 public class SeedsLauncherItem extends ProjectileWeaponItem {
@@ -31,10 +12,21 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 	}
 
 	@Override
-	public int getUseDuration(ItemStack stack, LivingEntity entity) {
+	public int getUseDuration(ItemStack stack) {
 		return 72000;
 	}
 
+	@Override
+	public Predicate<ItemStack> getAllSupportedProjectiles() {
+		return stack -> stack.is(ESTags.Items.SEEDS_LAUNCHER_AMMO);
+	}
+
+	@Override
+	public int getDefaultProjectileRange() {
+		return 5;
+	}
+
+	/* TODO something... with all that
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
@@ -56,7 +48,8 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 					this.shoot(serverLevel, living, living.getUsedItemHand(), stack, list, 0.75F, 7.5F, true, null);
 					Vec3 particlePos = ESMathUtil.rotationToPosition(living.position().add(0, 3 * living.getBbHeight() / 4, 0), 1f, -living.getXRot(), living.getYHeadRot() + 90);
 					serverLevel.sendParticles(ESParticles.PUNGENCY_FRUIT_SMOKE.get(), particlePos.x(), particlePos.y(), particlePos.z(), 20, 0.1, 0.1, 0.1, 0.025);
-					stack.hurtAndBreak(1, living, LivingEntity.getSlotForHand(living.getUsedItemHand()));
+					EquipmentSlot slot = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+					stack.hurtAndBreak(1, living, e -> e.broadcastBreakEvent(slot));
 				}
 				return true;
 			}
@@ -71,7 +64,8 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 		if (ammo.isEmpty()) {
 			return List.of();
 		} else {
-			int count = shooter.level() instanceof ServerLevel serverlevel ? EnchantmentHelper.processProjectileCount(serverlevel, weapon, shooter, 6) : 6;
+			int multishot = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.MULTISHOT, weapon);
+			int count = multishot > 0 ? 3 : 1;
 			List<ItemStack> list = new ArrayList<>(count);
 			ItemStack ammoCopy = ammo.copy();
 
@@ -84,16 +78,6 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 
 			return list;
 		}
-	}
-
-	@Override
-	public Predicate<ItemStack> getAllSupportedProjectiles() {
-		return stack -> stack.is(ESTags.Items.SEEDS_LAUNCHER_AMMO);
-	}
-
-	@Override
-	public int getDefaultProjectileRange() {
-		return 5;
 	}
 
 	@Override
@@ -141,4 +125,5 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 		Vector3f rotated = new Vector3f(direction).rotateAxis((float) (Math.PI / 2), vec.x, vec.y, vec.z);
 		return new Vector3f(direction).rotateAxis(angle * (float) (Math.PI / 180.0), rotated.x, rotated.y, rotated.z);
 	}
+	 */
 }

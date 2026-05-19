@@ -1,5 +1,7 @@
 package cn.leolezury.eternalstarlight.common.item.combat;
 
+import cn.leolezury.eternalstarlight.common.EternalStarlight;
+import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.world.InteractionHand;
@@ -43,23 +45,36 @@ public class GreatswordItem extends SwordItem {
 				new AttributeModifier(BASE_ATTACK_SPEED_UUID, "greatsword_speed", this.attackSpeed, AttributeModifier.Operation.ADDITION)
 			);
 
-			/* TODO potentially add somewhere else
-			builder.put(
-				ForgeMod.ENTITY_REACH.get(),
-				new AttributeModifier(EternalStarlight.id("weapon.entity_reach"), this.reach, AttributeModifier.Operation.ADDITION)
-			);
+			Attribute reach = ESPlatform.INSTANCE.getReach();
+			if (reach != null) {
+				builder.put(
+					reach,
+					new AttributeModifier(
+						EternalStarlight.id("weapon.entity_reach").toString(),
+						this.reach,
+						AttributeModifier.Operation.ADDITION
+					)
+				);
+			}
 
-			builder.put(
-				ForgeMod.BLOCK_REACH.get(),
-				new AttributeModifier(EternalStarlight.id("weapon.block_reach"), this.reach, AttributeModifier.Operation.ADDITION)
-			);
-			 */
+			Attribute blockReach = ESPlatform.INSTANCE.getBlockReach();
+			if (blockReach != null) {
+				builder.put(
+					blockReach,
+					new AttributeModifier(
+						EternalStarlight.id("weapon.block_reach").toString(),
+						this.reach,
+						AttributeModifier.Operation.ADDITION
+					)
+				);
+			}
 
 			return builder.build();
 		}
 
 		return super.getDefaultAttributeModifiers(slot);
 	}
+
 
 	@Override
 	public int getUseDuration(ItemStack itemStack) {

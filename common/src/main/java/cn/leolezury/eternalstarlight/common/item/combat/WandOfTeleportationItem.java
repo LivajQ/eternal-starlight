@@ -10,6 +10,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -48,7 +49,8 @@ public class WandOfTeleportationItem extends Item {
 			player.teleportTo(target.x, target.y, target.z);
 			createThornCircle(level, player, target);
 		}
-		stack.hurtAndBreak(1, player, player.getEquipmentSlotForItem(stack));
+		EquipmentSlot slot = player.getMainHandItem() == stack ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+		stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(slot));
 		player.getCooldowns().addCooldown(this, 600);
 	}
 

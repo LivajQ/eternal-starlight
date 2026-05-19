@@ -25,6 +25,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -33,6 +35,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -196,5 +199,14 @@ public class ESForgePlatform implements ESPlatform {
 		ESForgeNetworkHandler.sendToTracking(level, entity, packet);
 	}
 
+	@Override
+	public Attribute getReach() {
+		return ForgeMod.ENTITY_REACH.get();
+	}
+
+	@Override
+	public Attribute getBlockReach() {
+		return ForgeMod.BLOCK_REACH.get();
+	}
 
 }

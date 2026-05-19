@@ -2,6 +2,7 @@ package cn.leolezury.eternalstarlight.common.item.combat;
 
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
+import cn.leolezury.eternalstarlight.common.util.ESAttributeUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,6 +22,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class DualWieldingSwordItem extends SwordItem {
@@ -31,7 +33,7 @@ public class DualWieldingSwordItem extends SwordItem {
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 		if (hand == InteractionHand.OFF_HAND && player.getMainHandItem().is(this)) {
-			HitResult result = pick(player, player.blockInteractionRange(), player.entityInteractionRange());
+			HitResult result = pick(player, ESAttributeUtil.getBlockReach(player), ESAttributeUtil.getEntityReach(player));
 			if (result instanceof EntityHitResult entityResult && entityResult.getType() != HitResult.Type.MISS) {
 				ESDataAttachments.OFFHAND_ATTACK.setData(player, true);
 				player.attack(entityResult.getEntity());
@@ -45,11 +47,14 @@ public class DualWieldingSwordItem extends SwordItem {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
+	public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
 		list.add(CommonComponents.EMPTY);
 		list.add(Component.translatable("tooltip." + EternalStarlight.ID + ".dual_wielding").withStyle(ChatFormatting.GRAY));
-		list.add(Component.literal(" ").append(Component.translatable("tooltip." + EternalStarlight.ID + ".dual_wielding.offhand_attack").withStyle(ChatFormatting.BLUE)));
-		super.appendHoverText(itemStack, tooltipContext, list, tooltipFlag);
+		list.add(Component.literal(" ").append(
+			Component.translatable("tooltip." + EternalStarlight.ID + ".dual_wielding.offhand_attack")
+				.withStyle(ChatFormatting.BLUE)
+		));
+		super.appendHoverText(itemStack, level, list, tooltipFlag);
 	}
 
 	// copied from GameRenderer

@@ -13,37 +13,49 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 public class VoraciousArrow extends AbstractArrow {
+
 	private static final String TAG_DURATION = "duration";
 	private int duration = 200;
 
-	public VoraciousArrow(EntityType<? extends VoraciousArrow> entityType, Level level) {
-		super(entityType, level);
+	public VoraciousArrow(EntityType<? extends VoraciousArrow> type, Level level) {
+		super(type, level);
 	}
 
-	public VoraciousArrow(Level level, LivingEntity livingEntity, ItemStack itemStack, @Nullable ItemStack itemStack2) {
-		super(ESEntities.VORACIOUS_ARROW.get(), livingEntity, level, itemStack, itemStack2);
+	public VoraciousArrow(Level level, LivingEntity shooter) {
+		super(ESEntities.VORACIOUS_ARROW.get(), shooter, level);
 	}
 
-	public VoraciousArrow(Level level, double d, double e, double f, ItemStack itemStack, @Nullable ItemStack itemStack2) {
-		super(ESEntities.VORACIOUS_ARROW.get(), d, e, f, level, itemStack, itemStack2);
+	public VoraciousArrow(Level level, double x, double y, double z) {
+		super(ESEntities.VORACIOUS_ARROW.get(), x, y, z, level);
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
 		if (this.level().isClientSide && !this.inGround) {
-			this.level().addParticle(new DustColorTransitionOptions(new Vector3f(127 / 255f, 99 / 255f, 129 / 255f), new Vector3f(85 / 255f, 71 / 255f, 87 / 255f), 1f), this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
+			this.level().addParticle(
+				new DustColorTransitionOptions(
+					new Vector3f(127 / 255f, 99 / 255f, 129 / 255f),
+					new Vector3f(85 / 255f, 71 / 255f, 87 / 255f),
+					1f
+				),
+				this.getX(), this.getY(), this.getZ(),
+				0.0, 0.0, 0.0
+			);
 		}
 	}
 
 	@Override
-	protected void doPostHurtEffects(LivingEntity livingEntity) {
-		super.doPostHurtEffects(livingEntity);
-		livingEntity.addEffect(new MobEffectInstance(MobEffects.HUNGER, this.duration, 0), this.getEffectSource());
+	protected void doPostHurtEffects(LivingEntity target) {
+		super.doPostHurtEffects(target);
+
+		target.addEffect(
+			new MobEffectInstance(MobEffects.HUNGER, this.duration, 0),
+			this.getEffectSource()
+		);
 
 		if (getOwner() instanceof Player player) {
 			player.getFoodData().eat(3, 0);
@@ -64,21 +76,21 @@ public class VoraciousArrow extends AbstractArrow {
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compoundTag) {
-		super.readAdditionalSaveData(compoundTag);
-		if (compoundTag.contains(TAG_DURATION)) {
-			this.duration = compoundTag.getInt(TAG_DURATION);
+	public void readAdditionalSaveData(CompoundTag tag) {
+		super.readAdditionalSaveData(tag);
+		if (tag.contains(TAG_DURATION)) {
+			this.duration = tag.getInt(TAG_DURATION);
 		}
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compoundTag) {
-		super.addAdditionalSaveData(compoundTag);
-		compoundTag.putInt(TAG_DURATION, this.duration);
+	public void addAdditionalSaveData(CompoundTag tag) {
+		super.addAdditionalSaveData(tag);
+		tag.putInt(TAG_DURATION, this.duration);
 	}
 
 	@Override
-	protected ItemStack getDefaultPickupItem() {
+	protected ItemStack getPickupItem() {
 		return ESItems.VORACIOUS_ARROW.get().getDefaultInstance();
 	}
 }

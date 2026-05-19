@@ -111,7 +111,7 @@ public class AethersentGolem extends AbstractGolem {
 			if (this.getHealth() == f) {
 				return InteractionResult.PASS;
 			} else {
-				itemStack.consume(1, player);
+				itemStack.shrink(1);
 				if (level() instanceof ServerLevel serverLevel) {
 					for (int i = 0; i <= 10; i++) {
 						ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ExplosionShockParticleOptions.AETHERSENT, getX() + (random.nextFloat() - 0.5f) * getBbWidth() * 2, getY(), getZ() + (random.nextFloat() - 0.5f) * getBbWidth() * 2, 0, 1, 0));

@@ -30,7 +30,7 @@ public class TangledSkullItem extends StandingAndWallBlockItem {
 		}
 
 		player.awardStat(Stats.ITEM_USED.get(this));
-		itemStack.consume(1, player);
+		itemStack.shrink(1);
 
 		player.getCooldowns().addCooldown(this, 60);
 

@@ -2,8 +2,6 @@ package cn.leolezury.eternalstarlight.common.item.combat;
 
 import cn.leolezury.eternalstarlight.common.data.ESDamageTypes;
 import cn.leolezury.eternalstarlight.common.registry.ESCriteriaTriggers;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.FastColor;

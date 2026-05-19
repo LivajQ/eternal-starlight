@@ -3,11 +3,8 @@ package cn.leolezury.eternalstarlight.common.item.combat;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.util.ESConventionalTags;
 import com.google.common.base.Suppliers;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.block.Block;
 
 import java.util.Objects;
 import java.util.function.Supplier;

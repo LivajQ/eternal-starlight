@@ -1,20 +1,15 @@
 package cn.leolezury.eternalstarlight.common.item.combat;
 
-import cn.leolezury.eternalstarlight.common.handler.ESCommonHandler;
-import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 public class StarfireCrossbowItem extends CrossbowItem {
 	public StarfireCrossbowItem(Properties properties) {
 		super(properties);
 	}
 
+	/*
 	@Override
 	protected Projectile createProjectile(Level level, LivingEntity shooter, ItemStack weapon, ItemStack ammo, boolean isCrit) {
 		Projectile projectile = super.createProjectile(level, shooter, weapon, ammo, isCrit);
@@ -24,6 +19,7 @@ public class StarfireCrossbowItem extends CrossbowItem {
 		}
 		return projectile;
 	}
+	 */
 
 	@Override
 	public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {

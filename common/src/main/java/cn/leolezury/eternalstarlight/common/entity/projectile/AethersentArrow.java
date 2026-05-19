@@ -12,20 +12,19 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 
 public class AethersentArrow extends AbstractArrow {
 	public AethersentArrow(EntityType<? extends AethersentArrow> entityType, Level level) {
 		super(entityType, level);
 	}
 
-	public AethersentArrow(Level level, LivingEntity livingEntity, ItemStack itemStack, @Nullable ItemStack itemStack2) {
-		super(ESEntities.AETHERSENT_ARROW.get(), livingEntity, level, itemStack, itemStack2);
+	public AethersentArrow(Level level, LivingEntity shooter) {
+		super(ESEntities.AETHERSENT_ARROW.get(), shooter, level);
 		setPierceLevel((byte) (getPierceLevel() + 3));
 	}
 
-	public AethersentArrow(Level level, double d, double e, double f, ItemStack itemStack, @Nullable ItemStack itemStack2) {
-		super(ESEntities.AETHERSENT_ARROW.get(), d, e, f, level, itemStack, itemStack2);
+	public AethersentArrow(Level level, double x, double y, double z) {
+		super(ESEntities.AETHERSENT_ARROW.get(), x, y, z, level);
 		setPierceLevel((byte) (getPierceLevel() + 3));
 	}
 
@@ -41,7 +40,8 @@ public class AethersentArrow extends AbstractArrow {
 	}
 
 	@Override
-	protected ItemStack getDefaultPickupItem() {
+	protected ItemStack getPickupItem() {
 		return ESItems.AETHERSENT_ARROW.get().getDefaultInstance();
 	}
+
 }

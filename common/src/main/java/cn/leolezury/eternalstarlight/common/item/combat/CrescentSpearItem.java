@@ -123,8 +123,8 @@ public class CrescentSpearItem extends TieredItem {
 
 			ESDataAttachments.CRESCENT_SPEAR_DASH.setData(player, true);
 
-			float damage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5f;
-			player.startAutoSpinAttack(20, damage, stack);
+			//float damage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5f;
+			player.startAutoSpinAttack(20);
 
 			player.getCooldowns().addCooldown(this, 20);
 			player.playSound(ESSoundEvents.CRESCENT_SPEAR_THROW.get());

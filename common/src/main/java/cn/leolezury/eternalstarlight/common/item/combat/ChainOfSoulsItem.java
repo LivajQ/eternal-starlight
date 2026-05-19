@@ -29,7 +29,7 @@ public class ChainOfSoulsItem extends Item {
 			if (hook != null) {
 				retrieve(level, player, hook);
 			} else {
-				stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(interactionHand));
+				stack.hurtAndBreak(1, player, p -> LivingEntity.getEquipmentSlotForItem(stack));
 				this.shoot(level, player, stack);
 			}
 		}

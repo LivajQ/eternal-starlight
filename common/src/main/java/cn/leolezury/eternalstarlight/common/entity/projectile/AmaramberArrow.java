@@ -11,55 +11,63 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 public class AmaramberArrow extends AbstractArrow {
+
 	private static final String TAG_DURATION = "duration";
 	private int duration = 400;
 
-	public AmaramberArrow(EntityType<? extends AmaramberArrow> entityType, Level level) {
-		super(entityType, level);
+	public AmaramberArrow(EntityType<? extends AmaramberArrow> type, Level level) {
+		super(type, level);
 	}
 
-	public AmaramberArrow(Level level, LivingEntity livingEntity, ItemStack itemStack, @Nullable ItemStack itemStack2) {
-		super(ESEntities.AMARAMBER_ARROW.get(), livingEntity, level, itemStack, itemStack2);
+	public AmaramberArrow(Level level, LivingEntity shooter) {
+		super(ESEntities.AMARAMBER_ARROW.get(), shooter, level);
 	}
 
-	public AmaramberArrow(Level level, double d, double e, double f, ItemStack itemStack, @Nullable ItemStack itemStack2) {
-		super(ESEntities.AMARAMBER_ARROW.get(), d, e, f, level, itemStack, itemStack2);
+	public AmaramberArrow(Level level, double x, double y, double z) {
+		super(ESEntities.AMARAMBER_ARROW.get(), x, y, z, level);
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
 		if (this.level().isClientSide && !this.inGround) {
-			this.level().addParticle(ParticleTypes.CRIMSON_SPORE, this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
+			this.level().addParticle(
+				ParticleTypes.CRIMSON_SPORE,
+				this.getX(), this.getY(), this.getZ(),
+				0.0, 0.0, 0.0
+			);
 		}
 	}
 
 	@Override
-	protected void doPostHurtEffects(LivingEntity livingEntity) {
-		super.doPostHurtEffects(livingEntity);
-		MobEffectInstance mobEffectInstance = new MobEffectInstance(ESMobEffects.FLAMMABLE.asHolder(), this.duration, 0);
-		livingEntity.addEffect(mobEffectInstance, this.getEffectSource());
+	protected void doPostHurtEffects(LivingEntity target) {
+		super.doPostHurtEffects(target);
+		MobEffectInstance effect = new MobEffectInstance(
+			ESMobEffects.FLAMMABLE.get(),
+			this.duration,
+			0
+		);
+		target.addEffect(effect, this.getEffectSource());
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compoundTag) {
-		super.readAdditionalSaveData(compoundTag);
-		if (compoundTag.contains(TAG_DURATION)) {
-			this.duration = compoundTag.getInt(TAG_DURATION);
+	public void readAdditionalSaveData(CompoundTag tag) {
+		super.readAdditionalSaveData(tag);
+		if (tag.contains(TAG_DURATION)) {
+			this.duration = tag.getInt(TAG_DURATION);
 		}
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compoundTag) {
-		super.addAdditionalSaveData(compoundTag);
-		compoundTag.putInt(TAG_DURATION, this.duration);
+	public void addAdditionalSaveData(CompoundTag tag) {
+		super.addAdditionalSaveData(tag);
+		tag.putInt(TAG_DURATION, this.duration);
 	}
 
 	@Override
-	protected ItemStack getDefaultPickupItem() {
+	protected ItemStack getPickupItem() {
 		return ESItems.AMARAMBER_ARROW.get().getDefaultInstance();
 	}
 }

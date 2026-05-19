@@ -1,23 +1,18 @@
 package cn.leolezury.eternalstarlight.common.item.combat;
 
 import cn.leolezury.eternalstarlight.common.entity.projectile.FrozenTube;
-import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Position;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ProjectileItem;
 import net.minecraft.world.level.Level;
 
-public class FrozenTubeItem extends Item implements ProjectileItem {
+public class FrozenTubeItem extends Item {
 	public FrozenTubeItem(Properties properties) {
 		super(properties);
 	}
@@ -35,17 +30,10 @@ public class FrozenTubeItem extends Item implements ProjectileItem {
 		}
 
 		player.awardStat(Stats.ITEM_USED.get(this));
-		itemStack.consume(1, player);
+		itemStack.shrink(1);
 
 		player.getCooldowns().addCooldown(this, 20);
 
 		return InteractionResultHolder.sidedSuccess(itemStack, level.isClientSide());
-	}
-
-	@Override
-	public Projectile asProjectile(Level level, Position position, ItemStack itemStack, Direction direction) {
-		FrozenTube tube = new FrozenTube(ESEntities.FROZEN_TUBE.get(), level);
-		tube.setPos(position.x(), position.y(), position.z());
-		return tube;
 	}
 }

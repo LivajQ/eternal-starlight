@@ -1,5 +1,6 @@
 package cn.leolezury.eternalstarlight.common.item.combat;
 
+import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -56,16 +57,42 @@ public class ScytheItem extends TieredItem {
 				new AttributeModifier(BASE_ATTACK_SPEED_UUID, "scythe_speed", this.attackSpeed, AttributeModifier.Operation.ADDITION)
 			);
 
-			/* TODO same as GreatswordItem
-			builder.put(
-				ForgeMod.ENTITY_REACH.get(),
-				new AttributeModifier("scythe_reach", this.reach, AttributeModifier.Operation.ADDITION)
-			);
+			Attribute reach = ESPlatform.INSTANCE.getReach();
+			if (reach != null) {
+				builder.put(
+					reach,
+					new AttributeModifier(
+						EternalStarlight.id("weapon.entity_reach").toString(),
+						this.reach,
+						AttributeModifier.Operation.ADDITION
+					)
+				);
+			}
 
-			builder.put(
-				Attributes.SWEEPING_DAMAGE_RATIO.get(),
-				new AttributeModifier("scythe_sweep", this.sweep, AttributeModifier.Operation.ADDITION)
-			);
+			Attribute blockReach = ESPlatform.INSTANCE.getBlockReach();
+			if (blockReach != null) {
+				builder.put(
+					blockReach,
+					new AttributeModifier(
+						EternalStarlight.id("weapon.block_reach").toString(),
+						this.reach,
+						AttributeModifier.Operation.ADDITION
+					)
+				);
+			}
+
+			/* TODO sweep needs sth else
+			Attribute sweep = ESPlatform.INSTANCE.getSweep();
+			if (sweep != null) {
+				builder.put(
+					sweep,
+					new AttributeModifier(
+						EternalStarlight.id("weapon.sweep").toString(),
+						this.sweep,
+						AttributeModifier.Operation.ADDITION
+					)
+				);
+			}
 			 */
 
 			return builder.build();

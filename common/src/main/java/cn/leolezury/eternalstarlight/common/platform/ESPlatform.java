@@ -30,7 +30,9 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.*;
@@ -229,8 +231,12 @@ public interface ESPlatform {
 			sendToClient(player, packet);
 		}
 	}
-
 	default void sendToTrackingClients(ServerLevel level, Entity entity, ESPacket packet) {
 		sendToTrackingClientsImpl(level, entity, packet);
 	}
+
+	// attributes
+	Attribute getReach();
+	Attribute getBlockReach();
+
 }
