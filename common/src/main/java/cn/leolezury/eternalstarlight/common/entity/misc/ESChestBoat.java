@@ -4,7 +4,7 @@ import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -20,13 +20,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
 public class ESChestBoat extends ESBoat implements HasCustomInventoryScreen, ContainerEntity {
 	private NonNullList<ItemStack> itemStacks = NonNullList.withSize(27, ItemStack.EMPTY);
 	@Nullable
-	private ResourceKey<LootTable> lootTable;
+	private ResourceLocation lootTable;
 	private long lootTableSeed;
 
 	public ESChestBoat(EntityType<? extends ESChestBoat> type, Level level) {
@@ -49,14 +48,16 @@ public class ESChestBoat extends ESBoat implements HasCustomInventoryScreen, Con
 		return 1;
 	}
 
+	@Override
 	protected void addAdditionalSaveData(CompoundTag tag) {
 		super.addAdditionalSaveData(tag);
-		this.addChestVehicleSaveData(tag, this.registryAccess());
+		this.addChestVehicleSaveData(tag);
 	}
 
+	@Override
 	protected void readAdditionalSaveData(CompoundTag tag) {
 		super.readAdditionalSaveData(tag);
-		this.readChestVehicleSaveData(tag, this.registryAccess());
+		this.readChestVehicleSaveData(tag);
 	}
 
 	public void destroy(DamageSource source) {
@@ -173,14 +174,15 @@ public class ESChestBoat extends ESBoat implements HasCustomInventoryScreen, Con
 
 	@Nullable
 	@Override
-	public ResourceKey<LootTable> getLootTable() {
+	public ResourceLocation getLootTable() {
 		return this.lootTable;
 	}
 
 	@Override
-	public void setLootTable(@Nullable ResourceKey<LootTable> resourceKey) {
-		this.lootTable = resourceKey;
+	public void setLootTable(@Nullable ResourceLocation resourceLocation) {
+		this.lootTable = resourceLocation;
 	}
+
 
 	@Override
 	public long getLootTableSeed() {

@@ -4,6 +4,7 @@ import cn.leolezury.eternalstarlight.common.config.ESConfig;
 import cn.leolezury.eternalstarlight.common.data.ESBiomes;
 import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
@@ -41,11 +42,14 @@ public class TwilightGaze extends WaterAnimal {
 
 	public AnimationState swimAnimationState = new AnimationState();
 
-	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnData) {
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag tag) {
+		spawnData = super.finalizeSpawn(level, difficulty, spawnType, spawnData, tag);
+
 		this.setAirSupply(this.getMaxAirSupply());
 		this.setXRot(0.0F);
-		return super.finalizeSpawn(level, difficulty, spawnType, spawnData);
+
+		return spawnData;
 	}
 
 	@Override
@@ -139,7 +143,7 @@ public class TwilightGaze extends WaterAnimal {
 	}
 
 	@Override
-	public boolean canBeLeashed() {
+	public boolean canBeLeashed(Player player) {
 		return true;
 	}
 

@@ -4,17 +4,14 @@ import cn.leolezury.eternalstarlight.common.data.ESDimensions;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.registry.ESParticles;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -46,9 +43,9 @@ public class Rookfish extends Squid implements Bucketable {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(FROM_BUCKET, false);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(FROM_BUCKET, false);
 	}
 
 	@Override
@@ -105,9 +102,10 @@ public class Rookfish extends Squid implements Bucketable {
 	}
 
 	@Override
-	protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource damageSource, boolean bl) {
-		super.dropCustomDeathLoot(serverLevel, damageSource, bl);
-		if (damageSource.is(DamageTypes.DROWN) && serverLevel.getRandom().nextInt(10) == 0) {
+	protected void dropCustomDeathLoot(DamageSource source, int lootingLevel, boolean recentlyHit) {
+		super.dropCustomDeathLoot(source, lootingLevel, recentlyHit);
+
+		if (source.is(DamageTypes.DROWN) && this.random.nextInt(10) == 0) {
 			spawnAtLocation(ESItems.MUSIC_DISC_BRISK.get());
 		}
 	}

@@ -54,8 +54,8 @@ public class PermafrostCloud extends Entity implements TraceableEntity {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(SMALL, false);
+	protected void defineSynchedData() {
+		this.entityData.define(SMALL, false);
 	}
 
 	@Override

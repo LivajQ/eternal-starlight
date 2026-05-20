@@ -84,11 +84,11 @@ public class AuroraDeer extends Animal implements Charger {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(LEFT_ANTLER, true)
-			.define(RIGHT_ANTLER, true)
-			.define(SNOW, true);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(LEFT_ANTLER, true);
+		this.entityData.define(RIGHT_ANTLER, true);
+		this.entityData.define(SNOW, true);
 	}
 
 	@Override
@@ -194,7 +194,7 @@ public class AuroraDeer extends Animal implements Charger {
 					itemEntity.setDeltaMovement(itemEntity.getDeltaMovement().add((getRandom().nextFloat() - getRandom().nextFloat()) * 0.1F, getRandom().nextFloat() * 0.05F, (getRandom().nextFloat() - getRandom().nextFloat()) * 0.1F));
 				}
 			}
-			stack.hurtAndBreak(1, player, player.getEquipmentSlotForItem(stack));
+			stack.hurtAndBreak(1, player, p -> getEquipmentSlotForItem(stack));
 			return InteractionResult.sidedSuccess(player.level().isClientSide);
 		}
 		return super.mobInteract(player, hand);

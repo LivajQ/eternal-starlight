@@ -51,7 +51,7 @@ public class GolemLaserBeam extends RayAttack {
 		Vec3 offset = endPos.subtract(position());
 		Vec3 particlePos = position().add(offset.normalize().scale(offset.length() - 0.5));
 		for (int i = 0; i < 3; i++) {
-			level().addParticle(ExplosionShockParticleOptions.ENERGY, particlePos.x, particlePos.y, particlePos.z, (getRandom().nextDouble() - 0.5) * 0.2, (getRandom().nextDouble() - 0.5) * 0.2, (getRandom().nextDouble() - 0.5) * 0.2);
+			level().addParticle(ExplosionShockParticleOptions.ENERGY, particlePos.x, particlePos.y, particlePos.z, (level().getRandom().nextDouble() - 0.5) * 0.2, (level().getRandom().nextDouble() - 0.5) * 0.2, (level().getRandom().nextDouble() - 0.5) * 0.2);
 		}
 	}
 

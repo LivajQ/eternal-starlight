@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -33,7 +34,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,7 +46,7 @@ public class ShimmerLacewing extends Animal implements VariantHolder<Holder<Shim
 	protected static final EntityDataAccessor<String> VARIANT = SynchedEntityData.defineId(ShimmerLacewing.class, EntityDataSerializers.STRING);
 
 	public ResourceLocation getVariantId() {
-		return ResourceLocation.parse(this.getEntityData().get(VARIANT));
+		return new ResourceLocation(this.getEntityData().get(VARIANT));
 	}
 
 	public void setVariantId(ResourceLocation variant) {
@@ -66,16 +67,19 @@ public class ShimmerLacewing extends Animal implements VariantHolder<Holder<Shim
 	public Holder<ShimmerLacewingVariant> getVariant() {
 		ResourceLocation key = getVariantId();
 		Registry<ShimmerLacewingVariant> variants = level().registryAccess().registryOrThrow(ESRegistries.SHIMMER_LACEWING_VARIANT);
-		Optional<Holder.Reference<ShimmerLacewingVariant>> optional = variants.getHolder(key);
-		return optional.orElse(variants.getHolder(ESShimmerLacewingVariants.RIVER).orElseThrow());
+		ResourceKey<ShimmerLacewingVariant> variantKey = ResourceKey.create(ESRegistries.SHIMMER_LACEWING_VARIANT, key);
+		Optional<Holder.Reference<ShimmerLacewingVariant>> optional = variants.getHolder(variantKey);
+
+		return optional.orElse(variants.getHolder(ESShimmerLacewingVariants.RIVER).orElseThrow()
+		);
 	}
 
 	public ShimmerLacewing(EntityType<? extends ShimmerLacewing> entityType, Level level) {
 		super(entityType, level);
 		this.moveControl = new LacewingMoveControl();
-		this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
-		this.setPathfindingMalus(PathType.WATER, -1.0F);
-		this.setPathfindingMalus(PathType.WATER_BORDER, -1.0F);
+		this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, -1.0F);
+		this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
+		this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, -1.0F);
 		this.setNoGravity(true);
 	}
 
@@ -96,9 +100,9 @@ public class ShimmerLacewing extends Animal implements VariantHolder<Holder<Shim
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(VARIANT, ESShimmerLacewingVariants.RIVER.location().toString());
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(VARIANT, ESShimmerLacewingVariants.RIVER.location().toString());
 	}
 
 	@Override
@@ -154,15 +158,15 @@ public class ShimmerLacewing extends Animal implements VariantHolder<Holder<Shim
 	}
 
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag compoundTag) {
 		setVariant(ShimmerLacewingVariant.getSpawnVariant(level.registryAccess(), level.getBiome(blockPosition())));
-		return super.finalizeSpawn(level, instance, spawnType, data);
+		return super.finalizeSpawn(level, instance, spawnType, data, null);
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag compoundTag) {
 		super.readAdditionalSaveData(compoundTag);
-		setVariantId(ResourceLocation.read(compoundTag.getString(TAG_VARIANT)).getOrThrow());
+		setVariantId(new ResourceLocation(compoundTag.getString(TAG_VARIANT)));
 	}
 
 	@Override

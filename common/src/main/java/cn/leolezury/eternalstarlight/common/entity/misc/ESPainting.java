@@ -43,9 +43,9 @@ public class ESPainting extends Painting {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(ITEM_STACK, ESItems.STARLIT_PAINTING.get().getDefaultInstance());
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(ITEM_STACK, ESItems.STARLIT_PAINTING.get().getDefaultInstance());
 	}
 
 	public static Optional<ESPainting> createPainting(Level level, ItemStack item, BlockPos blockPos, Direction direction) {
@@ -64,9 +64,14 @@ public class ESPainting extends Painting {
 			if (list.isEmpty()) {
 				return Optional.empty();
 			} else {
-				int i = list.stream().mapToInt(holder -> holder.value().area()).max().orElse(0);
-				list.removeIf(holder -> holder.value().area() < i);
-				Optional<Holder<PaintingVariant>> optional = Util.getRandomSafe(list, painting.getRandom());
+				int i = list.stream()
+					.mapToInt(holder -> holder.value().getWidth() * holder.value().getHeight())
+					.max()
+					.orElse(0);
+
+				list.removeIf(holder -> holder.value().getWidth() * holder.value().getHeight() < i);
+
+				Optional<Holder<PaintingVariant>> optional = Util.getRandomSafe(list, painting.level().getRandom());
 				if (optional.isEmpty()) {
 					return Optional.empty();
 				} else {
@@ -92,10 +97,11 @@ public class ESPainting extends Painting {
 		if (this.level().getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
 			this.playSound(SoundEvents.PAINTING_BREAK, 1.0F, 1.0F);
 			if (entity instanceof Player player) {
-				if (player.hasInfiniteMaterials()) {
+				if (player.getAbilities().instabuild) {
 					return;
 				}
 			}
+
 			this.spawnAtLocation(getItem());
 		}
 	}
@@ -108,14 +114,15 @@ public class ESPainting extends Painting {
 	@Override
 	public void addAdditionalSaveData(CompoundTag compoundTag) {
 		super.addAdditionalSaveData(compoundTag);
-		compoundTag.put(TAG_ITEM, this.getItem().save(this.registryAccess()));
+		compoundTag.put(TAG_ITEM, this.getItem().save(new CompoundTag()));
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag compoundTag) {
 		super.readAdditionalSaveData(compoundTag);
+
 		if (compoundTag.contains(TAG_ITEM, CompoundTag.TAG_COMPOUND)) {
-			this.setItem(ItemStack.parse(this.registryAccess(), compoundTag.getCompound(TAG_ITEM)).orElse(ESItems.STARLIT_PAINTING.get().getDefaultInstance()));
+			this.setItem(ItemStack.of(compoundTag.getCompound(TAG_ITEM)));
 		} else {
 			this.setItem(ESItems.STARLIT_PAINTING.get().getDefaultInstance());
 		}

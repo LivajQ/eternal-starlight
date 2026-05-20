@@ -55,8 +55,8 @@ public class EyeOfSeeking extends Entity implements ItemSupplier {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(DATA_ITEM_STACK, this.getDefaultItem());
+	protected void defineSynchedData() {
+		this.entityData.define(DATA_ITEM_STACK, this.getDefaultItem());
 	}
 
 	public boolean shouldRenderAtSqrDistance(double d) {
@@ -174,17 +174,18 @@ public class EyeOfSeeking extends Entity implements ItemSupplier {
 
 	@Override
 	public void addAdditionalSaveData(CompoundTag compoundTag) {
-		compoundTag.put(TAG_ITEM, this.getItem().save(this.registryAccess()));
+		compoundTag.put(TAG_ITEM, this.getItem().save(new CompoundTag()));
 		compoundTag.putBoolean(TAG_SURVIVE_AFTER_DEATH, surviveAfterDeath);
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag compoundTag) {
-		if (compoundTag.contains(TAG_ITEM, 10)) {
-			this.setItem(ItemStack.parse(this.registryAccess(), compoundTag.getCompound(TAG_ITEM)).orElse(this.getDefaultItem()));
+		if (compoundTag.contains(TAG_ITEM, CompoundTag.TAG_COMPOUND)) {
+			this.setItem(ItemStack.of(compoundTag.getCompound(TAG_ITEM)));
 		} else {
 			this.setItem(this.getDefaultItem());
 		}
+
 		this.surviveAfterDeath = compoundTag.getBoolean(TAG_SURVIVE_AFTER_DEATH);
 	}
 

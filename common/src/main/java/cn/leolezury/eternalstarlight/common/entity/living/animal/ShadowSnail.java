@@ -50,9 +50,9 @@ public class ShadowSnail extends Animal {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(HIDE_STATE, 0);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(HIDE_STATE, 0);
 	}
 
 	@Override
@@ -104,7 +104,8 @@ public class ShadowSnail extends Animal {
 
 	@Override
 	public boolean hurt(DamageSource source, float amount) {
-		if (source.is(DamageTypeTags.PANIC_CAUSES) && getHideState() == 0) {
+		if (//source.is(DamageTypeTags.PANIC_CAUSES) &&
+		    getHideState() == 0) {
 			setHideState(1);
 			transitionTicks = 0;
 			getNavigation().stop();

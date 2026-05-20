@@ -53,7 +53,7 @@ public class TearBombMinecart extends MinecartTNT {
 			cloud.setRadiusPerTick(-cloud.getRadius() / (float) cloud.getDuration());
 			cloud.addEffect(new MobEffectInstance(new MobEffectInstance(MobEffects.POISON, 120)));
 			cloud.addEffect(new MobEffectInstance(new MobEffectInstance(MobEffects.CONFUSION, 120)));
-			cloud.addEffect(new MobEffectInstance(new MobEffectInstance(ESMobEffects.TEARY.asHolder(), 120)));
+			cloud.addEffect(new MobEffectInstance(new MobEffectInstance(ESMobEffects.TEARY.get(), 120)));
 			this.level().addFreshEntity(cloud);
 			this.discard();
 		}

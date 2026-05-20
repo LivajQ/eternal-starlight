@@ -7,9 +7,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biome;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public record ShimmerLacewingVariant(ResourceLocation texture, ResourceLocation textureFull, ResourceLocation glowTexture, ResourceLocation glowTextureFull, HolderSet<Biome> biomes) {
@@ -29,8 +29,8 @@ public record ShimmerLacewingVariant(ResourceLocation texture, ResourceLocation 
 
 	public static Holder<ShimmerLacewingVariant> getSpawnVariant(RegistryAccess registryAccess, Holder<Biome> holder) {
 		Registry<ShimmerLacewingVariant> registry = registryAccess.registryOrThrow(ESRegistries.SHIMMER_LACEWING_VARIANT);
-		Optional<Holder.Reference<ShimmerLacewingVariant>> optional = registry.holders().filter(reference -> reference.value().biomes().contains(holder)).findFirst().or(() -> registry.getHolder(ESShimmerLacewingVariants.RIVER));
-		Objects.requireNonNull(registry);
-		return optional.or(registry::getAny).orElseThrow();
+		Optional<Holder.Reference<ShimmerLacewingVariant>> optional = registry.holders().filter(ref -> ref.value().biomes().contains(holder)).findFirst().or(() -> registry.getHolder(ESShimmerLacewingVariants.RIVER));
+		return optional.or(() -> registry.getRandom(RandomSource.create())).orElseThrow();
 	}
+
 }

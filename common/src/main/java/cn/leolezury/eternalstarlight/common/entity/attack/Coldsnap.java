@@ -43,13 +43,13 @@ public class Coldsnap extends Whip {
 			while ((pos = tipPositions.poll()) != null) {
 				if (distanceToSqr(pos) < 20 * 20) {
 					if (getSpawnedTicks() > 1) {
-						level().addParticle(ParticleTypes.SNOWFLAKE, pos.x, pos.y, pos.z, (getRandom().nextDouble() - 0.5) * 0.2, 0.0, (getRandom().nextDouble() - 0.5) * 0.2);
+						level().addParticle(ParticleTypes.SNOWFLAKE, pos.x, pos.y, pos.z, (level().getRandom().nextDouble() - 0.5) * 0.2, 0.0, (level().getRandom().nextDouble() - 0.5) * 0.2);
 						if (lastParticlePos != null) {
 							int count = (int) (lastParticlePos.distanceTo(pos) / 0.4);
 							if (count > 0 && count < 20) {
 								for (int i = 0; i < count; i++) {
 									Vec3 extraPos = ESMathUtil.lerpVec((float) (i + 1) / (count + 1), lastParticlePos, pos);
-									level().addParticle(ParticleTypes.SNOWFLAKE, extraPos.x, extraPos.y, extraPos.z, (getRandom().nextDouble() - 0.5) * 0.2, 0.0, (getRandom().nextDouble() - 0.5) * 0.2);
+									level().addParticle(ParticleTypes.SNOWFLAKE, extraPos.x, extraPos.y, extraPos.z, (level().getRandom().nextDouble() - 0.5) * 0.2, 0.0, (level().getRandom().nextDouble() - 0.5) * 0.2);
 								}
 							}
 						}

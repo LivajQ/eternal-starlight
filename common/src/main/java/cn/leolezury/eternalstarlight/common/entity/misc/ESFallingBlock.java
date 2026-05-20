@@ -54,9 +54,9 @@ public class ESFallingBlock extends Entity {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(DATA_START_POS, BlockPos.ZERO)
-			.define(BLOCK_STATE, Optional.of(Blocks.DIRT.defaultBlockState()));
+	protected void defineSynchedData() {
+		this.entityData.define(DATA_START_POS, BlockPos.ZERO);
+		this.entityData.define(BLOCK_STATE, Optional.of(Blocks.DIRT.defaultBlockState()));
 	}
 
 	public BlockState getBlock() {

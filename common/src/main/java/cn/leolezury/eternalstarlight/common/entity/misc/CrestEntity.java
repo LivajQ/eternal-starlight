@@ -10,7 +10,6 @@ import cn.leolezury.eternalstarlight.common.util.TrailEffect;
 import cn.leolezury.eternalstarlight.common.vfx.ManaCrystalParticleVfx;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -56,7 +55,7 @@ public class CrestEntity extends Entity implements TrailOwner {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+	protected void defineSynchedData() {
 	}
 
 	@Override
@@ -92,7 +91,7 @@ public class CrestEntity extends Entity implements TrailOwner {
 		} else if (!level().isClientSide && age % 10 == 0) {
 			double deltaX = Mth.frac(this.getX()) + (Math.cos(this.age * 200));
 			double deltaZ = Mth.frac(this.getZ()) + (Math.sin(this.age * 200));
-			Vec3 movement = new Vec3(Mth.smoothstep(deltaX / 5), Mth.smoothstep(getRandom().nextFloat() / 2.0) / 1.8, Mth.smoothstep(deltaZ / 5));
+			Vec3 movement = new Vec3(Mth.smoothstep(deltaX / 5), Mth.smoothstep(level().getRandom().nextFloat() / 2.0) / 1.8, Mth.smoothstep(deltaZ / 5));
 			this.setDeltaMovement(ESMathUtil.lerpVec(0.1f, getDeltaMovement(), movement));
 		}
 
@@ -113,9 +112,9 @@ public class CrestEntity extends Entity implements TrailOwner {
 		}
 
 		if (!level().isClientSide && level() instanceof ServerLevel serverLevel) {
-			registryAccess().registryOrThrow(ESRegistries.CREST).getOptional(crest).ifPresent(value -> ManaCrystalParticleVfx.createInstance(value.type(), new Vec3(xo, yo, zo)).send(serverLevel));
-			registryAccess().registryOrThrow(ESRegistries.CREST).getOptional(crest).ifPresent(value -> ManaCrystalParticleVfx.createInstance(value.type(), position()).send(serverLevel));
-			registryAccess().registryOrThrow(ESRegistries.CREST).getOptional(crest).ifPresent(value -> ManaCrystalParticleVfx.createInstance(value.type(), position().add(position().subtract(xo, yo, zo))).send(serverLevel));
+			level().registryAccess().registryOrThrow(ESRegistries.CREST).getOptional(crest).ifPresent(value -> ManaCrystalParticleVfx.createInstance(value.type(), new Vec3(xo, yo, zo)).send(serverLevel));
+			level().registryAccess().registryOrThrow(ESRegistries.CREST).getOptional(crest).ifPresent(value -> ManaCrystalParticleVfx.createInstance(value.type(), position()).send(serverLevel));
+			level().registryAccess().registryOrThrow(ESRegistries.CREST).getOptional(crest).ifPresent(value -> ManaCrystalParticleVfx.createInstance(value.type(), position().add(position().subtract(xo, yo, zo))).send(serverLevel));
 		}
 	}
 
@@ -156,7 +155,7 @@ public class CrestEntity extends Entity implements TrailOwner {
 	public void readAdditionalSaveData(CompoundTag compoundTag) {
 		this.age = compoundTag.getInt(TAG_AGE);
 		this.health = compoundTag.getInt(TAG_HEALTH);
-		this.crest = ResourceKey.create(ESRegistries.CREST, ResourceLocation.parse(compoundTag.getString(TAG_CREST)));
+		this.crest = ResourceKey.create(ESRegistries.CREST, new ResourceLocation(compoundTag.getString(TAG_CREST)));
 	}
 
 	@Override

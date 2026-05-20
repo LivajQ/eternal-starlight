@@ -46,13 +46,14 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -132,9 +133,9 @@ public class StarfireBird extends Animal implements FlyingAnimal {
 
 	public StarfireBird(EntityType<? extends StarfireBird> entityType, Level level) {
 		super(entityType, level);
-		this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
-		this.setPathfindingMalus(PathType.WATER, -1.0F);
-		this.setPathfindingMalus(PathType.WATER_BORDER, -1.0F);
+		this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, -1.0F);
+		this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
+		this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, -1.0F);
 		this.switchMoveType(true);
 	}
 
@@ -161,7 +162,8 @@ public class StarfireBird extends Animal implements FlyingAnimal {
 		walkingTicks = 0;
 		flying = fly;
 		this.setNoGravity(fly);
-		this.stopInPlace();
+		this.setDeltaMovement(Vec3.ZERO);
+		this.getNavigation().stop();
 		if (fly) {
 			this.moveControl = new FlyingMoveControl(this, 20, true);
 			this.navigation = createNavigation(level());
@@ -172,16 +174,16 @@ public class StarfireBird extends Animal implements FlyingAnimal {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(SPECIAL_VARIANT, false);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(SPECIAL_VARIANT, false);
 	}
 
 	@Override
 	protected void registerGoals() {
 		this.goalSelector.addGoal(0, new FloatGoal(this));
 		this.goalSelector.addGoal(1, new StarfireBirdBreedGoal());
-		this.goalSelector.addGoal(2, new TemptGoal(this, 1, stack -> stack.is(ESTags.Items.STARFIRE_BIRD_FOOD), false));
+		this.goalSelector.addGoal(2, new TemptGoal(this, 1.0, Ingredient.of(ESTags.Items.STARFIRE_BIRD_FOOD), false));
 		this.goalSelector.addGoal(3, new StarfireBirdEnterNestGoal());
 		this.goalSelector.addGoal(4, new StarfireBirdGoToNestGoal());
 		this.goalSelector.addGoal(5, new StarfireBirdLandGoal());
@@ -372,10 +374,14 @@ public class StarfireBird extends Animal implements FlyingAnimal {
 		}
 
 		private boolean validTarget() {
-			return target != null
-				&& StarfireBird.this.level().getBlockState(BlockPos.containing(target)).isAir()
-				&& StarfireBird.this.level().getBlockState(BlockPos.containing(target).below()).entityCanStandOnFace(StarfireBird.this.level(), BlockPos.containing(target).below(), StarfireBird.this, Direction.UP)
-				&& StarfireBird.this.getPathfindingMalus(WalkNodeEvaluator.getPathTypeStatic(StarfireBird.this, BlockPos.containing(target))) == 0.0F;
+			if (target == null) return false;
+			BlockPos pos = BlockPos.containing(target);
+			BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos(pos.getX(), pos.getY(), pos.getZ());
+
+			return StarfireBird.this.level().getBlockState(pos).isAir()
+				&& StarfireBird.this.level().getBlockState(pos.below()).entityCanStandOnFace(StarfireBird.this.level(), pos.below(), StarfireBird.this, Direction.UP)
+				&& StarfireBird.this.getPathfindingMalus(
+				WalkNodeEvaluator.getBlockPathTypeStatic(StarfireBird.this.level(), mutable)) == 0.0F;
 		}
 
 		@Override
@@ -493,7 +499,7 @@ public class StarfireBird extends Animal implements FlyingAnimal {
 				StarfireBird.this.getLookControl().setLookAt(giftTarget, 10.0F, StarfireBird.this.getMaxHeadXRot());
 				StarfireBird.this.getNavigation().moveTo(giftTarget, 1);
 				if (StarfireBird.this.distanceTo(giftTarget) < 3 && StarfireBird.this.level() instanceof ServerLevel serverLevel) {
-					LootTable lootTable = serverLevel.getServer().reloadableRegistries().getLootTable(ESLootTables.GAMEPLAY_STARFIRE_BIRD_GIFT);
+					LootTable lootTable = serverLevel.getServer().getLootData().getLootTable(ESLootTables.GAMEPLAY_STARFIRE_BIRD_GIFT);
 					List<ItemStack> items = lootTable.getRandomItems(
 						new LootParams.Builder(serverLevel)
 							.withParameter(LootContextParams.ORIGIN, StarfireBird.this.position())
@@ -611,29 +617,36 @@ public class StarfireBird extends Animal implements FlyingAnimal {
 	}
 
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
 		if (random.nextInt(20) == 0) {
 			setSpecialVariant(true);
 		}
-		return super.finalizeSpawn(level, instance, spawnType, data);
+		return super.finalizeSpawn(level, instance, spawnType, data, tag);
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag compoundTag) {
 		super.readAdditionalSaveData(compoundTag);
+
 		setSpecialVariant(compoundTag.getBoolean(TAG_SPECIAL_VARIANT));
-		NbtUtils.readBlockPos(compoundTag, TAG_NEST_POS).ifPresent(pos -> nestPos = pos);
+		if (compoundTag.contains(TAG_NEST_POS, CompoundTag.TAG_COMPOUND)) {
+			CompoundTag posTag = compoundTag.getCompound(TAG_NEST_POS);
+			nestPos = NbtUtils.readBlockPos(posTag);
+		}
+
 		stayOutOfNestTicks = compoundTag.getInt(TAG_STAY_OUT_OF_NEST_TICKS);
 		hasEgg = compoundTag.getBoolean(TAG_HAS_EGG);
+
 		this.trustedPlayers.clear();
 		if (compoundTag.contains(TAG_TRUSTED_PLAYERS, CompoundTag.TAG_LIST)) {
 			ListTag listTag = compoundTag.getList(TAG_TRUSTED_PLAYERS, CompoundTag.TAG_INT_ARRAY);
 			for (Tag tag : listTag) {
-				if (tag != null && tag.getType() == IntArrayTag.TYPE && ((IntArrayTag) tag).getAsIntArray().length == 4) {
+				if (tag instanceof IntArrayTag arr && arr.getAsIntArray().length == 4) {
 					this.trustedPlayers.add(NbtUtils.loadUUID(tag));
 				}
 			}
 		}
+
 		giftCount = compoundTag.getInt(TAG_GIFT_COUNT);
 		giftCooldown = compoundTag.getInt(TAG_GIFT_COOLDOWN);
 	}
@@ -689,8 +702,8 @@ public class StarfireBird extends Animal implements FlyingAnimal {
 	}
 
 	@Override
-	public EntityDimensions getDefaultDimensions(Pose pose) {
-		return isBaby() ? super.getDefaultDimensions(pose).scale(0.75f) : super.getDefaultDimensions(pose);
+	public EntityDimensions getDimensions(Pose pose) {
+		return isBaby() ? super.getDimensions(pose).scale(0.75f) : super.getDimensions(pose);
 	}
 
 	@Nullable

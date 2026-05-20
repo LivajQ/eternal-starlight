@@ -41,6 +41,7 @@ public class TangledHusk extends LivingEntity implements TraceableEntity {
 
 	public TangledHusk(EntityType<? extends TangledHusk> type, Level level) {
 		super(type, level);
+		this.setMaxUpStep(0.0F);
 	}
 
 	@Nullable
@@ -79,7 +80,7 @@ public class TangledHusk extends LivingEntity implements TraceableEntity {
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
-		return createLivingAttributes().add(Attributes.STEP_HEIGHT, 0);
+		return createLivingAttributes();
 	}
 
 	@Override
@@ -101,10 +102,10 @@ public class TangledHusk extends LivingEntity implements TraceableEntity {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(OWNER_ID, -1)
-			.define(SPAWNED_TICKS, 0);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(OWNER_ID, -1);
+		this.entityData.define(SPAWNED_TICKS, 0);
 	}
 
 	@Override
@@ -155,7 +156,7 @@ public class TangledHusk extends LivingEntity implements TraceableEntity {
 				serverLevel.sendParticles(ESExplosionParticleOptions.LUNAR, getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
 				ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(RingExplosionParticleOptions.LUNAR, getX(), getY(), getZ(), 0, 0.2, 0));
 				ScreenShakeVfx.createInstance(level().dimension(), position(), 40, 50, 0.3f, 0.3f, 3, 5.5f).send(serverLevel);
-				playSound(SoundEvents.GENERIC_EXPLODE.value());
+				playSound(SoundEvents.GENERIC_EXPLODE);
 				for (LivingEntity living : level().getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, this, getBoundingBox().inflate(2))) {
 					if (ESEntityUtil.shouldHarm(getOwner(), living) && living.hurt(ESDamageTypes.getEntityDamageSource(level(), ESDamageTypes.POISON, getOwner()), 10)) {
 						living.hurtMarked = true;

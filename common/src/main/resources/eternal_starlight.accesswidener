@@ -66,6 +66,9 @@ accessible method net/minecraft/advancements/CriteriaTriggers register (Lnet/min
 extendable method net/minecraft/world/entity/LivingEntity getEyeHeight (Lnet/minecraft/world/entity/Pose;Lnet/minecraft/world/entity/EntityDimensions;)F
 
 # custom tnt
+accessible field net/minecraft/world/entity/item/PrimedTnt owner Lnet/minecraft/world/entity/LivingEntity;
+
+extendable method net/minecraft/world/entity/item/PrimedTnt explode ()V
 
 # equipment changes check
 

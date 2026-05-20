@@ -102,10 +102,10 @@ public class Yeti extends Animal {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(ROLL_STATE, 0)
-			.define(HAS_FUR, true);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(ROLL_STATE, 0);
+		this.entityData.define(HAS_FUR, true);
 	}
 
 	@Override
@@ -190,8 +190,7 @@ public class Yeti extends Animal {
 			if (!level().isClientSide) {
 				this.level().playSound(null, this, SoundEvents.SHEEP_SHEAR, SoundSource.PLAYERS, 1.0F, 1.0F);
 				this.gameEvent(GameEvent.SHEAR, player);
-				itemStack.hurtAndBreak(1, player, getSlotForHand(hand));
-
+				itemStack.hurtAndBreak(1, player, p -> getEquipmentSlotForItem(itemStack));
 				int i = 1 + getRandom().nextInt(3);
 				for (int j = 0; j < i; ++j) {
 					ItemEntity itemEntity = this.spawnAtLocation(ESItems.WHITE_YETI_FUR.get(), 1);

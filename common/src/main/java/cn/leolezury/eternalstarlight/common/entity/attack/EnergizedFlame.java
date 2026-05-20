@@ -5,7 +5,6 @@ import cn.leolezury.eternalstarlight.common.particle.GatheringTrailParticleOptio
 import cn.leolezury.eternalstarlight.common.particle.RingExplosionParticleOptions;
 import cn.leolezury.eternalstarlight.common.util.ESEntityUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
@@ -44,7 +43,7 @@ public class EnergizedFlame extends Entity implements TraceableEntity {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+	protected void defineSynchedData() {
 
 	}
 
@@ -69,7 +68,7 @@ public class EnergizedFlame extends Entity implements TraceableEntity {
 				}
 			}
 			if (tickCount == 20) {
-				playSound(SoundEvents.FIRECHARGE_USE, 1, (getRandom().nextFloat() - getRandom().nextFloat()) * 0.2F + 1.0F);
+				playSound(SoundEvents.FIRECHARGE_USE, 1, (level().getRandom().nextFloat() - level().getRandom().nextFloat()) * 0.2F + 1.0F);
 			}
 			if (tickCount > 20 && getOwner() != null) {
 				AABB box = getBoundingBox().inflate(0.5, 0, 0.5);
@@ -77,7 +76,7 @@ public class EnergizedFlame extends Entity implements TraceableEntity {
 				for (LivingEntity living : level().getEntitiesOfClass(LivingEntity.class, box)) {
 					if (ESEntityUtil.shouldHarm(getOwner(), living)) {
 						living.hurt(ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.ENERGIZED_FLAME, this, getOwner()), 2);
-						living.igniteForSeconds(3);
+						living.setSecondsOnFire(3);
 					}
 				}
 			}

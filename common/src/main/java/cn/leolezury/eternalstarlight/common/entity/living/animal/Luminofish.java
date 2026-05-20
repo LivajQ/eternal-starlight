@@ -52,9 +52,9 @@ public class Luminofish extends AbstractSchoolingFish {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(SWELL_TICKS, 0);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(SWELL_TICKS, 0);
 	}
 
 	@Override

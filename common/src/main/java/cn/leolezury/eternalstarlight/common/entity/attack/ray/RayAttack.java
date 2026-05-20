@@ -94,11 +94,11 @@ public class RayAttack extends Entity implements TraceableEntity {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(CASTER, -1)
-			.define(PITCH, 0f)
-			.define(YAW, 0f)
-			.define(LENGTH, 0f);
+	protected void defineSynchedData() {
+		this.entityData.define(CASTER, -1);
+		this.entityData.define(PITCH, 0f);
+		this.entityData.define(YAW, 0f);
+		this.entityData.define(LENGTH, 0f);
 	}
 
 	@Override

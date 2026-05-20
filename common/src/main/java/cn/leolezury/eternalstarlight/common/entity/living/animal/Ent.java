@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -62,7 +63,7 @@ public class Ent extends Animal implements VariantHolder<Holder<EntVariant>> {
 	protected static final EntityDataAccessor<String> VARIANT = SynchedEntityData.defineId(Ent.class, EntityDataSerializers.STRING);
 
 	public ResourceLocation getVariantId() {
-		return ResourceLocation.parse(this.getEntityData().get(VARIANT));
+		return new ResourceLocation(this.getEntityData().get(VARIANT));
 	}
 
 	public void setVariantId(ResourceLocation variant) {
@@ -83,15 +84,18 @@ public class Ent extends Animal implements VariantHolder<Holder<EntVariant>> {
 	public Holder<EntVariant> getVariant() {
 		ResourceLocation key = getVariantId();
 		Registry<EntVariant> variants = level().registryAccess().registryOrThrow(ESRegistries.ENT_VARIANT);
-		Optional<Holder.Reference<EntVariant>> optional = variants.getHolder(key);
-		return optional.orElse(variants.getHolder(ESEntVariants.LUNAR).orElseThrow());
+		ResourceKey<EntVariant> variantKey = ResourceKey.create(ESRegistries.ENT_VARIANT, key);
+		Optional<Holder.Reference<EntVariant>> optional = variants.getHolder(variantKey);
+
+		return optional.orElse(variants.getHolder(ESEntVariants.LUNAR).orElseThrow()
+		);
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(HAS_LEAVES, true)
-			.define(VARIANT, ESEntVariants.LUNAR.location().toString());
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(HAS_LEAVES, true);
+		this.entityData.define(VARIANT, ESEntVariants.LUNAR.location().toString());
 	}
 
 	@Override
@@ -112,7 +116,7 @@ public class Ent extends Animal implements VariantHolder<Holder<EntVariant>> {
 		if (compoundTag.contains(TAG_HAS_LEAVES, CompoundTag.TAG_BYTE)) {
 			setHasLeaves(compoundTag.getBoolean(TAG_HAS_LEAVES));
 		}
-		setVariantId(ResourceLocation.read(compoundTag.getString(TAG_VARIANT)).getOrThrow());
+		setVariantId(new ResourceLocation(compoundTag.getString(TAG_VARIANT)));
 	}
 
 	@Override
@@ -130,9 +134,9 @@ public class Ent extends Animal implements VariantHolder<Holder<EntVariant>> {
 	}
 
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag compoundTag) {
 		setVariant(EntVariant.getSpawnVariant(level.registryAccess(), level.getBiome(blockPosition())));
-		return super.finalizeSpawn(level, instance, spawnType, data);
+		return super.finalizeSpawn(level, instance, spawnType, data, null);
 	}
 
 	@Override
@@ -143,7 +147,7 @@ public class Ent extends Animal implements VariantHolder<Holder<EntVariant>> {
 			if (ESPlatform.INSTANCE.isShears(stack) && hasLeaves()) {
 				setHasLeaves(false);
 				spawnAtLocation(getVariant().value().leaves().value());
-				stack.hurtAndBreak(1, player, player.getEquipmentSlotForItem(stack));
+				stack.hurtAndBreak(1, player, p -> getEquipmentSlotForItem(stack));
 				playSound(SoundEvents.SHEEP_SHEAR);
 				return InteractionResult.sidedSuccess(level().isClientSide);
 			}
@@ -159,9 +163,9 @@ public class Ent extends Animal implements VariantHolder<Holder<EntVariant>> {
 	}
 
 	@Override
-	protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
-		super.dropCustomDeathLoot(level, source, recentlyHit);
-		spawnAtLocation(getVariant().value().leaves().value());
+	protected void dropCustomDeathLoot(DamageSource source, int lootingLevel, boolean recentlyHit) {
+		super.dropCustomDeathLoot(source, lootingLevel, recentlyHit);
+		this.spawnAtLocation(getVariant().value().leaves().value());
 	}
 
 	@Override

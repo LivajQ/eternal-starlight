@@ -59,8 +59,8 @@ public class CrystalCluster extends Entity implements TraceableEntity {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(SPAWNED_TICKS, 0);
+	protected void defineSynchedData() {
+		this.entityData.define(SPAWNED_TICKS, 0);
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class CrystalCluster extends Entity implements TraceableEntity {
 			if (getSpawnedTicks() > 5 && getOwner() != null) {
 				for (LivingEntity livingEntity : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(0.5))) {
 					if (ESEntityUtil.shouldHarm(getOwner(), livingEntity) && livingEntity.hurt(ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.CRYSTAL_INFECTION, this, getOwner()), 4)) {
-						livingEntity.addEffect(new MobEffectInstance(ESMobEffects.CRYSTAL_INFECTION.asHolder(), 120));
+						livingEntity.addEffect(new MobEffectInstance(ESMobEffects.CRYSTAL_INFECTION.get(), 120));
 					}
 				}
 			}

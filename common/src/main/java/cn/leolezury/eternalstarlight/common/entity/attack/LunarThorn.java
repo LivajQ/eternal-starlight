@@ -70,8 +70,8 @@ public class LunarThorn extends Entity implements TraceableEntity {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(SPAWNED_TICKS, 0);
+	protected void defineSynchedData() {
+		this.entityData.define(SPAWNED_TICKS, 0);
 	}
 
 	@Override

@@ -7,7 +7,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
@@ -15,7 +14,6 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.phys.Vec3;
 
 public class ESBoat extends Boat {
 	private static final String TAG_TYPE = "type";
@@ -52,23 +50,35 @@ public class ESBoat extends Boat {
 		};
 	}
 
+	/*
 	@Override
-	protected Vec3 getPassengerAttachmentPoint(Entity entity, EntityDimensions entityDimensions, float f) {
-		Vec3 point = super.getPassengerAttachmentPoint(entity, entityDimensions, f);
-		if (getESBoatType() == Type.JINGLESTEM) {
-			return new Vec3(point.x, point.y / 3.0 * 8.0, point.z);
+	public void positionRider(Entity passenger) {
+		super.positionRider(passenger);
+
+		if (this.hasPassenger(passenger)) {
+			double yOffset = 0.0D;
+
+			if (getESBoatType() == Type.JINGLESTEM) {
+				yOffset = 0.35D;
+			}
+
+			passenger.setPos(
+				this.getX(),
+				this.getY() + this.getPassengersRidingOffset() + passenger.getMyRidingOffset() + yOffset,
+				this.getZ()
+			);
 		}
-		return point;
 	}
+	 */
 
 	public void setStarlightBoatType(ESBoat.Type boatType) {
 		this.getEntityData().set(BOAT_TYPE, boatType.ordinal());
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(BOAT_TYPE, Type.LUNAR.ordinal());
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(BOAT_TYPE, Type.LUNAR.ordinal());
 	}
 
 	@Override

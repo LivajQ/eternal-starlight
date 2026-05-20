@@ -8,10 +8,10 @@ import net.minecraft.core.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public record EntVariant(Holder<Item> leaves, ResourceLocation texture, ResourceLocation textureFull, HolderSet<Biome> biomes) {
@@ -31,8 +31,9 @@ public record EntVariant(Holder<Item> leaves, ResourceLocation texture, Resource
 
 	public static Holder<EntVariant> getSpawnVariant(RegistryAccess registryAccess, Holder<Biome> holder) {
 		Registry<EntVariant> registry = registryAccess.registryOrThrow(ESRegistries.ENT_VARIANT);
-		Optional<Holder.Reference<EntVariant>> optional = registry.holders().filter(reference -> reference.value().biomes().contains(holder)).findFirst().or(() -> registry.getHolder(ESEntVariants.LUNAR));
-		Objects.requireNonNull(registry);
-		return optional.or(registry::getAny).orElseThrow();
+
+		Optional<Holder.Reference<EntVariant>> optional = registry.holders().filter(ref -> ref.value().biomes().contains(holder)).findFirst().or(() -> registry.getHolder(ESEntVariants.LUNAR));
+		return optional.or(() -> registry.getRandom(RandomSource.create())).orElseThrow();
 	}
+
 }

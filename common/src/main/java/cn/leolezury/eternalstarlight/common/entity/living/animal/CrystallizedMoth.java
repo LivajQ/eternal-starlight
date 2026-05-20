@@ -12,7 +12,6 @@ import cn.leolezury.eternalstarlight.common.util.ESMathUtil;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
 import cn.leolezury.eternalstarlight.common.vfx.ScreenShakeVfx;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -46,7 +45,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,9 +73,9 @@ public class CrystallizedMoth extends TamableAnimal implements FlyingAnimal, Neu
 	public CrystallizedMoth(EntityType<? extends CrystallizedMoth> entityType, Level level) {
 		super(entityType, level);
 		this.moveControl = new MothMoveControl();
-		this.setPathfindingMalus(PathType.DANGER_FIRE, -1.0F);
-		this.setPathfindingMalus(PathType.WATER, -1.0F);
-		this.setPathfindingMalus(PathType.WATER_BORDER, -1.0F);
+		this.setPathfindingMalus(BlockPathTypes.DANGER_FIRE, -1.0F);
+		this.setPathfindingMalus(BlockPathTypes.WATER, -1.0F);
+		this.setPathfindingMalus(BlockPathTypes.WATER_BORDER, -1.0F);
 		this.setNoGravity(true);
 	}
 
@@ -97,16 +96,16 @@ public class CrystallizedMoth extends TamableAnimal implements FlyingAnimal, Neu
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(ATTACK_TICKS, 0);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(ATTACK_TICKS, 0);
 	}
 
 	@Override
 	protected void registerGoals() {
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(1, new CrystallizedMothAttackGoal());
-		goalSelector.addGoal(2, new FollowOwnerGoal(this, 1.0, 10.0F, 2.0F));
+		goalSelector.addGoal(2, new FollowOwnerGoal(this, 1.0, 10.0F, 2.0F, true));
 		goalSelector.addGoal(3, new BreedGoal(this, 1.0));
 		goalSelector.addGoal(4, new TemptGoal(this, 1.2D, FOOD_ITEMS, false));
 		goalSelector.addGoal(5, new RandomFlyGoal(this) {
@@ -265,14 +264,15 @@ public class CrystallizedMoth extends TamableAnimal implements FlyingAnimal, Neu
 			return bl ? InteractionResult.CONSUME : InteractionResult.PASS;
 		} else if (this.isTame()) {
 			if (this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
-				itemStack.consume(1, player);
-				FoodProperties foodProperties = itemStack.get(DataComponents.FOOD);
-				float f = foodProperties != null ? (float) foodProperties.nutrition() : 1.0F;
+				itemStack.shrink(1);
+				FoodProperties foodProperties = itemStack.getItem().getFoodProperties();
+				float f = foodProperties != null ? (float) foodProperties.getNutrition() : 1.0F;
 				this.heal(2.0F * f);
 				return InteractionResult.sidedSuccess(this.level().isClientSide());
 			}
+
 			if (itemStack.is(ESItems.LUNARIS_CACTUS_GEL.get())) {
-				itemStack.consume(1, player);
+				itemStack.shrink(1);
 				if (this.random.nextInt(5) == 0) {
 					ItemEntity itemEntity = this.spawnAtLocation(ESItems.SHIVERING_GEL.get(), 1);
 					if (itemEntity != null) {
@@ -284,7 +284,7 @@ public class CrystallizedMoth extends TamableAnimal implements FlyingAnimal, Neu
 				return InteractionResult.SUCCESS;
 			}
 		} else if (this.isFood(itemStack) && !this.isAngry()) {
-			itemStack.consume(1, player);
+			itemStack.shrink(1);
 			this.tryToTame(player);
 			return InteractionResult.SUCCESS;
 		}
@@ -305,16 +305,21 @@ public class CrystallizedMoth extends TamableAnimal implements FlyingAnimal, Neu
 	// copied from vanilla Wolf
 	@Override
 	public boolean wantsToAttack(LivingEntity target, LivingEntity owner) {
-		if (!(target instanceof Creeper) && !(target instanceof Ghast)) {
-			return switch (target) {
-				case CrystallizedMoth moth -> !moth.isTame() || moth.getOwner() != owner;
-				case Player playerTarget when owner instanceof Player playerOwner && !playerOwner.canHarmPlayer(playerTarget) -> false;
-				case AbstractHorse horse when horse.isTamed() -> false;
-				default -> !(target instanceof TamableAnimal animal) || !animal.isTame();
-			};
-		} else {
-			return false;
+		if (target instanceof Creeper || target instanceof Ghast) return false;
+
+		if (target instanceof CrystallizedMoth moth) return !moth.isTame() || moth.getOwner() != owner;
+
+		if (target instanceof Player playerTarget) {
+			if (owner instanceof Player playerOwner && !playerOwner.canHarmPlayer(playerTarget)) return false;
 		}
+
+		if (target instanceof AbstractHorse horse) {
+			if (horse.isTamed()) return false;
+		}
+
+		if (target instanceof TamableAnimal animal) return !animal.isTame();
+
+		return true;
 	}
 
 	@Override
@@ -322,11 +327,13 @@ public class CrystallizedMoth extends TamableAnimal implements FlyingAnimal, Neu
 		return !this.isTame();
 	}
 
+	/*
 	@Override
 	public boolean shouldTryTeleportToOwner() {
 		LivingEntity livingEntity = this.getOwner();
 		return livingEntity != null && this.distanceToSqr(this.getOwner()) >= 20 * 20;
 	}
+	 */
 
 	@Override
 	protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
@@ -339,7 +346,7 @@ public class CrystallizedMoth extends TamableAnimal implements FlyingAnimal, Neu
 		CrystallizedMoth moth = ESEntities.CRYSTALLIZED_MOTH.get().create(level);
 		if (this.isTame() && moth != null) {
 			moth.setOwnerUUID(this.getOwnerUUID());
-			moth.setTame(true, true);
+			moth.setTame(true);
 		}
 		return moth;
 	}

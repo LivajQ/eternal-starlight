@@ -27,7 +27,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
@@ -95,6 +94,7 @@ public abstract class Whip extends Entity {
 	public Whip(EntityType<? extends Whip> entityType, Level level) {
 		super(entityType, level);
 		this.noCulling = true;
+		this.setNoGravity(true);
 	}
 
 	public Whip(EntityType<? extends Whip> entityType, Level level, Player player, @Nullable ItemStack weapon, float damageScale) {
@@ -109,20 +109,16 @@ public abstract class Whip extends Entity {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(SPAWNED_TICKS, 0)
-			.define(OWNER_ID, -1)
-			.define(FOIL, false);
+	protected void defineSynchedData() {
+		this.entityData.define(SPAWNED_TICKS, 0);
+		this.entityData.define(OWNER_ID, -1);
+		this.entityData.define(FOIL, false);
 	}
+
 
 	@Override
 	public boolean shouldRenderAtSqrDistance(double d) {
 		return true;
-	}
-
-	@Override
-	protected double getDefaultGravity() {
-		return 0;
 	}
 
 	public boolean isFoil() {
@@ -134,60 +130,109 @@ public abstract class Whip extends Entity {
 		super.tick();
 		if (!level().isClientSide) {
 			if (owner == null && ownerId != null && level() instanceof ServerLevel serverLevel) {
-				Entity entity = serverLevel.getEntity(ownerId);
-				if (entity != null) {
-					owner = entity;
+				Entity e = serverLevel.getEntity(ownerId);
+				if (e != null) {
+					owner = e;
 				}
 				if (owner == null) {
 					ownerId = null;
 				}
 			}
+
 			setOwnerId(owner != null ? owner.getId() : -1);
+
 			if (getSpawnedTicks() >= getLifespan()) {
 				discard();
 			}
+
 			setSpawnedTicks(getSpawnedTicks() + 1);
+
 			Player player = getPlayerOwner();
-			if (!(player != null && !player.isRemoved() && player.isAlive() && firedFromWeapon != null && ItemStack.isSameItemSameComponents(player.getMainHandItem(), firedFromWeapon))) {
+			if (!(player != null
+				&& !player.isRemoved()
+				&& player.isAlive()
+				&& firedFromWeapon != null
+				&& ItemStack.isSameItemSameTags(player.getMainHandItem(), firedFromWeapon))) {
 				discard();
 			}
+
 			if (player != null) {
 				setPos(player.getEyePosition());
+
 				if (getSpawnedTicks() == getLifespan() / 2) {
-					playSound(ESSoundEvents.WHIP_CRACK.get(), 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
-					Vec3 endPos = ESMathUtil.rotationToPosition(player.getEyePosition(), getWhipRange((float) player.getAttributeValue(Attributes.ENTITY_INTERACTION_RANGE)), -owner.getXRot(), owner.getYHeadRot() + 90);
-					BlockHitResult hitResult = level().clip(new ClipContext(player.getEyePosition(), endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.of(this)));
+					playSound(ESSoundEvents.WHIP_CRACK.get(), 1.0F,
+						1.0F / (this.level().getRandom().nextFloat() * 0.4F + 0.8F));
+
+					float interactionRange = 3.0F; // vanilla-ish reach base
+					Vec3 endPos = ESMathUtil.rotationToPosition(
+						player.getEyePosition(),
+						getWhipRange(interactionRange),
+						-owner.getXRot(),
+						owner.getYHeadRot() + 90
+					);
+
+					BlockHitResult hitResult = level().clip(new ClipContext(
+						player.getEyePosition(),
+						endPos,
+						ClipContext.Block.COLLIDER,
+						ClipContext.Fluid.NONE,
+						this
+					));
+
 					if (hitResult.getType() != HitResult.Type.MISS) {
 						endPos = hitResult.getLocation();
 					}
-					List<Entity> entities = level().getEntitiesOfClass(Entity.class, new AABB(player.getEyePosition(), endPos).inflate(1));
+
+					List<Entity> entities = level().getEntitiesOfClass(
+						Entity.class,
+						new AABB(player.getEyePosition(), endPos).inflate(1)
+					);
 					entities.sort(Comparator.comparingDouble(e -> e.distanceToSqr(this)));
+
 					for (Entity pickedEntity : entities) {
-						LivingEntity entity = null;
+						LivingEntity target = null;
+
 						if (pickedEntity instanceof LivingEntity living) {
-							entity = living;
+							target = living;
 						}
 						if (ESPlatform.INSTANCE.getPartEntityParent(pickedEntity) instanceof LivingEntity living) {
-							entity = living;
+							target = living;
 						}
-						if (entity != null) {
-							AABB aabb = entity.getBoundingBox().inflate(entity.getPickRadius() + 1.5f);
-							if (ESEntityUtil.shouldHarm(player, entity) && entity.isPickable() && (aabb.contains(player.getEyePosition()) || aabb.clip(player.getEyePosition(), endPos).isPresent())) {
+
+						if (target != null) {
+							AABB aabb = target.getBoundingBox().inflate(target.getPickRadius() + 1.5F);
+							boolean intersects =
+								aabb.contains(player.getEyePosition()) ||
+									aabb.clip(player.getEyePosition(), endPos).isPresent();
+
+							if (ESEntityUtil.shouldHarm(player, target)
+								&& target.isPickable()
+								&& intersects) {
+
 								DamageSource damageSource = damageSources().playerAttack(player);
-								float damage = (float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) * damageScale;
-								float knockback = player.getKnockback(entity, damageSource);
-								if (level() instanceof ServerLevel serverLevel && this.getWeaponItem() != null) {
-									damage = EnchantmentHelper.modifyDamage(serverLevel, this.getWeaponItem(), entity, damageSource, damage);
-									knockback = EnchantmentHelper.modifyKnockback(serverLevel, this.getWeaponItem(), player, damageSource, knockback);
+
+								float damage = (float)player.getAttributeValue(Attributes.ATTACK_DAMAGE) * damageScale;
+								float knockback = (float)player.getAttributeValue(Attributes.ATTACK_KNOCKBACK);
+
+								ItemStack weapon = this.getWeaponItem();
+								if (weapon != null) {
+									damage += EnchantmentHelper.getDamageBonus(weapon, target.getMobType());
 								}
-								if (entity.hurt(damageSource, damage)) {
-									if (getWeaponItem() != null && getWeaponItem().getItem() instanceof WhipItem whipItem) {
-										whipItem.doPostHurtEffects(this, entity);
+								knockback += EnchantmentHelper.getKnockbackBonus(player);
+
+								if (target.hurt(damageSource, damage)) {
+									if (weapon != null && weapon.getItem() instanceof WhipItem whipItem) {
+										whipItem.doPostHurtEffects(this, target);
 									}
-									if (level() instanceof ServerLevel serverLevel) {
-										EnchantmentHelper.doPostAttackEffectsWithItemSource(serverLevel, entity, damageSource, this.getWeaponItem());
-									}
-									entity.knockback(knockback * 0.5F, Mth.sin(player.getYRot() * Mth.DEG_TO_RAD), -Mth.cos(player.getYRot() * Mth.DEG_TO_RAD));
+
+									EnchantmentHelper.doPostHurtEffects(target, player);
+									EnchantmentHelper.doPostDamageEffects(player, target);
+
+									target.knockback(
+										knockback * 0.5F,
+										Mth.sin(player.getYRot() * Mth.DEG_TO_RAD),
+										-Mth.cos(player.getYRot() * Mth.DEG_TO_RAD)
+									);
 								}
 							}
 						}
@@ -199,6 +244,7 @@ public abstract class Whip extends Entity {
 			if (currentOwnerId != getOwnerId()) {
 				setOwner(level().getEntity(getOwnerId()));
 			}
+
 			oldAnimationTicks = animationTicks;
 			if (animationTicks == 0) {
 				animationTicks = getSpawnedTicks();
@@ -222,7 +268,6 @@ public abstract class Whip extends Entity {
 	public abstract float getWhipRange(float interactionRange);
 
 	@Nullable
-	@Override
 	public ItemStack getWeaponItem() {
 		return firedFromWeapon;
 	}
@@ -230,29 +275,35 @@ public abstract class Whip extends Entity {
 	@Override
 	public void addAdditionalSaveData(CompoundTag compoundTag) {
 		compoundTag.putInt(TAG_SPAWNED_TICKS, getSpawnedTicks());
+
 		if (ownerId != null) {
 			compoundTag.putUUID(TAG_OWNER, ownerId);
 		}
+
 		if (this.firedFromWeapon != null && !this.firedFromWeapon.isEmpty()) {
-			compoundTag.put(TAG_WEAPON, firedFromWeapon.save(registryAccess(), new CompoundTag()));
+			compoundTag.put(TAG_WEAPON, firedFromWeapon.save(new CompoundTag()));
 		}
+
 		compoundTag.putFloat(TAG_DAMAGE_SCALE, damageScale);
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag compoundTag) {
 		setSpawnedTicks(compoundTag.getInt(TAG_SPAWNED_TICKS));
+
 		if (compoundTag.hasUUID(TAG_OWNER)) {
 			ownerId = compoundTag.getUUID(TAG_OWNER);
 		}
+
 		if (compoundTag.contains(TAG_WEAPON, CompoundTag.TAG_COMPOUND)) {
-			firedFromWeapon = ItemStack.parse(registryAccess(), compoundTag.getCompound(TAG_WEAPON)).orElse(null);
+			firedFromWeapon = ItemStack.of(compoundTag.getCompound(TAG_WEAPON));
 			if (firedFromWeapon != null) {
 				this.entityData.set(FOIL, firedFromWeapon.hasFoil());
 			}
 		} else {
 			firedFromWeapon = null;
 		}
+
 		if (compoundTag.contains(TAG_DAMAGE_SCALE, CompoundTag.TAG_ANY_NUMERIC)) {
 			damageScale = compoundTag.getFloat(TAG_DAMAGE_SCALE);
 		}
@@ -288,7 +339,7 @@ public abstract class Whip extends Entity {
 	}
 
 	@Override
-	public boolean canChangeDimensions(Level level, Level level2) {
+	public boolean canChangeDimensions() {
 		return false;
 	}
 }
