@@ -5,29 +5,30 @@ import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.NbtOps;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.HangingEntity;
-import net.minecraft.world.entity.decoration.Painting;
+import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.HangingEntityItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 
 public class ESPaintingItem extends HangingEntityItem {
-	private static final Component TOOLTIP_RANDOM_VARIANT = Component.translatable("painting.random").withStyle(ChatFormatting.GRAY);
+	private static final Component TOOLTIP_RANDOM_VARIANT =
+		Component.translatable("painting.random").withStyle(ChatFormatting.GRAY);
 
 	public ESPaintingItem(Properties properties) {
 		super(ESEntities.PAINTING.get(), properties);
@@ -35,56 +36,72 @@ public class ESPaintingItem extends HangingEntityItem {
 
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
-		BlockPos blockPos = context.getClickedPos();
-		Direction direction = context.getClickedFace();
-		BlockPos relativePos = blockPos.relative(direction);
+		BlockPos pos = context.getClickedPos();
+		Direction dir = context.getClickedFace();
+		BlockPos placePos = pos.relative(dir);
 		Player player = context.getPlayer();
-		ItemStack itemStack = context.getItemInHand();
-		if (player != null && !this.mayPlace(player, direction, itemStack, relativePos)) {
+		ItemStack stack = context.getItemInHand();
+
+		if (player != null && !this.mayPlace(player, dir, stack, placePos)) {
 			return InteractionResult.FAIL;
-		} else {
-			Level level = context.getLevel();
-			Optional<ESPainting> optional = ESPainting.createPainting(level, itemStack.copyWithCount(1), relativePos, direction);
-			if (optional.isEmpty()) {
-				return InteractionResult.CONSUME;
-			}
-			HangingEntity hangingEntity = optional.get();
-			CustomData customData = itemStack.getOrDefault(DataComponents.ENTITY_DATA, CustomData.EMPTY);
-			if (!customData.isEmpty()) {
-				EntityType.updateCustomEntityTag(level, player, hangingEntity, customData);
-			}
-			if (hangingEntity.survives()) {
-				if (!level.isClientSide) {
-					hangingEntity.playPlacementSound();
-					level.gameEvent(player, GameEvent.ENTITY_PLACE, hangingEntity.position());
-					level.addFreshEntity(hangingEntity);
-					// [ES] Fix incorrect shrinking on clientside
-					itemStack.shrink(1);
-				}
-				return InteractionResult.sidedSuccess(level.isClientSide);
-			} else {
-				return InteractionResult.CONSUME;
-			}
 		}
+
+		Level level = context.getLevel();
+		Optional<ESPainting> opt = ESPainting.createPainting(level, stack.copy(), placePos, dir);
+		if (opt.isEmpty()) {
+			return InteractionResult.CONSUME;
+		}
+
+		HangingEntity entity = opt.get();
+
+		CompoundTag tag = stack.getTagElement("EntityTag");
+		if (tag != null) {
+			EntityType.updateCustomEntityTag(level, player, entity, tag);
+		}
+
+		if (entity.survives()) {
+			if (!level.isClientSide) {
+				entity.playPlacementSound();
+				level.gameEvent(player, GameEvent.ENTITY_PLACE, entity.position());
+				level.addFreshEntity(entity);
+				stack.shrink(1);
+			}
+			return InteractionResult.sidedSuccess(level.isClientSide);
+		}
+
+		return InteractionResult.CONSUME;
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, Item.TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
-		super.appendHoverText(itemStack, tooltipContext, list, tooltipFlag);
-		HolderLookup.Provider provider = tooltipContext.registries();
-		if (provider != null) {
-			CustomData customData = itemStack.getOrDefault(DataComponents.ENTITY_DATA, CustomData.EMPTY);
-			if (!customData.isEmpty()) {
-				customData.read(provider.createSerializationContext(NbtOps.INSTANCE), Painting.VARIANT_MAP_CODEC).result().ifPresentOrElse((holder) -> {
-					holder.unwrapKey().ifPresent((resourceKey) -> {
-						list.add(Component.translatable(resourceKey.location().toLanguageKey("painting", "title")).withStyle(ChatFormatting.YELLOW));
-						list.add(Component.translatable(resourceKey.location().toLanguageKey("painting", "author")).withStyle(ChatFormatting.GRAY));
-					});
-					list.add(Component.translatable("painting.dimensions", holder.value().width(), holder.value().height()));
-				}, () -> list.add(TOOLTIP_RANDOM_VARIANT));
-			} else if (tooltipFlag.isCreative()) {
-				list.add(TOOLTIP_RANDOM_VARIANT);
+	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+		super.appendHoverText(stack, level, tooltip, flag);
+
+		CompoundTag tag = stack.getTagElement("EntityTag");
+
+		if (tag != null && tag.contains("variant", Tag.TAG_STRING)) {
+			String id = tag.getString("variant");
+			ResourceLocation rl = new ResourceLocation(id);
+
+			tooltip.add(Component.translatable(rl.toLanguageKey("painting", "title"))
+				.withStyle(ChatFormatting.YELLOW));
+			tooltip.add(Component.translatable(rl.toLanguageKey("painting", "author"))
+				.withStyle(ChatFormatting.GRAY));
+
+			PaintingVariant variant = level != null
+				? level.registryAccess().registryOrThrow(Registries.PAINTING_VARIANT)
+				.get(rl)
+				: null;
+
+			if (variant != null) {
+				tooltip.add(Component.translatable(
+					"painting.dimensions",
+					variant.getWidth(),
+					variant.getHeight()
+				));
 			}
+		} else if (flag.isCreative()) {
+			tooltip.add(TOOLTIP_RANDOM_VARIANT);
 		}
 	}
 }
+

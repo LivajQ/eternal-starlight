@@ -6,7 +6,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class BlossomOfStarsItem extends Item {
@@ -15,8 +17,14 @@ public class BlossomOfStarsItem extends Item {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
-		list.add(Component.translatable("tooltip." + EternalStarlight.ID + ".blossom_of_stars").withColor(0x5187c4).withStyle(ChatFormatting.ITALIC));
-		super.appendHoverText(itemStack, tooltipContext, list, tooltipFlag);
+	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+		tooltip.add(
+			Component.translatable("tooltip." + EternalStarlight.ID + ".blossom_of_stars")
+				.withStyle(style -> style.withColor(0x5187c4))
+				.withStyle(ChatFormatting.ITALIC)
+		);
+
+		super.appendHoverText(stack, level, tooltip, flag);
 	}
+
 }

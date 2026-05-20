@@ -3,12 +3,13 @@ package cn.leolezury.eternalstarlight.common.item.recipe;
 import cn.leolezury.eternalstarlight.common.registry.ESRecipeSerializers;
 import cn.leolezury.eternalstarlight.common.spell.ManaType;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
+import com.google.gson.JsonObject;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
@@ -20,33 +21,46 @@ public class ManaCrystalRecipe extends CustomRecipe {
 	private final ManaType manaType;
 	private final Item manaCrystal;
 
-	public ManaCrystalRecipe(CraftingBookCategory craftingBookCategory, ManaType type, Item item) {
-		super(craftingBookCategory);
+	public ManaCrystalRecipe(ResourceLocation id, CraftingBookCategory category, ManaType type, Item item) {
+		super(id, category);
 		this.manaType = type;
 		this.manaCrystal = item;
 	}
 
 	@Override
-	public boolean matches(CraftingInput recipeInput, Level level) {
-		int day = (int) (level.getDayTime() / 24000L);
-		if (recipeInput.width() == 3 && recipeInput.height() == 3) {
+	public boolean matches(CraftingContainer container, Level level) {
+		int day = (int)(level.getDayTime() / 24000L);
+
+		if (container.getWidth() == 3 && container.getHeight() == 3) {
 			boolean checkDay = day % 6 == List.of(ManaType.values()).indexOf(manaType) - 1;
-			boolean checkEmpty = recipeInput.getItem(0).isEmpty() && recipeInput.getItem(2).isEmpty() && recipeInput.getItem(6).isEmpty() && recipeInput.getItem(8).isEmpty();
-			boolean checkIngredients = recipeInput.getItem(1).is(ESTags.Items.MANA_CRYSTAL_INGREDIENTS) && recipeInput.getItem(3).is(ESTags.Items.MANA_CRYSTAL_INGREDIENTS) && recipeInput.getItem(4).is(ESTags.Items.MANA_CRYSTAL_INGREDIENTS) && recipeInput.getItem(5).is(ESTags.Items.MANA_CRYSTAL_INGREDIENTS) && recipeInput.getItem(7).is(ESTags.Items.MANA_CRYSTAL_INGREDIENTS);
+
+			boolean checkEmpty =
+				container.getItem(0).isEmpty() &&
+					container.getItem(2).isEmpty() &&
+					container.getItem(6).isEmpty() &&
+					container.getItem(8).isEmpty();
+
+			boolean checkIngredients =
+				container.getItem(1).is(ESTags.Items.MANA_CRYSTAL_INGREDIENTS) &&
+					container.getItem(3).is(ESTags.Items.MANA_CRYSTAL_INGREDIENTS) &&
+					container.getItem(4).is(ESTags.Items.MANA_CRYSTAL_INGREDIENTS) &&
+					container.getItem(5).is(ESTags.Items.MANA_CRYSTAL_INGREDIENTS) &&
+					container.getItem(7).is(ESTags.Items.MANA_CRYSTAL_INGREDIENTS);
+
 			return checkDay && checkEmpty && checkIngredients;
-		} else {
-			return false;
 		}
+
+		return false;
 	}
 
 	@Override
-	public ItemStack assemble(CraftingInput recipeInput, HolderLookup.Provider provider) {
+	public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
 		return manaCrystal.getDefaultInstance();
 	}
 
 	@Override
-	public boolean canCraftInDimensions(int i, int j) {
-		return i == 3 && j == 3;
+	public boolean canCraftInDimensions(int w, int h) {
+		return w == 3 && h == 3;
 	}
 
 	@Override
@@ -55,35 +69,32 @@ public class ManaCrystalRecipe extends CustomRecipe {
 	}
 
 	public static class Serializer implements RecipeSerializer<ManaCrystalRecipe> {
-		private static final MapCodec<ManaCrystalRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-			CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(CraftingRecipe::category),
-			ManaType.CODEC.fieldOf("mana_type").forGetter(recipe -> recipe.manaType),
-			BuiltInRegistries.ITEM.byNameCodec().fieldOf("crystal").forGetter(recipe -> recipe.manaCrystal)
-		).apply(instance, ManaCrystalRecipe::new));
 
 		@Override
-		public MapCodec<ManaCrystalRecipe> codec() {
-			return CODEC;
+		public ManaCrystalRecipe fromJson(ResourceLocation id, JsonObject json) {
+			CraftingBookCategory category =
+				CraftingBookCategory.CODEC.byName(GsonHelper.getAsString(json, "category"), CraftingBookCategory.MISC);
+
+			ManaType type = ManaType.valueOf(GsonHelper.getAsString(json, "mana_type").toUpperCase());
+
+			Item crystal = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(json, "crystal")));
+
+			return new ManaCrystalRecipe(id, category, type, crystal);
 		}
 
 		@Override
-		public StreamCodec<RegistryFriendlyByteBuf, ManaCrystalRecipe> streamCodec() {
-			return new StreamCodec<>() {
-				@Override
-				public ManaCrystalRecipe decode(RegistryFriendlyByteBuf friendlyByteBuf) {
-					CraftingBookCategory category = friendlyByteBuf.readEnum(CraftingBookCategory.class);
-					ManaType type = friendlyByteBuf.readEnum(ManaType.class);
-					Item output = friendlyByteBuf.readById(BuiltInRegistries.ITEM::byId);
-					return new ManaCrystalRecipe(category, type, output);
-				}
+		public ManaCrystalRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
+			CraftingBookCategory category = buf.readEnum(CraftingBookCategory.class);
+			ManaType type = buf.readEnum(ManaType.class);
+			Item output = buf.readById(BuiltInRegistries.ITEM);
+			return new ManaCrystalRecipe(id, category, type, output);
+		}
 
-				@Override
-				public void encode(RegistryFriendlyByteBuf friendlyByteBuf, ManaCrystalRecipe recipe) {
-					friendlyByteBuf.writeEnum(recipe.category());
-					friendlyByteBuf.writeEnum(recipe.manaType);
-					friendlyByteBuf.writeById(BuiltInRegistries.ITEM::getId, recipe.manaCrystal);
-				}
-			};
+		@Override
+		public void toNetwork(FriendlyByteBuf buf, ManaCrystalRecipe recipe) {
+			buf.writeEnum(recipe.category());
+			buf.writeEnum(recipe.manaType);
+			buf.writeId(BuiltInRegistries.ITEM, recipe.manaCrystal);
 		}
 	}
 }

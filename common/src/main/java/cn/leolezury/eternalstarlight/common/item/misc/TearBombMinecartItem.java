@@ -2,8 +2,8 @@ package cn.leolezury.eternalstarlight.common.item.misc;
 
 import cn.leolezury.eternalstarlight.common.entity.misc.TearBombMinecart;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
-import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.server.level.ServerLevel;
@@ -16,62 +16,72 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseRailBlock;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.gameevent.GameEvent.Context;
 import net.minecraft.world.phys.Vec3;
 
 public class TearBombMinecartItem extends Item {
 	private static final DispenseItemBehavior DISPENSE_ITEM_BEHAVIOR = new DefaultDispenseItemBehavior() {
-		private final DefaultDispenseItemBehavior defaultDispenseItemBehavior = new DefaultDispenseItemBehavior();
+		private final DefaultDispenseItemBehavior fallback = new DefaultDispenseItemBehavior();
 
 		@Override
-		public ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
-			Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
-			ServerLevel serverLevel = blockSource.level();
-			Vec3 vec3 = blockSource.center();
-			double d = vec3.x() + direction.getStepX() * 1.125F;
-			double e = Math.floor(vec3.y()) + direction.getStepY();
-			double f = vec3.z() + direction.getStepZ() * 1.125F;
-			BlockPos blockPos = blockSource.pos().relative(direction);
-			BlockState blockState = serverLevel.getBlockState(blockPos);
-			RailShape railShape = blockState.getBlock() instanceof BaseRailBlock ? blockState.getValue(((BaseRailBlock) blockState.getBlock()).getShapeProperty()) : RailShape.NORTH_SOUTH;
-			double g;
-			if (blockState.is(BlockTags.RAILS)) {
-				if (railShape.isAscending()) {
-					g = 0.6;
-				} else {
-					g = 0.1;
-				}
+		public ItemStack execute(BlockSource source, ItemStack stack) {
+			Direction dir = source.getBlockState().getValue(DispenserBlock.FACING);
+			ServerLevel level = source.getLevel();
+
+			Vec3 center = new Vec3(
+				source.getPos().getX() + 0.5,
+				source.getPos().getY() + 0.5,
+				source.getPos().getZ() + 0.5
+			);
+
+			double x = center.x + dir.getStepX() * 1.125F;
+			double y = Math.floor(center.y) + dir.getStepY();
+			double z = center.z + dir.getStepZ() * 1.125F;
+
+			BlockPos frontPos = source.getPos().relative(dir);
+			BlockState state = level.getBlockState(frontPos);
+
+			RailShape shape = state.getBlock() instanceof BaseRailBlock
+				? state.getValue(((BaseRailBlock) state.getBlock()).getShapeProperty())
+				: RailShape.NORTH_SOUTH;
+
+			double yOffset;
+
+			if (state.is(BlockTags.RAILS)) {
+				yOffset = shape.isAscending() ? 0.6 : 0.1;
 			} else {
-				if (!blockState.isAir() || !serverLevel.getBlockState(blockPos.below()).is(BlockTags.RAILS)) {
-					return this.defaultDispenseItemBehavior.dispense(blockSource, itemStack);
+				if (!state.isAir() || !level.getBlockState(frontPos.below()).is(BlockTags.RAILS)) {
+					return fallback.dispense(source, stack);
 				}
 
-				BlockState blockState2 = serverLevel.getBlockState(blockPos.below());
-				RailShape railShape2 = blockState2.getBlock() instanceof BaseRailBlock ? blockState2.getValue(((BaseRailBlock) blockState2.getBlock()).getShapeProperty()) : RailShape.NORTH_SOUTH;
-				if (direction != Direction.DOWN && railShape2.isAscending()) {
-					g = -0.4;
+				BlockState below = level.getBlockState(frontPos.below());
+				RailShape belowShape = below.getBlock() instanceof BaseRailBlock
+					? below.getValue(((BaseRailBlock) below.getBlock()).getShapeProperty())
+					: RailShape.NORTH_SOUTH;
+
+				if (dir != Direction.DOWN && belowShape.isAscending()) {
+					yOffset = -0.4;
 				} else {
-					g = -0.9;
+					yOffset = -0.9;
 				}
 			}
 
-			AbstractMinecart minecart = new TearBombMinecart(serverLevel, d, e + g, f);
-			serverLevel.addFreshEntity(minecart);
-			itemStack.shrink(1);
-			return itemStack;
+			AbstractMinecart minecart = new TearBombMinecart(level, x, y + yOffset, z);
+			level.addFreshEntity(minecart);
+
+			stack.shrink(1);
+			return stack;
 		}
 
 		@Override
-		protected void playSound(BlockSource blockSource) {
-			blockSource.level().levelEvent(LevelEvent.SOUND_DISPENSER_DISPENSE, blockSource.pos(), 0);
+		protected void playSound(BlockSource source) {
+			source.getLevel().levelEvent(1000, source.getPos(), 0);
 		}
 	};
 
-	public TearBombMinecartItem(Item.Properties properties) {
+	public TearBombMinecartItem(Properties properties) {
 		super(properties);
 		DispenserBlock.registerBehavior(this, DISPENSE_ITEM_BEHAVIOR);
 	}
@@ -79,26 +89,35 @@ public class TearBombMinecartItem extends Item {
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
 		Level level = context.getLevel();
-		BlockPos blockPos = context.getClickedPos();
-		BlockState blockState = level.getBlockState(blockPos);
-		if (!blockState.is(BlockTags.RAILS)) {
+		BlockPos pos = context.getClickedPos();
+		BlockState state = level.getBlockState(pos);
+
+		if (!state.is(BlockTags.RAILS)) {
 			return InteractionResult.FAIL;
-		} else {
-			ItemStack itemStack = context.getItemInHand();
-			if (level instanceof ServerLevel serverLevel) {
-				RailShape railShape = blockState.getBlock() instanceof BaseRailBlock ? blockState.getValue(((BaseRailBlock) blockState.getBlock()).getShapeProperty()) : RailShape.NORTH_SOUTH;
-				double d = 0.0F;
-				if (railShape.isAscending()) {
-					d = 0.5F;
-				}
-
-				TearBombMinecart minecart = new TearBombMinecart(serverLevel, blockPos.getX() + 0.5F, blockPos.getY() + 0.0625F + d, blockPos.getZ() + 0.5F);
-				serverLevel.addFreshEntity(minecart);
-				serverLevel.gameEvent(GameEvent.ENTITY_PLACE, blockPos, Context.of(context.getPlayer(), serverLevel.getBlockState(blockPos.below())));
-			}
-
-			itemStack.shrink(1);
-			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
+
+		ItemStack stack = context.getItemInHand();
+
+		if (level instanceof ServerLevel serverLevel) {
+			RailShape shape = state.getBlock() instanceof BaseRailBlock
+				? state.getValue(((BaseRailBlock) state.getBlock()).getShapeProperty())
+				: RailShape.NORTH_SOUTH;
+
+			double yOffset = shape.isAscending() ? 0.5F : 0.0F;
+
+			TearBombMinecart minecart = new TearBombMinecart(
+				serverLevel,
+				pos.getX() + 0.5F,
+				pos.getY() + 0.0625F + yOffset,
+				pos.getZ() + 0.5F
+			);
+
+			serverLevel.addFreshEntity(minecart);
+			serverLevel.gameEvent(GameEvent.ENTITY_PLACE, pos,
+				GameEvent.Context.of(context.getPlayer(), serverLevel.getBlockState(pos.below())));
+		}
+
+		stack.shrink(1);
+		return InteractionResult.sidedSuccess(level.isClientSide);
 	}
 }

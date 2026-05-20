@@ -1,52 +1,59 @@
 package cn.leolezury.eternalstarlight.common.item.recipe;
 
 import cn.leolezury.eternalstarlight.common.registry.ESRecipeSerializers;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
 public class ToolModificationRecipe extends CustomRecipe {
-	private final Item tool, input;
+	private final Item tool;
+	private final Item input;
 	private final ItemStack output;
 
-	public ToolModificationRecipe(CraftingBookCategory category, Item tool, Item input, ItemStack output) {
-		super(category);
+	public ToolModificationRecipe(ResourceLocation id, CraftingBookCategory category, Item tool, Item input, ItemStack output) {
+		super(id, category);
 		this.tool = tool;
 		this.input = input;
 		this.output = output;
 	}
 
 	@Override
-	public boolean matches(CraftingInput recipeInput, Level level) {
-		if (recipeInput.items().stream().anyMatch(stack -> !stack.isEmpty() && !stack.is(tool) && !stack.is(input))) {
-			return false;
+	public boolean matches(CraftingContainer container, Level level) {
+		long toolCount = 0;
+		long inputCount = 0;
+
+		for (int i = 0; i < container.getContainerSize(); i++) {
+			ItemStack stack = container.getItem(i);
+
+			if (stack.isEmpty()) continue;
+
+			if (stack.is(tool)) toolCount++;
+			else if (stack.is(input)) inputCount++;
+			else return false;
 		}
-		if (recipeInput.items().stream().filter(stack -> stack.is(tool)).count() != 1) {
-			return false;
-		}
-		return recipeInput.items().stream().filter(stack -> stack.is(input)).count() == 1;
+
+		return toolCount == 1 && inputCount == 1;
 	}
 
 	@Override
-	public ItemStack assemble(CraftingInput recipeInput, HolderLookup.Provider provider) {
+	public ItemStack assemble(CraftingContainer container, RegistryAccess access) {
 		return output.copy();
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(CraftingInput recipeInput) {
-		NonNullList<ItemStack> items = NonNullList.withSize(recipeInput.size(), ItemStack.EMPTY);
+	public NonNullList<ItemStack> getRemainingItems(CraftingContainer container) {
+		NonNullList<ItemStack> items = NonNullList.withSize(container.getContainerSize(), ItemStack.EMPTY);
 
-		for (int i = 0; i < items.size(); ++i) {
-			if (recipeInput.getItem(i).is(tool)) {
-				ItemStack remaining = recipeInput.getItem(i).copy();
+		for (int i = 0; i < container.getContainerSize(); i++) {
+			ItemStack stack = container.getItem(i);
+
+			if (stack.is(tool)) {
+				ItemStack remaining = stack.copy();
 				if (remaining.getDamageValue() + 1 < remaining.getMaxDamage()) {
 					remaining.setDamageValue(remaining.getDamageValue() + 1);
 					items.set(i, remaining);
@@ -58,48 +65,12 @@ public class ToolModificationRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public boolean canCraftInDimensions(int i, int j) {
+	public boolean canCraftInDimensions(int w, int h) {
 		return true;
 	}
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
 		return ESRecipeSerializers.TOOL_MODIFICATION.get();
-	}
-
-	public static class Serializer implements RecipeSerializer<ToolModificationRecipe> {
-		private static final MapCodec<ToolModificationRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-			CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(CraftingRecipe::category),
-			BuiltInRegistries.ITEM.byNameCodec().fieldOf("tool").forGetter(o -> o.tool),
-			BuiltInRegistries.ITEM.byNameCodec().fieldOf("input").forGetter(o -> o.input),
-			ItemStack.OPTIONAL_CODEC.fieldOf("output").forGetter(o -> o.output)
-		).apply(instance, ToolModificationRecipe::new));
-
-		@Override
-		public MapCodec<ToolModificationRecipe> codec() {
-			return CODEC;
-		}
-
-		@Override
-		public StreamCodec<RegistryFriendlyByteBuf, ToolModificationRecipe> streamCodec() {
-			return new StreamCodec<>() {
-				@Override
-				public ToolModificationRecipe decode(RegistryFriendlyByteBuf friendlyByteBuf) {
-					CraftingBookCategory category = friendlyByteBuf.readEnum(CraftingBookCategory.class);
-					Item tool = friendlyByteBuf.readById(BuiltInRegistries.ITEM::byId);
-					Item input = friendlyByteBuf.readById(BuiltInRegistries.ITEM::byId);
-					ItemStack output = ItemStack.STREAM_CODEC.decode(friendlyByteBuf);
-					return new ToolModificationRecipe(category, tool, input, output);
-				}
-
-				@Override
-				public void encode(RegistryFriendlyByteBuf friendlyByteBuf, ToolModificationRecipe recipe) {
-					friendlyByteBuf.writeEnum(recipe.category());
-					friendlyByteBuf.writeById(BuiltInRegistries.ITEM::getId, recipe.tool);
-					friendlyByteBuf.writeById(BuiltInRegistries.ITEM::getId, recipe.input);
-					ItemStack.STREAM_CODEC.encode(friendlyByteBuf, recipe.output);
-				}
-			};
-		}
 	}
 }

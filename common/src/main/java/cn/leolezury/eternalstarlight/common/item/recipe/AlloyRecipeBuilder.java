@@ -1,14 +1,18 @@
 package cn.leolezury.eternalstarlight.common.item.recipe;
 
+import cn.leolezury.eternalstarlight.common.registry.ESRecipeSerializers;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
+import net.minecraft.advancements.RequirementsStrategy;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.NonNullList;
-import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.valueproviders.ConstantInt;
@@ -16,10 +20,13 @@ import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class AlloyRecipeBuilder {
 	private final NonNullList<AlloyRecipe.Result> results = NonNullList.create();
@@ -108,15 +115,78 @@ public class AlloyRecipeBuilder {
 		return this;
 	}
 
-	public void save(RecipeOutput recipeOutput, ResourceLocation id) {
+	public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
 		this.ensureValid(id);
-		Advancement.Builder advancementBuilder = recipeOutput.advancement()
+
+		Advancement.Builder advancementBuilder = Advancement.Builder.advancement()
 			.addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
 			.rewards(AdvancementRewards.Builder.recipe(id))
-			.requirements(AdvancementRequirements.Strategy.OR);
-		this.itemPredicates.forEach((name, predicate) -> advancementBuilder.addCriterion(name, InventoryChangeTrigger.TriggerInstance.hasItems(predicate, ItemPredicate.Builder.item().of(ESTags.Items.ALLOY_FURNACES).build())));
+			.requirements(RequirementsStrategy.OR);
+
+		this.itemPredicates.forEach((name, predicate) ->
+			advancementBuilder.addCriterion(
+				name,
+				InventoryChangeTrigger.TriggerInstance.hasItems(
+					predicate,
+					ItemPredicate.Builder.item().of(ESTags.Items.ALLOY_FURNACES).build()
+				)
+			)
+		);
+
 		AlloyRecipe recipe = new AlloyRecipe(this.results, this.ingredients, this.burnTime);
-		recipeOutput.accept(id, recipe, advancementBuilder.build(id.withPrefix("recipes/alloy/")));
+
+		consumer.accept(new FinishedRecipe() {
+
+			@Override
+			public void serializeRecipeData(JsonObject json) {
+				JsonArray resultsArray = new JsonArray();
+
+				for (AlloyRecipe.Result result : recipe.results()) {
+					JsonObject obj = new JsonObject();
+
+					JsonObject itemJson = new JsonObject();
+					itemJson.addProperty("item", BuiltInRegistries.ITEM.getKey(result.item().getItem()).toString());
+					itemJson.addProperty("count", result.item().getCount());
+
+					obj.add("item", itemJson);
+
+					obj.addProperty("amount_min", result.amount().getMinValue());
+					obj.addProperty("amount_max", result.amount().getMaxValue());
+
+					resultsArray.add(obj);
+				}
+
+				json.add("results", resultsArray);
+
+				JsonArray ingredientsArray = new JsonArray();
+				for (Ingredient ingredient : recipe.ingredients()) {
+					ingredientsArray.add(ingredient.toJson());
+				}
+				json.add("ingredients", ingredientsArray);
+
+				json.addProperty("burn_time", recipe.burnTime());
+			}
+
+			@Override
+			public ResourceLocation getId() {
+				return id;
+			}
+
+			@Override
+			public RecipeSerializer<?> getType() {
+				return ESRecipeSerializers.ALLOY.get();
+			}
+
+			@Override
+			public @Nullable JsonObject serializeAdvancement() {
+				return advancementBuilder.serializeToJson();
+			}
+
+			@Override
+			public @Nullable ResourceLocation getAdvancementId() {
+				return id.withPrefix("recipes/alloy/");
+			}
+		});
 	}
 
 	private void ensureValid(ResourceLocation id) {

@@ -22,6 +22,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class SeekingEyeItem extends Item {
@@ -33,38 +34,62 @@ public class SeekingEyeItem extends Item {
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
 		player.startUsingItem(hand);
+
 		if (level instanceof ServerLevel serverLevel) {
 			TagKey<Structure> key = ESTags.Structures.BOSS_LANDMARKS;
-			ItemStack otherHandStack = player.getItemInHand(hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
-			if (otherHandStack.is(ESTags.Items.GOLEM_FORGE_LOCATORS)) {
+
+			ItemStack other = player.getItemInHand(
+				hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND
+			);
+
+			if (other.is(ESTags.Items.GOLEM_FORGE_LOCATORS)) {
 				key = ESTags.Structures.GOLEM_FORGE;
 			}
-			if (otherHandStack.is(ESTags.Items.CURSED_GARDEN_LOCATORS)) {
+			if (other.is(ESTags.Items.CURSED_GARDEN_LOCATORS)) {
 				key = ESTags.Structures.CURSED_GARDEN;
 			}
-			BlockPos blockPos = serverLevel.findNearestMapStructure(key, player.blockPosition(), 100, false);
-			if (blockPos != null) {
+
+			BlockPos pos = serverLevel.findNearestMapStructure(key, player.blockPosition(), 100, false);
+			if (pos != null) {
 				EyeOfSeeking eye = new EyeOfSeeking(level, player.getX(), player.getY(0.5D), player.getZ());
 				eye.setItem(stack);
-				eye.signalTo(blockPos);
+				eye.signalTo(pos);
+
 				level.gameEvent(GameEvent.PROJECTILE_SHOOT, eye.position(), GameEvent.Context.of(player));
 				level.addFreshEntity(eye);
 
-				level.playSound(null, player.getX(), player.getY(), player.getZ(), ESSoundEvents.SEEKING_EYE_LAUNCH.get(), SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
-				stack.consume(1, player);
+				level.playSound(
+					null,
+					player.getX(), player.getY(), player.getZ(),
+					ESSoundEvents.SEEKING_EYE_LAUNCH.get(),
+					SoundSource.NEUTRAL,
+					0.5F,
+					0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
+				);
 
+				stack.shrink(1);
 				player.awardStat(Stats.ITEM_USED.get(this));
 				player.swing(hand, true);
 			}
 		}
+
 		return InteractionResultHolder.consume(stack);
 	}
 
 	@Override
-	public void appendHoverText(ItemStack itemStack, TooltipContext tooltipContext, List<Component> components, TooltipFlag tooltipFlag) {
-		super.appendHoverText(itemStack, tooltipContext, components, tooltipFlag);
-		components.add(CommonComponents.EMPTY);
-		components.add(Component.translatable("tooltip." + EternalStarlight.ID + ".seeking_eye.target").withStyle(ChatFormatting.GRAY));
-		components.add(Component.literal(" ").append(Component.translatable("tooltip." + EternalStarlight.ID + ".seeking_eye.associated_item")).withStyle(ChatFormatting.BLUE));
+	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+		super.appendHoverText(stack, level, tooltip, flag);
+
+		tooltip.add(CommonComponents.EMPTY);
+		tooltip.add(
+			Component.translatable("tooltip." + EternalStarlight.ID + ".seeking_eye.target")
+				.withStyle(ChatFormatting.GRAY)
+		);
+
+		tooltip.add(
+			Component.literal(" ")
+				.append(Component.translatable("tooltip." + EternalStarlight.ID + ".seeking_eye.associated_item")
+					.withStyle(s -> s.withColor(0x0000FF))) // BLUE
+		);
 	}
 }

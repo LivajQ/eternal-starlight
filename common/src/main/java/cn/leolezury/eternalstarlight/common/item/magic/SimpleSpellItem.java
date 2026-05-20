@@ -8,7 +8,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +28,7 @@ public class SimpleSpellItem extends Item {
 	}
 
 	@Override
-	public int getUseDuration(ItemStack itemStack, LivingEntity entity) {
+	public int getUseDuration(ItemStack itemStack) {
 		return 72000;
 	}
 
@@ -37,7 +36,8 @@ public class SimpleSpellItem extends Item {
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
 		ItemStack itemStack = player.getItemInHand(interactionHand);
 		if (!level.isClientSide && spell.value().canCast(player, false)) {
-			itemStack.hurtAndBreak(1, player, player.getUsedItemHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+			EquipmentSlot slot = player.getUsedItemHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+			itemStack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(slot));
 			if (player instanceof SpellCaster) {
 				ESDataAttachments.SPELL_SOURCE.setData(player, new SpellCastData.ItemSpellSource(this, interactionHand));
 			}

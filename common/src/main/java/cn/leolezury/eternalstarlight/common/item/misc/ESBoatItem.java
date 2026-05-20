@@ -62,7 +62,7 @@ public class ESBoatItem extends Item {
 					if (!level.isClientSide()) {
 						level.addFreshEntity(boat);
 						level.gameEvent(player, GameEvent.ENTITY_PLACE, result.getLocation());
-						itemStack.consume(1, player);
+						itemStack.shrink(1);
 					}
 
 					player.awardStat(Stats.ITEM_USED.get(this));

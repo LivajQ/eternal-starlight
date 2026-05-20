@@ -1,5 +1,6 @@
 package cn.leolezury.eternalstarlight.common.item.component;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.AbstractList;
@@ -39,15 +40,45 @@ public class ItemStackList extends AbstractList<ItemStack> {
 
 	@Override
 	public boolean equals(Object other) {
-		if (this == other) {
-			return true;
-		} else {
-			return other instanceof ItemStackList stacks && ItemStack.listMatches(this.list, stacks.list);
-		}
+		if (this == other) return true;
+		if (!(other instanceof ItemStackList stacks)) return false;
+		return stacksEqual(this.list, stacks.list);
 	}
 
 	@Override
 	public int hashCode() {
-		return ItemStack.hashStackList(this.list);
+		return hashStacks(this.list);
+	}
+
+	private static boolean stacksEqual(List<ItemStack> a, List<ItemStack> b) {
+		if (a.size() != b.size()) return false;
+
+		for (int i = 0; i < a.size(); i++) {
+			if (!ItemStack.isSameItemSameTags(a.get(i), b.get(i))) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private static int hashStacks(List<ItemStack> list) {
+		int hash = 1;
+
+		for (ItemStack stack : list) {
+			int stackHash = 0;
+
+			if (!stack.isEmpty()) {
+				stackHash = Item.getId(stack.getItem());
+				if (stack.hasTag()) {
+					stackHash = 31 * stackHash + stack.getTag().hashCode();
+				}
+				stackHash = 31 * stackHash + stack.getCount();
+			}
+
+			hash = 31 * hash + stackHash;
+		}
+
+		return hash;
 	}
 }
