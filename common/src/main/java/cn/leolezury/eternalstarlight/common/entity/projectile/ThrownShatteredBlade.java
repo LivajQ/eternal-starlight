@@ -4,7 +4,6 @@ import cn.leolezury.eternalstarlight.common.data.ESDamageTypes;
 import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -26,13 +25,15 @@ public class ThrownShatteredBlade extends AbstractArrow {
 	private static final String TAG_DEALT_DAMAGE = "dealt_damage";
 
 	private boolean dealtDamage;
+	private ItemStack weaponItem = ItemStack.EMPTY;
 
 	public ThrownShatteredBlade(EntityType<? extends ThrownShatteredBlade> entityType, Level level) {
 		super(entityType, level);
 	}
 
-	public ThrownShatteredBlade(Level level, LivingEntity livingEntity, @Nullable ItemStack weapon) {
-		super(ESEntities.SHATTERED_BLADE.get(), livingEntity, level, new ItemStack(ESItems.SHATTERED_SWORD_BLADE.get()), weapon);
+	public ThrownShatteredBlade(Level level, LivingEntity owner, @Nullable ItemStack weapon) {
+		super(ESEntities.SHATTERED_BLADE.get(), owner, level);
+		if (weapon != null) this.weaponItem = weapon.copy();
 	}
 
 	@Override
@@ -86,31 +87,54 @@ public class ThrownShatteredBlade extends AbstractArrow {
 	protected void onHitEntity(EntityHitResult entityHitResult) {
 		Entity entity = entityHitResult.getEntity();
 		Entity owner = this.getOwner();
-		float damage = owner instanceof LivingEntity living && living.getAttribute(Attributes.ATTACK_DAMAGE) != null ? (float) living.getAttributeValue(Attributes.ATTACK_DAMAGE) : 5;
-		DamageSource damageSource = ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.SHATTERED_BLADE, this, owner == null ? this : owner);
 
-		if (level() instanceof ServerLevel serverLevel && this.getWeaponItem() != null) {
-			damage = EnchantmentHelper.modifyDamage(serverLevel, this.getWeaponItem(), entity, damageSource, damage);
+		float damage = 5.0F;
+		if (owner instanceof LivingEntity living && living.getAttribute(Attributes.ATTACK_DAMAGE) != null) {
+			damage = (float) living.getAttributeValue(Attributes.ATTACK_DAMAGE);
+		}
+
+		DamageSource damageSource = ESDamageTypes.getIndirectEntityDamageSource(
+			level(),
+			ESDamageTypes.SHATTERED_BLADE,
+			this,
+			owner == null ? this : owner
+		);
+
+		if (!this.weaponItem.isEmpty() && entity instanceof LivingEntity livingTarget) {
+			damage += EnchantmentHelper.getDamageBonus(this.weaponItem, livingTarget.getMobType());
 		}
 
 		this.dealtDamage = true;
+
 		if (entity.hurt(damageSource, damage)) {
 			if (entity.getType() == EntityType.ENDERMAN) {
 				return;
 			}
-			if (level() instanceof ServerLevel serverLevel) {
-				// so that we can trigger melee-only effects
-				DamageSource directSource = getOwner() instanceof Player player ? this.damageSources().playerAttack(player) : (getOwner() instanceof LivingEntity living ? damageSources().mobAttack(living) : damageSource);
-				EnchantmentHelper.doPostAttackEffectsWithItemSource(serverLevel, entity, directSource, this.getWeaponItem());
+
+			if (entity instanceof LivingEntity livingTarget && owner instanceof LivingEntity livingOwner) {
+				EnchantmentHelper.doPostHurtEffects(livingTarget, livingOwner);
+				EnchantmentHelper.doPostDamageEffects(livingOwner, livingTarget);
 			}
+
 			if (entity instanceof LivingEntity livingEntity) {
-				this.doKnockback(livingEntity, damageSource);
+				this.applyKnockback(livingEntity, 0.4F);
 				this.doPostHurtEffects(livingEntity);
 			}
 		}
 
 		this.setDeltaMovement(this.getDeltaMovement().multiply(-0.01, -0.1, -0.01));
 		this.playSound(SoundEvents.PLAYER_ATTACK_CRIT, 1.0F, 1.0F);
+	}
+
+	protected void applyKnockback(LivingEntity target, float strength) {
+		Vec3 motion = this.getDeltaMovement();
+		if (motion.lengthSqr() == 0.0) {
+			return;
+		}
+
+		Vec3 norm = motion.normalize().scale(strength);
+		target.push(norm.x, 0.1F, norm.z);
+		target.hurtMarked = true;
 	}
 
 	@Override
@@ -124,7 +148,7 @@ public class ThrownShatteredBlade extends AbstractArrow {
 	}
 
 	@Override
-	protected ItemStack getDefaultPickupItem() {
+	protected ItemStack getPickupItem() {
 		return ESItems.SHATTERED_SWORD_BLADE.get().getDefaultInstance();
 	}
 

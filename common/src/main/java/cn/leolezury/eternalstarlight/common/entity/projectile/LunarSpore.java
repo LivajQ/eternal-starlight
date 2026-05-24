@@ -9,11 +9,11 @@ import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import cn.leolezury.eternalstarlight.common.util.ESEntityUtil;
 import cn.leolezury.eternalstarlight.common.util.TrailEffect;
 import cn.leolezury.eternalstarlight.common.vfx.ScreenShakeVfx;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -50,7 +50,7 @@ public class LunarSpore extends ThrowableProjectile implements TrailOwner {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+	protected void defineSynchedData() {
 
 	}
 
@@ -72,7 +72,7 @@ public class LunarSpore extends ThrowableProjectile implements TrailOwner {
 	}
 
 	private void explodeAndDiscard() {
-		playSound(SoundEvents.GENERIC_EXPLODE.value());
+		playSound(SoundEvents.GENERIC_EXPLODE);
 		if (level() instanceof ServerLevel serverLevel) {
 			for (int i = 0; i < 4; i++) {
 				Vec3 vec3 = new Vec3(this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth());
@@ -97,10 +97,14 @@ public class LunarSpore extends ThrowableProjectile implements TrailOwner {
 
 	@Override
 	public TrailEffect createNewTrail() {
-		return new TrailEffect(0.4f, switch (getOwner()) {
-			case LunarMonstrosity ignored -> 15;
-			case null, default -> 12;
-		});
+		int length = 12;
+
+		Entity owner = getOwner();
+		if (owner instanceof LunarMonstrosity) {
+			length = 15;
+		}
+
+		return new TrailEffect(0.4f, length);
 	}
 
 	@Override

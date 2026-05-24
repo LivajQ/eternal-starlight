@@ -31,13 +31,13 @@ public class ThrownEnergyBoomerang extends ThrownBoomerang {
 		super.doPostHurtEffects(livingEntity);
 		Entity owner = getOwner();
 		ItemStack weapon = getWeaponItem();
-		livingEntity.igniteForSeconds(2);
+		livingEntity.setSecondsOnFire(2);
 		if ((owner == null || weapon == null || !SpecialItemCooldown.isOnCooldown(owner, weapon.getItem())) && level() instanceof ServerLevel serverLevel) {
 			for (LivingEntity living : level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(2))) {
 				if (ESEntityUtil.shouldHarm(getOwner(), living) && living != livingEntity) {
 					living.invulnerableTime = 0;
 					if (living.hurt(ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.ELECTRIC_SHOCK, this, getOwner()), 8)) {
-						living.igniteForSeconds(2);
+						living.setSecondsOnFire(2);
 						Vec3 speed = living.position().add((random.nextDouble() - 0.5) * living.getBbWidth(), random.nextDouble() * living.getBbHeight(), (random.nextDouble() - 0.5) * living.getBbWidth()).subtract(position());
 						ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ESParticles.ELECTRIC_SPARK.get(), getX(), getY(), getZ(), speed.x, speed.y, speed.z));
 					}
@@ -50,7 +50,7 @@ public class ThrownEnergyBoomerang extends ThrownBoomerang {
 	}
 
 	@Override
-	protected ItemStack getDefaultPickupItem() {
+	protected ItemStack getPickupItem() {
 		return ESItems.ENERGY_BOOMERANG.get().getDefaultInstance();
 	}
 }

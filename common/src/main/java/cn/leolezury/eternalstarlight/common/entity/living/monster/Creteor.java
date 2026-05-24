@@ -102,12 +102,12 @@ public class Creteor extends Monster implements PowerableMob {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(ACTIVATED, false)
-			.define(IGNITED, false)
-			.define(POWERED, false)
-			.define(SWELL, 0);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(ACTIVATED, false);
+		this.entityData.define(IGNITED, false);
+		this.entityData.define(POWERED, false);
+		this.entityData.define(SWELL, 0);
 	}
 
 	@Override
@@ -239,7 +239,7 @@ public class Creteor extends Monster implements PowerableMob {
 				if (!itemStack.isDamageableItem()) {
 					itemStack.shrink(1);
 				} else {
-					itemStack.hurtAndBreak(1, player, getSlotForHand(interactionHand));
+					itemStack.hurtAndBreak(1, player, p -> getEquipmentSlotForItem(itemStack));
 				}
 			}
 
@@ -262,7 +262,7 @@ public class Creteor extends Monster implements PowerableMob {
 			}
 			playSound(ESSoundEvents.CRETEOR_EXPLODE.get());
 			this.spawnLingeringCloud();
-			this.triggerOnDeathMobEffects(RemovalReason.KILLED);
+			//this.triggerOnDeathMobEffects(RemovalReason.KILLED);
 			this.discard();
 			if (ESConfig.INSTANCE.mobsConfig.tinyCreteor.canSpawn()) {
 				int splitCount = getRandom().nextInt(2, 5);

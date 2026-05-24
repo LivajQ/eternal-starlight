@@ -223,12 +223,11 @@ public class TangledSkull extends Monster {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(CHARGING, false)
-			.define(SHOT, false)
-			.define(SHOT_FROM_MONSTROSITY, false)
-			.define(SHOT_MOVEMENT, Vec3.ZERO.toVector3f());
+	protected void defineSynchedData() {
+		this.entityData.define(CHARGING, false);
+		this.entityData.define(SHOT, false);
+		this.entityData.define(SHOT_FROM_MONSTROSITY, false);
+		this.entityData.define(SHOT_MOVEMENT, Vec3.ZERO.toVector3f());
 	}
 
 	@Override

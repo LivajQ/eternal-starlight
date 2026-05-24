@@ -186,7 +186,7 @@ public class ESBoss extends Monster implements MultiBehaviorUser {
 	}
 
 	@Override
-	public boolean canChangeDimensions(Level level, Level level1) {
+	public boolean canChangeDimensions() {
 		return false;
 	}
 

@@ -11,11 +11,11 @@ import cn.leolezury.eternalstarlight.common.util.ESMathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -53,7 +53,7 @@ public class Seeker extends Monster implements VariantHolder<Holder<SeekerVarian
 	protected static final EntityDataAccessor<String> VARIANT = SynchedEntityData.defineId(Seeker.class, EntityDataSerializers.STRING);
 
 	public ResourceLocation getVariantId() {
-		return ResourceLocation.parse(this.getEntityData().get(VARIANT));
+		return new ResourceLocation(this.getEntityData().get(VARIANT));
 	}
 
 	public void setVariantId(ResourceLocation variant) {
@@ -74,7 +74,9 @@ public class Seeker extends Monster implements VariantHolder<Holder<SeekerVarian
 	public Holder<SeekerVariant> getVariant() {
 		ResourceLocation key = getVariantId();
 		Registry<SeekerVariant> variants = level().registryAccess().registryOrThrow(ESRegistries.SEEKER_VARIANT);
-		Optional<Holder.Reference<SeekerVariant>> optional = variants.getHolder(key);
+		ResourceKey<SeekerVariant> variantKey = ResourceKey.create(ESRegistries.SEEKER_VARIANT, key);
+		Optional<Holder.Reference<SeekerVariant>> optional = variants.getHolder(variantKey);
+
 		return optional.orElse(variants.getHolder(ESSeekerVariants.LUNAR).orElseThrow());
 	}
 
@@ -112,11 +114,11 @@ public class Seeker extends Monster implements VariantHolder<Holder<SeekerVarian
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(VARIANT, ESSeekerVariants.LUNAR.location().toString())
-			.define(SEEKER_X_ROT, 0f)
-			.define(SEEKER_Y_ROT, 0f);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(VARIANT, ESSeekerVariants.LUNAR.location().toString());
+		this.entityData.define(SEEKER_X_ROT, 0f);
+		this.entityData.define(SEEKER_Y_ROT, 0f);
 	}
 
 	@Override
@@ -276,9 +278,9 @@ public class Seeker extends Monster implements VariantHolder<Holder<SeekerVarian
 	}
 
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
 		setVariant(SeekerVariant.getSpawnVariant(level.registryAccess(), level.getBiome(blockPosition())));
-		return super.finalizeSpawn(level, instance, spawnType, data);
+		return super.finalizeSpawn(level, instance, spawnType, data, tag);
 	}
 
 	@Override
@@ -294,7 +296,7 @@ public class Seeker extends Monster implements VariantHolder<Holder<SeekerVarian
 	@Override
 	public void readAdditionalSaveData(CompoundTag compoundTag) {
 		super.readAdditionalSaveData(compoundTag);
-		setVariantId(ResourceLocation.read(compoundTag.getString(TAG_VARIANT)).getOrThrow());
+		setVariantId(new ResourceLocation(compoundTag.getString(TAG_VARIANT)));
 	}
 
 	@Override

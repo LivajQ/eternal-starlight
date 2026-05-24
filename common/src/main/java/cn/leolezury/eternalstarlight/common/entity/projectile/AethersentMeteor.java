@@ -135,9 +135,9 @@ public class AethersentMeteor extends AbstractHurtingProjectile implements Trail
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(SIZE, 0);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(SIZE, 0);
 	}
 
 	@Override
@@ -217,7 +217,7 @@ public class AethersentMeteor extends AbstractHurtingProjectile implements Trail
 			}
 			if (natural || (getTarget() == null && targetPos == null) || (getTarget() != null && getY() <= (getTarget().getY() + getTarget().getBbHeight())) || (targetPos != null && getY() <= targetPos.y + 1)) {
 				if (natural) {
-					playSound(SoundEvents.GENERIC_EXPLODE.value(), getSoundVolume(), getVoicePitch());
+					playSound(SoundEvents.GENERIC_EXPLODE, getSoundVolume(), getVoicePitch());
 				}
 				if (!level().isClientSide && level() instanceof ServerLevel serverLevel) {
 					for (LivingEntity livingEntity : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(getSize(), 0, getSize()))) {
@@ -251,9 +251,9 @@ public class AethersentMeteor extends AbstractHurtingProjectile implements Trail
 			}
 		} else {
 			oXSpin = xSpin;
-			xSpin += Mth.PI * (0.03f + getRandom().nextFloat() * 0.02f);
+			xSpin += Mth.PI * (0.03f + level().getRandom().nextFloat() * 0.02f);
 			oYSpin = ySpin;
-			ySpin += Mth.PI * (0.03f + getRandom().nextFloat() * 0.02f);
+			ySpin += Mth.PI * (0.03f + level().getRandom().nextFloat() * 0.02f);
 		}
 	}
 

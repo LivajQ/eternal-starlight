@@ -65,9 +65,9 @@ public class BallLightning extends ThrowableProjectile implements TrailOwner {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(SPAWNED_TICKS, 0)
-			.define(TARGET_ID, -1);
+	protected void defineSynchedData() {
+		this.entityData.define(SPAWNED_TICKS, 0);
+		this.entityData.define(TARGET_ID, -1);
 	}
 
 	private Entity target;
@@ -114,7 +114,7 @@ public class BallLightning extends ThrowableProjectile implements TrailOwner {
 				ESEntityUtil.RaytraceResult result = ESEntityUtil.raytrace(level(), CollisionContext.of(this), position().add(0, getBbHeight() / 2, 0), target.position().add(0, target.getBbHeight() / 2, 0));
 				for (Entity entity : result.entities()) {
 					if (entity instanceof LivingEntity && ESEntityUtil.shouldHarm(getOwner(), entity) && entity.hurt(ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.ELECTRIC_SHOCK, this, getOwner()), 8)) {
-						entity.igniteForSeconds(2);
+						entity.setSecondsOnFire(2);
 					}
 				}
 			}
@@ -134,8 +134,8 @@ public class BallLightning extends ThrowableProjectile implements TrailOwner {
 	}
 
 	@Override
-	protected void applyGravity() {
-
+	protected float getGravity() {
+		return 0.0F;
 	}
 
 	@Override
@@ -154,7 +154,7 @@ public class BallLightning extends ThrowableProjectile implements TrailOwner {
 	}
 
 	private void explodeAndDiscard() {
-		playSound(SoundEvents.GENERIC_EXPLODE.value());
+		playSound(SoundEvents.GENERIC_EXPLODE);
 		if (level() instanceof ServerLevel serverLevel) {
 			serverLevel.sendParticles(ESExplosionParticleOptions.ENERGY, getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
 			for (int i = 0; i < 20; i++) {

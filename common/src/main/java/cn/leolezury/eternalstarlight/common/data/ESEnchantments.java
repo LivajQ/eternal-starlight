@@ -7,7 +7,10 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import org.apache.commons.lang3.mutable.MutableFloat;
 
 public final class ESEnchantments {
 	public static final ResourceKey<Enchantment> POISONING      = create("poisoning");
@@ -45,4 +48,23 @@ public final class ESEnchantments {
 		Registry.register(BuiltInRegistries.ENCHANTMENT, SWIFT_LASH.location(),     new SwiftLashEnchantment());
 		Registry.register(BuiltInRegistries.ENCHANTMENT, ABYSSAL_TOUCH.location(),  new AbyssalTouchEnchantment());
 	}
+
+	public static float modifyBoomerangCritChance(ItemStack tool, float base) {
+		float result = base;
+		result += PrecisionEnchantment.getCritChanceBonus(tool);
+		return result;
+	}
+
+	public static float modifyBoomerangHomingStrength(ItemStack tool, float base) {
+		float result = base;
+		result += HomingEnchantment.getHomingBonus(tool);
+		return result;
+	}
+
+	public static float modifyBoomerangPickupRadius(ItemStack tool, float base) {
+		float result = base;
+		result += GatheringEnchantment.getPickupRadiusBonus(tool);
+		return result;
+	}
+
 }

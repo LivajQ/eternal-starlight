@@ -13,7 +13,6 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -78,7 +77,7 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 	protected static final EntityDataAccessor<String> MATERIAL = SynchedEntityData.defineId(AstralGolem.class, EntityDataSerializers.STRING);
 
 	public ResourceLocation getMaterialId() {
-		return ResourceLocation.parse(this.getEntityData().get(MATERIAL));
+		return new ResourceLocation(this.getEntityData().get(MATERIAL));
 	}
 
 	public void setMaterialId(ResourceLocation material) {
@@ -96,16 +95,16 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(MATERIAL, "null")
-			.define(BLOCKING, false);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(MATERIAL, "null");
+		this.entityData.define(BLOCKING, false);
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag compoundTag) {
 		super.readAdditionalSaveData(compoundTag);
-		setMaterialId(ResourceLocation.read(compoundTag.getString(TAG_MATERIAL)).getOrThrow());
+		setMaterialId(ResourceLocation.read(compoundTag.getString(TAG_MATERIAL)).getOrThrow(false, msg -> { throw new RuntimeException(msg); }));
 		homePos = new BlockPos(compoundTag.getInt(TAG_HOME_X), compoundTag.getInt(TAG_HOME_Y), compoundTag.getInt(TAG_HOME_Z));
 	}
 
@@ -146,9 +145,9 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 
 	@Nullable
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @org.jetbrains.annotations.Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
 		homePos = blockPosition();
-		return super.finalizeSpawn(level, instance, spawnType, data);
+		return super.finalizeSpawn(level, instance, spawnType, data, tag);
 	}
 
 	public AstralGolemMaterial getMaterial() {
@@ -181,7 +180,7 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 			} else {
 				float f1 = 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F;
 				this.playSound(ESSoundEvents.ASTRAL_GOLEM_REPAIR.get(), 1.0F, f1);
-				if (!player.hasInfiniteMaterials()) {
+				if (!player.getAbilities().instabuild) {
 					itemstack.shrink(1);
 					Boarwarf.setBoarwarfCredit(player, Boarwarf.getBoarwarfCredit(player) + 10);
 				}
@@ -234,32 +233,38 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 		if (isGolemBlocking()) {
 			return false;
 		}
+
 		this.attackAnimationTick = 10;
-		this.level().broadcastEntityEvent(this, (byte) 4);
+		this.level().broadcastEntityEvent(this, (byte)4);
+
 		float f = getAttackDamage();
 		DamageSource damageSource = this.damageSources().mobAttack(this);
-		Level var5 = this.level();
-		if (var5 instanceof ServerLevel serverLevel) {
-			f = EnchantmentHelper.modifyDamage(serverLevel, this.getWeaponItem(), target, damageSource, f);
-		}
+
+		MobType mobType = target instanceof LivingEntity living ? living.getMobType() : MobType.UNDEFINED;
+		f += EnchantmentHelper.getDamageBonus(this.getMainHandItem(), mobType);
 
 		boolean bl = target.hurt(damageSource, f);
 		if (bl) {
-			float g = this.getKnockback(target, damageSource);
-			if (g > 0.0F && target instanceof LivingEntity) {
-				LivingEntity livingEntity = (LivingEntity) target;
-				livingEntity.knockback(g * 0.5F, Mth.sin(this.getYRot() * 0.017453292F), -Mth.cos(this.getYRot() * 0.017453292F));
+			float g = (float)this.getAttributeValue(Attributes.ATTACK_KNOCKBACK);
+			g += EnchantmentHelper.getKnockbackBonus(this);
+
+			if (g > 0.0F && target instanceof LivingEntity living) {
+				living.knockback(
+					g * 0.5F,
+					Mth.sin(this.getYRot() * 0.017453292F),
+					-Mth.cos(this.getYRot() * 0.017453292F)
+				);
 				this.setDeltaMovement(this.getDeltaMovement().multiply(0.6, 1.0, 0.6));
 			}
 
-			Level var7 = this.level();
-			if (var7 instanceof ServerLevel) {
-				ServerLevel serverLevel2 = (ServerLevel) var7;
-				EnchantmentHelper.doPostAttackEffects(serverLevel2, target, damageSource);
+			if (target instanceof LivingEntity livingTarget) {
+				EnchantmentHelper.doPostHurtEffects(livingTarget, this);
 			}
+			EnchantmentHelper.doPostDamageEffects(this, target);
 
 			this.setLastHurtMob(target);
-			this.playAttackSound();
+
+			this.playSound(SoundEvents.IRON_GOLEM_ATTACK, 1.0F, 1.0F);
 		}
 
 		return bl;
@@ -268,7 +273,7 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 	@Override
 	public boolean hurt(DamageSource source, float amount) {
 		float f = getMaterial() == null ? 1 : getMaterial().defenseMultiplier();
-		if (source.getEntity() instanceof Player player && !player.hasInfiniteMaterials()) {
+		if (source.getEntity() instanceof Player player && !player.getAbilities().instabuild) {
 			if (Boarwarf.getBoarwarfCredit(player) > -10000) {
 				Boarwarf.setBoarwarfCredit(player, (int) (Boarwarf.getBoarwarfCredit(player) - amount));
 			}
@@ -278,7 +283,7 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 
 	@Override
 	public void die(DamageSource source) {
-		if (source.getEntity() instanceof Player player && !player.hasInfiniteMaterials()) {
+		if (source.getEntity() instanceof Player player && !player.getAbilities().instabuild) {
 			if (Boarwarf.getBoarwarfCredit(player) > -10000) {
 				Boarwarf.setBoarwarfCredit(player, Boarwarf.getBoarwarfCredit(player) - 10);
 			}

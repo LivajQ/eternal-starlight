@@ -35,7 +35,7 @@ public class GatekeeperFireball extends Fireball implements TrailOwner {
 	}
 
 	public GatekeeperFireball(Level level, LivingEntity livingEntity, Vec3 motion) {
-		super(ESEntities.GATEKEEPER_FIREBALL.get(), livingEntity, motion, level);
+		super(ESEntities.GATEKEEPER_FIREBALL.get(), livingEntity, motion.x, motion.y, motion.z, level);
 	}
 
 	protected static final EntityDataAccessor<Integer> SPAWNED_TICKS = SynchedEntityData.defineId(GatekeeperFireball.class, EntityDataSerializers.INT);
@@ -49,9 +49,9 @@ public class GatekeeperFireball extends Fireball implements TrailOwner {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(SPAWNED_TICKS, 0);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(SPAWNED_TICKS, 0);
 	}
 
 	@Nullable

@@ -13,6 +13,7 @@ import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -48,7 +49,9 @@ public class FrozenBomb extends ThrowableItemProjectile {
 			}
 			serverLevel.sendParticles(ESExplosionParticleOptions.FROZEN, this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 10, 1.5, 1.5, 1.5, 0);
 			serverLevel.sendParticles(ESExplosionParticleOptions.FROZEN_BLAST, this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 3, 0.2, 0.2, 0.2, 0.0);
-			level().explode(this, null, null, this.getX(), this.getY(), this.getZ(), 3, false, Level.ExplosionInteraction.TNT, ESExplosionParticleOptions.FROZEN, ESExplosionParticleOptions.FROZEN, SoundEvents.GENERIC_EXPLODE);
+			level().explode(this, this.getX(), this.getY(), this.getZ(), 3.0F, Level.ExplosionInteraction.TNT);
+			level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.0F);
+			serverLevel.sendParticles(ESExplosionParticleOptions.FROZEN, this.getX(), this.getY(), this.getZ(), 20, 0.5, 0.5, 0.5, 0.1);
 			for (LivingEntity entity : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(3))) {
 				if (ESEntityUtil.shouldHarm(getOwner(), entity)) {
 					if (entity.canFreeze()) {

@@ -6,7 +6,6 @@ import cn.leolezury.eternalstarlight.common.item.combat.ShatteredSwordItem;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
@@ -54,15 +53,18 @@ public class LonestarSkeleton extends Skeleton {
 
 	@Nullable
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
-		SpawnGroupData data = super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData);
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
+		SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnData, dataTag);
 		Arrays.fill(this.handDropChances, 0.2F);
+
 		if (!getItemBySlot(EquipmentSlot.HEAD).isEmpty() || random.nextInt(5) == 0) {
 			setItemSlot(EquipmentSlot.HEAD, ESItems.AMARAMBER_MASK.get().getDefaultInstance());
 		}
+
 		if (!getItemBySlot(EquipmentSlot.CHEST).isEmpty() || random.nextInt(5) == 0) {
 			setItemSlot(EquipmentSlot.CHEST, ESItems.AMARAMBER_CHESTPLATE.get().getDefaultInstance());
 		}
+
 		return data;
 	}
 
@@ -77,13 +79,13 @@ public class LonestarSkeleton extends Skeleton {
 		return -0.7F;
 	}
 
-
 	@Override
-	protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource damageSource, boolean bl) {
+	protected void dropCustomDeathLoot(DamageSource source, int lootingLevel, boolean recentlyHit) {
 		if (getMainHandItem().is(ESItems.SHATTERED_SWORD.get())) {
 			ShatteredSwordItem.setHasBlade(getMainHandItem(), true);
 		}
-		super.dropCustomDeathLoot(serverLevel, damageSource, bl);
+
+		super.dropCustomDeathLoot(source, lootingLevel, recentlyHit);
 	}
 
 	@Override

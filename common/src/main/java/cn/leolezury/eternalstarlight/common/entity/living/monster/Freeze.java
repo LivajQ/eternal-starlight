@@ -61,10 +61,10 @@ public class Freeze extends Monster implements RangedAttackMob {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(ATTACKING, false)
-			.define(ATTACK_TICKS, 0);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(ATTACKING, false);
+		this.entityData.define(ATTACK_TICKS, 0);
 	}
 
 	@Override
@@ -184,7 +184,7 @@ public class Freeze extends Monster implements RangedAttackMob {
 			if (!onGround()) {
 				Vec3 pos = position().add(0, getBbHeight() / 20f * 12f, 0);
 				for (int i = 0; i < 5; i++) {
-					level().addParticle(ParticleTypes.WHITE_SMOKE, pos.x + (getBbWidth() / 2f) * (getRandom().nextFloat() - 0.5f), pos.y, pos.z + (getBbWidth() / 2f) * (getRandom().nextFloat() - 0.5f), 0, -0.15, 0);
+					level().addParticle(ParticleTypes.SMOKE, pos.x + (getBbWidth() / 2f) * (getRandom().nextFloat() - 0.5f), pos.y, pos.z + (getBbWidth() / 2f) * (getRandom().nextFloat() - 0.5f), 0, -0.15, 0);
 				}
 			}
 			idleAnimationState.startIfStopped(tickCount);

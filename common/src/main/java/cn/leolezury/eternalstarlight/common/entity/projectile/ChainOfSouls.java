@@ -34,7 +34,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,21 +86,16 @@ public class ChainOfSouls extends Projectile implements Grappling {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(REACHED_TARGET, false)
-			.define(LENGTH, 0.0F)
-			.define(TIP_DIRECTION, Direction.DOWN)
-			.define(TARGET_ID, -1);
+	protected void defineSynchedData() {
+		this.entityData.define(REACHED_TARGET, false);
+		this.entityData.define(LENGTH, 0.0F);
+		this.entityData.define(TIP_DIRECTION, Direction.DOWN);
+		this.entityData.define(TARGET_ID, -1);
 	}
 
 	@Override
 	public boolean shouldRenderAtSqrDistance(double d) {
 		return true;
-	}
-
-	@Override
-	protected double getDefaultGravity() {
-		return 0.05;
 	}
 
 	@Override
@@ -113,13 +107,14 @@ public class ChainOfSouls extends Projectile implements Grappling {
 	public void tick() {
 		super.tick();
 		Player player = this.getPlayerOwner();
+
 		if (!level().isClientSide) {
+
 			if (target == null && targetId != null && level() instanceof ServerLevel serverLevel) {
 				Entity entity = serverLevel.getEntity(targetId);
 				if (entity != null) {
 					target = entity;
-				}
-				if (target == null) {
+				} else {
 					targetId = null;
 				}
 			}
@@ -127,39 +122,55 @@ public class ChainOfSouls extends Projectile implements Grappling {
 			if (target != null) {
 				setTargetId(target.getId());
 				setDeltaMovement(Vec3.ZERO);
+
 				if (!isValidTarget(target)) {
 					target = null;
 					targetId = null;
 				} else {
 					Vec3 targetPos = target.position().add(0, target.getBbHeight() / 2, 0);
-
 					this.setPos(targetPos);
 
-					if (target instanceof LivingEntity && !(target instanceof ArmorStand) && level() instanceof ServerLevel serverLevel) {
+					if (target instanceof LivingEntity living && !(target instanceof ArmorStand) && level() instanceof ServerLevel serverLevel) {
 						Player playerOwner = getPlayerOwner();
 						if (playerOwner != null) {
+
 							float damage = (float) ESConfig.INSTANCE.itemsConfig.chainOfSouls.soulAbsorbDamage();
 							DamageSource damageSource = ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.SOUL_ABSORB, this, playerOwner);
+
 							if (getWeaponItem() != null) {
-								damage = EnchantmentHelper.modifyDamage(serverLevel, getWeaponItem(), target, damageSource, damage);
+								damage += EnchantmentHelper.getDamageBonus(getWeaponItem(), living.getMobType());
 							}
-							if (target.hurt(damageSource, damage)) {
-								EnchantmentHelper.doPostAttackEffects(serverLevel, target, damageSource);
-								playerOwner.heal((float) (damage * ESConfig.INSTANCE.itemsConfig.chainOfSouls.healPercentage()));
+
+							if (living.hurt(damageSource, damage)) {
+
+								EnchantmentHelper.doPostHurtEffects(living, playerOwner);
+								EnchantmentHelper.doPostDamageEffects(playerOwner, living);
+
+								playerOwner.heal((float)(damage * ESConfig.INSTANCE.itemsConfig.chainOfSouls.healPercentage()));
 								playSound(ESSoundEvents.CHAIN_OF_SOULS_ABSORB.get());
+
 								for (int i = 0; i < 7; i++) {
-									serverLevel.sendParticles(ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER_OMINOUS, target.getRandomX(1), target.getRandomY(), target.getRandomZ(1), 5, 0, 0, 0, 0);
+									serverLevel.sendParticles(ParticleTypes.SOUL,
+										target.getRandomX(1), target.getRandomY(), target.getRandomZ(1),
+										5, 0, 0, 0, 0);
 								}
+
 								for (int i = 0; i < 2; i++) {
 									Vec3 randomPlayerPos = new Vec3(playerOwner.getRandomX(1), playerOwner.getRandomY(), playerOwner.getRandomZ(1));
 									Vec3 randomTargetPos = new Vec3(target.getRandomX(1), target.getRandomY(), target.getRandomZ(1));
-									ESPlatform.INSTANCE.sendToTrackingClients(serverLevel, this, new ParticlePacket(GatheringTrailParticleOptions.SOUL_THIN, randomTargetPos.x, randomTargetPos.y, randomTargetPos.z, randomPlayerPos.x - randomTargetPos.x, randomPlayerPos.y - randomTargetPos.y, randomPlayerPos.z - randomTargetPos.z));
+									ESPlatform.INSTANCE.sendToTrackingClients(serverLevel, this,
+										new ParticlePacket(GatheringTrailParticleOptions.SOUL_THIN,
+											randomTargetPos.x, randomTargetPos.y, randomTargetPos.z,
+											randomPlayerPos.x - randomTargetPos.x,
+											randomPlayerPos.y - randomTargetPos.y,
+											randomPlayerPos.z - randomTargetPos.z));
 								}
 							}
 
 							if (!target.getType().is(ESTags.EntityTypes.CHAIN_OF_SOULS_CANNOT_PULL)) {
 								Vec3 ownerPos = playerOwner.position().add(0, playerOwner.getBbHeight() / 2, 0);
 								Vec3 posDiff = ownerPos.subtract(targetPos);
+
 								if (posDiff.length() > length() * 1.2f) {
 									double scale = 1.0 - Math.sqrt(Math.min(posDiff.lengthSqr(), 64 * 64)) / 64.0;
 									target.addDeltaMovement(posDiff.normalize().scale(scale * scale));
@@ -183,13 +194,15 @@ public class ChainOfSouls extends Projectile implements Grappling {
 				blockSupport.set(blockSupport.get()
 					|| level().getBlockState(pos).getCollisionShape(level(), pos).toAabbs().stream().anyMatch(box ->
 					box.move(pos).intersects(getBoundingBox()))));
+
 			if (reachedTarget() && target == null && !blockSupport.get()) {
-				applyGravity();
+				applyCustomGravity();
 			}
 		}
+
 		if (player != null && (this.level().isClientSide() || !this.shouldRetract(player))) {
 			HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
-			if (hitResult.getType() != Type.MISS && target == null) {
+			if (hitResult.getType() != HitResult.Type.MISS && target == null) {
 				this.onHit(hitResult);
 			}
 			if (target == null) {
@@ -201,8 +214,14 @@ public class ChainOfSouls extends Projectile implements Grappling {
 		}
 	}
 
+	private void applyCustomGravity() {
+		if (!this.isNoGravity()) {
+			this.setDeltaMovement(this.getDeltaMovement().add(0, -0.03, 0));
+		}
+	}
+
 	private boolean shouldRetract(Player player) {
-		if (!player.isRemoved() && player.isAlive() && (firedFromWeapon != null && (ItemStack.isSameItemSameComponents(player.getMainHandItem(), firedFromWeapon) || ItemStack.isSameItemSameComponents(player.getOffhandItem(), firedFromWeapon))) && !(this.distanceToSqr(player) > getMaxRange() * getMaxRange())) {
+		if (!player.isRemoved() && player.isAlive() && (firedFromWeapon != null && (ItemStack.isSameItemSameTags(player.getMainHandItem(), firedFromWeapon) || ItemStack.isSameItemSameTags(player.getOffhandItem(), firedFromWeapon))) && !(this.distanceToSqr(player) > getMaxRange() * getMaxRange())) {
 			return false;
 		} else {
 			this.discard();
@@ -253,7 +272,7 @@ public class ChainOfSouls extends Projectile implements Grappling {
 	}
 
 	@Nullable
-	@Override
+	//@Override
 	public ItemStack getWeaponItem() {
 		return firedFromWeapon;
 	}
@@ -264,11 +283,13 @@ public class ChainOfSouls extends Projectile implements Grappling {
 		compoundTag.putBoolean(TAG_REACHED_TARGET, this.reachedTarget());
 		compoundTag.putFloat(TAG_LENGTH, this.length());
 		compoundTag.putInt(TAG_TIP_DIRECTION, getTipDirection().get3DDataValue());
+
 		if (target != null) {
 			compoundTag.putUUID(TAG_TARGET, target.getUUID());
 		}
+
 		if (this.firedFromWeapon != null && !this.firedFromWeapon.isEmpty()) {
-			compoundTag.put(TAG_WEAPON, firedFromWeapon.save(registryAccess(), new CompoundTag()));
+			compoundTag.put(TAG_WEAPON, this.firedFromWeapon.save(new CompoundTag()));
 		}
 	}
 
@@ -278,13 +299,15 @@ public class ChainOfSouls extends Projectile implements Grappling {
 		this.setReachedTarget(compoundTag.getBoolean(TAG_REACHED_TARGET));
 		this.setLength(compoundTag.getFloat(TAG_LENGTH));
 		this.setTipDirection(Direction.from3DDataValue(compoundTag.getInt(TAG_TIP_DIRECTION)));
+
 		if (compoundTag.hasUUID(TAG_TARGET)) {
 			targetId = compoundTag.getUUID(TAG_TARGET);
 		}
+
 		if (compoundTag.contains(TAG_WEAPON, CompoundTag.TAG_COMPOUND)) {
-			firedFromWeapon = ItemStack.parse(registryAccess(), compoundTag.getCompound(TAG_WEAPON)).orElse(null);
+			this.firedFromWeapon = ItemStack.of(compoundTag.getCompound(TAG_WEAPON));
 		} else {
-			firedFromWeapon = null;
+			this.firedFromWeapon = null;
 		}
 	}
 
@@ -358,7 +381,7 @@ public class ChainOfSouls extends Projectile implements Grappling {
 	}
 
 	@Override
-	public boolean canChangeDimensions(Level level, Level level2) {
+	public boolean canChangeDimensions() {
 		return false;
 	}
 

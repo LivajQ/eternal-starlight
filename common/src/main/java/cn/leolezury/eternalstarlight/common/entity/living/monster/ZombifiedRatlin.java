@@ -61,7 +61,7 @@ public class ZombifiedRatlin extends Ratlin {
 	public void aiStep() {
 		super.aiStep();
 		if (this.isAlive() && this.isSunBurnTick()) {
-			this.igniteForSeconds(8.0F);
+			this.setSecondsOnFire(8);
 		}
 	}
 

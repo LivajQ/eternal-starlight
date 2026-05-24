@@ -42,7 +42,7 @@ public class SonarBomb extends ThrowableItemProjectile {
 			serverLevel.sendParticles(new ItemParticleOption(ParticleTypes.ITEM, getItem()), this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 5, 0.2, 0.2, 0.2, 0.0);
 			serverLevel.sendParticles(ParticleTypes.EXPLOSION, this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 3, 0.2, 0.2, 0.2, 0.0);
 			serverLevel.sendParticles(ParticleTypes.SMOKE, this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 2, 0.2, 0.2, 0.2, 0.0);
-			serverLevel.sendParticles(ParticleTypes.WHITE_SMOKE, this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 2, 0.2, 0.2, 0.2, 0.0);
+			serverLevel.sendParticles(ParticleTypes.SMOKE, this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 2, 0.2, 0.2, 0.2, 0.0);
 			for (LivingEntity livingEntity : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(20))) {
 				if (ESEntityUtil.shouldHarm(getOwner(), livingEntity)) {
 					livingEntity.hurt(level().damageSources().mobProjectile(this, getOwner() instanceof LivingEntity owner ? owner : null), livingEntity.getType().is(ESTags.EntityTypes.VULNERABLE_TO_SONAR_BOMB) ? 20 : 5);
@@ -50,7 +50,7 @@ public class SonarBomb extends ThrowableItemProjectile {
 					ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ESParticles.CRYSTALLIZED_MOTH_SONAR.get(), getX(), getY(), getZ(), delta.x, delta.y, delta.z));
 				}
 			}
-			playSound(SoundEvents.GENERIC_EXPLODE.value());
+			playSound(SoundEvents.GENERIC_EXPLODE);
 			playSound(ESSoundEvents.SONAR_BOMB_EXPLODE.get());
 			ScreenShakeVfx.createInstance(level().dimension(), position(), 30, 30, 0.15f, 0.24f, 4, 5).send(serverLevel);
 			discard();

@@ -141,7 +141,7 @@ public class LonestarSkeletonShootBladeGoal extends Goal {
 						ThrownShatteredBlade blade = new ThrownShatteredBlade(mob.level(), mob, this.mob.getMainHandItem());
 						blade.shootFromRotation(mob, mob.getXRot(), mob.getYRot(), 0.0F, 2.5F, 1.0F);
 						this.mob.level().addFreshEntity(blade);
-						this.mob.level().playSound(null, blade.blockPosition(), SoundEvents.TRIDENT_THROW.value(), SoundSource.HOSTILE);
+						this.mob.level().playSound(null, blade.blockPosition(), SoundEvents.TRIDENT_THROW, SoundSource.HOSTILE);
 						ItemStack stack = this.mob.getMainHandItem();
 						ShatteredSwordItem.setHasBlade(stack, false);
 						this.attackTime = this.attackIntervalMin;

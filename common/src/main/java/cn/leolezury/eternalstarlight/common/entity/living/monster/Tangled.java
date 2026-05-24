@@ -12,7 +12,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
@@ -83,11 +82,10 @@ public class Tangled extends Monster implements MultiBehaviorUser {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(BEHAVIOR_STATE, 0)
-			.define(BEHAVIOR_TICKS, 0)
-			.define(VARIANT, 0);
+	protected void defineSynchedData() {
+		this.entityData.define(BEHAVIOR_STATE, 0);
+		this.entityData.define(BEHAVIOR_TICKS, 0);
+		this.entityData.define(VARIANT, 0);
 	}
 
 	@Override
@@ -95,7 +93,7 @@ public class Tangled extends Monster implements MultiBehaviorUser {
 		this.goalSelector.addGoal(0, new FloatGoal(this));
 		this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0, false) {
 			@Override
-			protected void checkAndPerformAttack(LivingEntity livingEntity) {
+			protected void checkAndPerformAttack(LivingEntity target, double distanceToTarget) {
 
 			}
 		});
@@ -116,9 +114,10 @@ public class Tangled extends Monster implements MultiBehaviorUser {
 	}
 
 	@Nullable
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag dataTag) {
 		setVariant(random.nextInt(3));
-		return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
+		return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
 	}
 
 	@Override
@@ -202,9 +201,10 @@ public class Tangled extends Monster implements MultiBehaviorUser {
 	}
 
 	@Override
-	protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource damageSource, boolean bl) {
-		super.dropCustomDeathLoot(serverLevel, damageSource, bl);
-		Entity entity = damageSource.getEntity();
+	protected void dropCustomDeathLoot(DamageSource source, int lootingLevel, boolean recentlyHit) {
+		super.dropCustomDeathLoot(source, lootingLevel, recentlyHit);
+
+		Entity entity = source.getEntity();
 		if (entity instanceof Creeper creeper) {
 			if (creeper.canDropMobsSkull()) {
 				ItemStack itemStack = ESItems.TANGLED_SKULL.get().getDefaultInstance();

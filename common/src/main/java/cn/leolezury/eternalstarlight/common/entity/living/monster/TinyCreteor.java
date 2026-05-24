@@ -89,11 +89,10 @@ public class TinyCreteor extends Monster implements PowerableMob {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(IGNITED, false)
-			.define(POWERED, false)
-			.define(SWELL, 0);
+	protected void defineSynchedData() {
+		this.entityData.define(IGNITED, false);
+		this.entityData.define(POWERED, false);
+		this.entityData.define(SWELL, 0);
 	}
 
 	@Override
@@ -187,7 +186,9 @@ public class TinyCreteor extends Monster implements PowerableMob {
 				if (!itemStack.isDamageableItem()) {
 					itemStack.shrink(1);
 				} else {
-					itemStack.hurtAndBreak(1, player, getSlotForHand(interactionHand));
+					itemStack.hurtAndBreak(1, player, (p) -> {
+						p.broadcastBreakEvent(getEquipmentSlotForItem(itemStack));
+					});
 				}
 			}
 
@@ -209,7 +210,7 @@ public class TinyCreteor extends Monster implements PowerableMob {
 			}
 			playSound(ESSoundEvents.CRETEOR_EXPLODE.get());
 			this.spawnLingeringCloud();
-			this.triggerOnDeathMobEffects(RemovalReason.KILLED);
+			//this.triggerOnDeathMobEffects(RemovalReason.KILLED);
 			this.discard();
 		}
 	}

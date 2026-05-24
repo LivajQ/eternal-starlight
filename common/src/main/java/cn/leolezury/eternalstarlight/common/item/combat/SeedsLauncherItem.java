@@ -1,11 +1,27 @@
 package cn.leolezury.eternalstarlight.common.item.combat;
 
+import cn.leolezury.eternalstarlight.common.entity.projectile.ShotSeeds;
+import cn.leolezury.eternalstarlight.common.registry.ESParticles;
+import cn.leolezury.eternalstarlight.common.util.ESMathUtil;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileWeaponItem;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 
+//incredible mess
 public class SeedsLauncherItem extends ProjectileWeaponItem {
 	public SeedsLauncherItem(Properties properties) {
 		super(properties);
@@ -26,26 +42,18 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 		return 5;
 	}
 
-	/* TODO something... with all that
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-		ItemStack stack = player.getItemInHand(hand);
-		ItemStack projectile = player.getProjectile(stack);
-		boolean success = performShooting(level, player, projectile, hand);
-		if (success) {
-			SeedsLauncherAmmoType type = SeedsLauncherAmmoType.getAmmoType(level.registryAccess(), projectile.getItem()).value();
-			player.getCooldowns().addCooldown(this, type.cooldownAsTicks());
-		}
-		return success ? InteractionResultHolder.consume(stack) : super.use(level, player, hand);
-	}
-
 	public boolean performShooting(Level level, LivingEntity living, ItemStack projectile, InteractionHand hand) {
 		ItemStack stack = living.getItemInHand(hand);
 		if (!projectile.isEmpty()) {
 			List<ItemStack> list = draw(stack, projectile, living);
 			if (!list.isEmpty()) {
 				if (level instanceof ServerLevel serverLevel) {
-					this.shoot(serverLevel, living, living.getUsedItemHand(), stack, list, 0.75F, 7.5F, true, null);
+					for (ItemStack ammoStack : list) {
+
+						ShotSeeds seeds = new ShotSeeds(level, living, ammoStack, stack);
+						seeds.shootFromRotation(living, living.getXRot(), living.getYRot(), 0.0F, 0.75F, 7.5F);
+						level.addFreshEntity(seeds);
+					}
 					Vec3 particlePos = ESMathUtil.rotationToPosition(living.position().add(0, 3 * living.getBbHeight() / 4, 0), 1f, -living.getXRot(), living.getYHeadRot() + 90);
 					serverLevel.sendParticles(ESParticles.PUNGENCY_FRUIT_SMOKE.get(), particlePos.x(), particlePos.y(), particlePos.z(), 20, 0.1, 0.1, 0.1, 0.025);
 					EquipmentSlot slot = hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
@@ -57,8 +65,6 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 		return false;
 	}
 
-	// copied from ProjectileWeaponItem
-	// modified default projectile count to 6
 	@NotNull
 	protected static List<ItemStack> draw(ItemStack weapon, ItemStack ammo, LivingEntity shooter) {
 		if (ammo.isEmpty()) {
@@ -78,6 +84,39 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 
 			return list;
 		}
+	}
+
+	protected static ItemStack useAmmo(ItemStack weapon, ItemStack ammo, LivingEntity shooter, boolean simulate) {
+		if (ammo.isEmpty()) return ItemStack.EMPTY;
+
+		ItemStack copy = ammo.copy();
+
+		if (!simulate) {
+			if (shooter instanceof Player player) {
+				ammo.shrink(1);
+
+				if (ammo.isEmpty()) {
+					player.getInventory().removeItem(ammo);
+				}
+			} else {
+				ammo.shrink(1);
+			}
+		}
+
+		return copy;
+	}
+
+	/* TODO something... with all that
+	@Override
+	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+		ItemStack stack = player.getItemInHand(hand);
+		ItemStack projectile = player.getProjectile(stack);
+		boolean success = performShooting(level, player, projectile, hand);
+		if (success) {
+			SeedsLauncherAmmoType type = SeedsLauncherAmmoType.getAmmoType(level.registryAccess(), projectile.getItem()).value();
+			player.getCooldowns().addCooldown(this, type.cooldownAsTicks());
+		}
+		return success ? InteractionResultHolder.consume(stack) : super.use(level, player, hand);
 	}
 
 	@Override

@@ -12,7 +12,6 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.EnchantedItemInUse;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -54,8 +53,8 @@ public class ShotSeeds extends ThrowableItemProjectile {
 			living = null;
 		}
 
-		EnchantedItemInUse enchantedItemInUse = new EnchantedItemInUse(itemStack, null, living, consumer);
-		EnchantmentHelper.runIterationOnItem(itemStack, (holder, i) -> holder.value().onProjectileSpawned(serverLevel, i, enchantedItemInUse, seeds));
+		//EnchantedItemInUse enchantedItemInUse = new EnchantedItemInUse(itemStack, null, living, consumer);
+		//EnchantmentHelper.runIterationOnItem(itemStack, (holder, i) -> holder.value().onProjectileSpawned(serverLevel, i, enchantedItemInUse, seeds));
 	}
 
 	@Override
@@ -69,7 +68,7 @@ public class ShotSeeds extends ThrowableItemProjectile {
 		}
 	}
 
-	@Override
+	//@Override
 	public @Nullable ItemStack getWeaponItem() {
 		return firedFromWeapon;
 	}
@@ -83,30 +82,38 @@ public class ShotSeeds extends ThrowableItemProjectile {
 	@Override
 	protected void onHitEntity(EntityHitResult hitResult) {
 		super.onHitEntity(hitResult);
+
 		Entity entity = hitResult.getEntity();
 		Entity owner = this.getOwner();
 		float damage = 0.5f;
+
 		DamageSource source = ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.SEEDS, this, owner);
-		if (this.getWeaponItem() != null) {
-			if (level() instanceof ServerLevel serverLevel) {
-				damage = EnchantmentHelper.modifyDamage(serverLevel, this.getWeaponItem(), entity, source, damage);
-			}
+
+		if (this.getWeaponItem() != null && entity instanceof LivingEntity living) {
+			damage += EnchantmentHelper.getDamageBonus(this.getWeaponItem(), living.getMobType());
 		}
-		damage += (float) (getDeltaMovement().length() * 1.25);
+
+		damage += (float)(getDeltaMovement().length() * 1.25);
+
 		SeedsLauncherAmmoType type = SeedsLauncherAmmoType.getAmmoType(level().registryAccess(), getItem().getItem()).value();
 		damage *= type.damageMultiplier();
+
 		entity.invulnerableTime = 0;
+
 		if (entity.hurt(source, damage)) {
 			if (entity instanceof LivingEntity living) {
-				if (level() instanceof ServerLevel serverLevel) {
-					EnchantmentHelper.doPostAttackEffectsWithItemSource(serverLevel, living, source, this.getWeaponItem());
+				if (owner instanceof LivingEntity livingOwner) {
+					EnchantmentHelper.doPostHurtEffects(living, livingOwner);
+					EnchantmentHelper.doPostDamageEffects(livingOwner, living);
 				}
 			}
+
 			if (isOnFire()) {
-				entity.igniteForSeconds((getRemainingFireTicks() / 20f) / 15f);
+				entity.setSecondsOnFire((int)((getRemainingFireTicks() / 20f) / 15f));
 			}
 		}
 	}
+
 
 	@Override
 	protected Item getDefaultItem() {

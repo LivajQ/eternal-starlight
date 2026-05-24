@@ -55,8 +55,8 @@ public class PermafrostSpit extends ThrowableProjectile implements TrailOwner {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(SMALL, false);
+	protected void defineSynchedData() {
+		this.entityData.define(SMALL, false);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class PermafrostSpit extends ThrowableProjectile implements TrailOwner {
 			level().addFreshEntity(cloud);
 			if (!isSmall() && getOwner() instanceof LivingEntity living) {
 				for (int i = 0; i < 5; i++) {
-					Vec3 delta = ESMathUtil.rotationToPosition(1, 35, 360f * i / 5f + getRandom().nextInt(30));
+					Vec3 delta = ESMathUtil.rotationToPosition(1, 35, 360f * i / 5f + level().getRandom().nextInt(30));
 					PermafrostSpit spit = new PermafrostSpit(level(), living);
 					spit.shoot(delta.x, delta.y, delta.z, 0.4f, 0.1f);
 					spit.setPos(position());
@@ -114,7 +114,7 @@ public class PermafrostSpit extends ThrowableProjectile implements TrailOwner {
 		if (hitResult.getType() != HitResult.Type.MISS && getOwner() instanceof LivingEntity owner && ESEntityUtil.shouldHarm(owner, hitResult.getEntity())) {
 			hitResult.getEntity().hurt(ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.FREEZE, this, owner), (float) ((owner.getAttribute(Attributes.ATTACK_SPEED) != null ? owner.getAttributeValue(Attributes.ATTACK_SPEED) : 12) * 1.25));
 			if (hitResult.getEntity() instanceof LivingEntity living && living.canFreeze()) {
-				living.addEffect(new MobEffectInstance(ESMobEffects.BRITTLE.asHolder(), 200, 0));
+				living.addEffect(new MobEffectInstance(ESMobEffects.BRITTLE.get(), 200, 0));
 			}
 		}
 	}

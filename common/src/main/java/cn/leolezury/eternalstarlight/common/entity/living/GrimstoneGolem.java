@@ -1,7 +1,6 @@
 package cn.leolezury.eternalstarlight.common.entity.living;
 
 import cn.leolezury.eternalstarlight.common.config.ESConfig;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -92,7 +91,7 @@ public class GrimstoneGolem extends AbstractGolem {
 		if (getItemInHand(InteractionHand.MAIN_HAND).isEmpty() && !player.getItemInHand(interactionHand).isEmpty()) {
 			setItemInHand(InteractionHand.MAIN_HAND, player.getItemInHand(interactionHand).copy());
 			Arrays.fill(handDropChances, 0);
-			if (!player.hasInfiniteMaterials()) {
+			if (!player.getAbilities().instabuild) {
 				player.setItemInHand(interactionHand, ItemStack.EMPTY);
 			}
 			if (!player.level().isClientSide) {
@@ -111,8 +110,9 @@ public class GrimstoneGolem extends AbstractGolem {
 	}
 
 	@Override
-	protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource damageSource, boolean bl) {
-		super.dropCustomDeathLoot(serverLevel, damageSource, bl);
+	protected void dropCustomDeathLoot(DamageSource source, int lootingLevel, boolean recentlyHit) {
+		super.dropCustomDeathLoot(source, lootingLevel, recentlyHit);
+
 		if (!getMainHandItem().isEmpty() && handDropChances[0] == 0 && handDropChances[1] == 0) {
 			spawnAtLocation(getMainHandItem().copy());
 		}

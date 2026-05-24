@@ -1,8 +1,9 @@
 package cn.leolezury.eternalstarlight.common.entity.projectile;
 
 import cn.leolezury.eternalstarlight.common.data.ESEnchantments;
+import cn.leolezury.eternalstarlight.common.enchantment.PrecisionEnchantment;
 import cn.leolezury.eternalstarlight.common.util.ESEntityUtil;
-import net.minecraft.core.component.DataComponents;
+import com.google.common.collect.Multimap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,7 +13,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -20,28 +23,28 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 
 public abstract class ThrownBoomerang extends AbstractArrow {
 	private static final String TAG_DEALT_DAMAGE = "dealt_damage";
 
 	private boolean dealtDamage;
+	private ItemStack weaponItem = ItemStack.EMPTY;
 
 	public ThrownBoomerang(EntityType<? extends ThrownBoomerang> type, Level level) {
 		super(type, level);
 	}
 
 	public ThrownBoomerang(EntityType<? extends ThrownBoomerang> type, Level level, @Nullable LivingEntity owner, double x, double y, double z, ItemStack pickupItemStack) {
-		super(type, x, y, z, level, pickupItemStack, pickupItemStack);
+		super(type, x, y, z, level);
+		this.weaponItem = pickupItemStack == null ? ItemStack.EMPTY : pickupItemStack.copy();
 		this.setOwner(owner);
 	}
 
@@ -53,8 +56,8 @@ public abstract class ThrownBoomerang extends AbstractArrow {
 		}
 		if (!level().isClientSide && !this.dealtDamage) {
 			float homing = 0;
-			if (level() instanceof ServerLevel serverLevel && this.getWeaponItem() != null) {
-				homing = ESEnchantments.modifyBoomerangHomingStrength(serverLevel, this.getWeaponItem(), homing);
+			if (level() instanceof ServerLevel serverLevel && this.weaponItem != null) {
+				homing = ESEnchantments.modifyBoomerangHomingStrength(this.getWeaponItem(), homing);
 			}
 			homing = Mth.clamp(homing, 0, 1);
 			Vec3 homingTarget = null;
@@ -71,7 +74,7 @@ public abstract class ThrownBoomerang extends AbstractArrow {
 		if (owner instanceof Player player) {
 			float pickupRadius = 0;
 			if (level() instanceof ServerLevel serverLevel && this.getWeaponItem() != null) {
-				pickupRadius = ESEnchantments.modifyBoomerangPickupRadius(serverLevel, this.getWeaponItem(), pickupRadius);
+				pickupRadius = ESEnchantments.modifyBoomerangPickupRadius(this.getWeaponItem(), pickupRadius);
 			}
 			if (pickupRadius > 0) {
 				for (ItemEntity item : level().getEntitiesOfClass(ItemEntity.class, getBoundingBox().inflate(pickupRadius))) {
@@ -113,6 +116,10 @@ public abstract class ThrownBoomerang extends AbstractArrow {
 		}
 	}
 
+	public ItemStack getWeaponItem() {
+		return this.weaponItem;
+	}
+
 	@Nullable
 	@Override
 	protected EntityHitResult findHitEntity(Vec3 vec3, Vec3 vec32) {
@@ -120,75 +127,78 @@ public abstract class ThrownBoomerang extends AbstractArrow {
 	}
 
 	private double getItemDamage(AttributeInstance instance) {
-		double baseValue = instance != null ? instance.getBaseValue() : 1;
-		ItemStack weapon = getWeaponItem();
-		if (weapon == null) {
-			return baseValue;
-		}
-		double result = baseValue;
-		List<AttributeModifier> allModifiers = new ArrayList<>();
-		List<AttributeModifier> originalModifiers = instance != null ? new ArrayList<>(instance.getModifiers()) : new ArrayList<>();
-		ItemAttributeModifiers modifiers = weapon.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-		originalModifiers.removeIf(o -> modifiers.modifiers().stream().anyMatch(modifier -> modifier.attribute().is(Attributes.ATTACK_DAMAGE) && modifier.modifier().id().equals(o.id())));
-		for (ItemAttributeModifiers.Entry entry : modifiers.modifiers()) {
-			if (entry.attribute().is(Attributes.ATTACK_DAMAGE)) {
-				allModifiers.addFirst(entry.modifier());
+		double base = instance != null ? instance.getBaseValue() : 1.0;
+		double result = base;
+
+		if (weaponItem.isEmpty()) return result;
+
+		Multimap<Attribute, AttributeModifier> modifiers = weaponItem.getAttributeModifiers(EquipmentSlot.MAINHAND);
+
+		Collection<AttributeModifier> dmgMods = modifiers.get(Attributes.ATTACK_DAMAGE);
+
+		for (AttributeModifier mod : dmgMods) {
+			switch (mod.getOperation()) {
+				case ADDITION -> result += mod.getAmount();
+				case MULTIPLY_BASE -> result += base * mod.getAmount();
+				case MULTIPLY_TOTAL -> result += result * mod.getAmount();
 			}
 		}
-		allModifiers.addAll(originalModifiers);
-		for (AttributeModifier modifier : allModifiers) {
-			double amount = modifier.amount();
-			double addition;
-			switch (modifier.operation()) {
-				case ADD_VALUE -> addition = amount;
-				case ADD_MULTIPLIED_BASE -> addition = amount * baseValue;
-				case ADD_MULTIPLIED_TOTAL -> addition = amount * result;
-				default -> throw new MatchException(null, null);
-			}
-			result += addition;
-		}
+
 		return result;
 	}
 
 	@Override
-	protected void onHitEntity(EntityHitResult entityHitResult) {
-		Entity entity = entityHitResult.getEntity();
+	protected void onHitEntity(EntityHitResult hitResult) {
+		Entity entity = hitResult.getEntity();
 		Entity owner = this.getOwner();
-		float damage = (float) getItemDamage(owner instanceof LivingEntity living ? living.getAttribute(Attributes.ATTACK_DAMAGE) : null);
-		DamageSource damageSource = damageSources().thrown(this, getOwner());
-		float critChance = 0;
-		boolean critSuccess = false;
-		if (level() instanceof ServerLevel serverLevel && this.getWeaponItem() != null) {
-			damage = EnchantmentHelper.modifyDamage(serverLevel, this.getWeaponItem(), entity, damageSource, damage);
-			critChance = ESEnchantments.modifyBoomerangCritChance(serverLevel, this.getWeaponItem(), entity, damageSource, critChance);
-		}
 
-		if (getRandom().nextFloat() < critChance) {
-			damage *= 1.5f;
+		float damage = (float) getItemDamage(
+			owner instanceof LivingEntity living ? living.getAttribute(Attributes.ATTACK_DAMAGE) : null
+		);
+
+		DamageSource source = this.damageSources().thrown(this, owner);
+
+		float critChance = 0;
+		critChance = ESEnchantments.modifyBoomerangCritChance(this.weaponItem, critChance);
+		boolean critSuccess = false;
+
+		if (this.level().getRandom().nextFloat() < critChance) {
+			damage *= 1.5F;
 			critSuccess = true;
 		}
 
 		this.dealtDamage = true;
-		if (entity.hurt(damageSource, damage)) {
+
+		if (entity.hurt(source, damage)) {
 			if (entity.getType() == EntityType.ENDERMAN) {
 				return;
 			}
-			if (level() instanceof ServerLevel serverLevel) {
-				// so that we can trigger melee-only effects
-				DamageSource directSource = getOwner() instanceof Player player ? this.damageSources().playerAttack(player) : (getOwner() instanceof LivingEntity living ? damageSources().mobAttack(living) : damageSource);
-				EnchantmentHelper.doPostAttackEffectsWithItemSource(serverLevel, entity, directSource, this.getWeaponItem());
+
+			if (entity instanceof LivingEntity livingTarget && owner instanceof LivingEntity livingOwner) {
+				EnchantmentHelper.doPostHurtEffects(livingTarget, livingOwner);
+				EnchantmentHelper.doPostDamageEffects(livingOwner, livingTarget);
 			}
+
 			if (entity instanceof LivingEntity livingEntity) {
-				this.doKnockback(livingEntity, damageSource);
+				applyKnockback(livingEntity, 0.4F);
 				this.doPostHurtEffects(livingEntity);
 			}
-			if (critSuccess && getOwner() instanceof Player player) {
+
+			if (critSuccess && owner instanceof Player player) {
 				player.crit(entity);
 			}
 		}
 
-		//this.setDeltaMovement(this.getDeltaMovement().multiply(-0.01, -0.1, -0.01));
 		this.playSound(SoundEvents.PLAYER_ATTACK_CRIT, 1.0F, 1.0F);
+	}
+
+	protected void applyKnockback(LivingEntity target, float strength) {
+		Vec3 dir = this.getDeltaMovement();
+		if (dir.lengthSqr() == 0.0) return;
+
+		Vec3 n = dir.normalize().scale(strength);
+		target.push(n.x, 0.1F, n.z);
+		target.hurtMarked = true;
 	}
 
 	@Override
@@ -229,4 +239,5 @@ public abstract class ThrownBoomerang extends AbstractArrow {
 	public boolean shouldRender(double d, double e, double f) {
 		return true;
 	}
+
 }

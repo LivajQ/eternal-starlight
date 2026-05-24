@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.entity.living.npc.boarwarf;
 
-import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.config.ESConfig;
 import cn.leolezury.eternalstarlight.common.data.ESRegistries;
 import cn.leolezury.eternalstarlight.common.entity.living.goal.*;
@@ -8,15 +7,14 @@ import cn.leolezury.eternalstarlight.common.entity.living.npc.boarwarf.golem.Ast
 import cn.leolezury.eternalstarlight.common.registry.ESBoarwarfProfessions;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
-import com.mojang.serialization.DataResult;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
@@ -79,7 +77,7 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 	protected static final EntityDataAccessor<String> TYPE = SynchedEntityData.defineId(Boarwarf.class, EntityDataSerializers.STRING);
 
 	public ResourceLocation getTypeId() {
-		return ResourceLocation.parse(this.getEntityData().get(TYPE));
+		return new ResourceLocation(this.getEntityData().get(TYPE));
 	}
 
 	public BoarwarfType getBoarwarfType() {
@@ -100,7 +98,7 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 	protected static final EntityDataAccessor<String> PROFESSION = SynchedEntityData.defineId(Boarwarf.class, EntityDataSerializers.STRING);
 
 	public ResourceLocation getProfessionId() {
-		return ResourceLocation.parse(this.getEntityData().get(PROFESSION));
+		return new ResourceLocation(this.getEntityData().get(PROFESSION));
 	}
 
 	public AbstractBoarwarfProfession getProfession() {
@@ -119,29 +117,34 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(TYPE, "null")
-			.define(PROFESSION, "null");
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(TYPE, "null");
+		this.entityData.define(PROFESSION, "null");
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag compoundTag) {
 		super.readAdditionalSaveData(compoundTag);
-		if (compoundTag.contains(TAG_OFFERS)) {
-			DataResult<MerchantOffers> parsed = MerchantOffers.CODEC.parse(this.registryAccess().createSerializationContext(NbtOps.INSTANCE), compoundTag.get(TAG_OFFERS));
-			parsed.resultOrPartial(Util.prefix("Failed to load offers: ", EternalStarlight.LOGGER::warn)).ifPresent((merchantOffers) -> this.offers = merchantOffers);
+		if (compoundTag.contains(TAG_OFFERS, CompoundTag.TAG_COMPOUND)) {
+			this.offers = new MerchantOffers(compoundTag.getCompound(TAG_OFFERS));
 		}
-		setTypeId(ResourceLocation.read(compoundTag.getString(TAG_TYPE)).getOrThrow());
-		setProfessionId(ResourceLocation.read(compoundTag.getString(TAG_PROFESSION)).getOrThrow());
+
+		setTypeId(new ResourceLocation(compoundTag.getString(TAG_TYPE)));
+		setProfessionId(new ResourceLocation(compoundTag.getString(TAG_PROFESSION)));
+
 		restockCooldown = compoundTag.getInt(TAG_RESTOCK_COOLDOWN);
 		chatCooldown = compoundTag.getInt(TAG_CHAT_COOLDOWN);
 		chatTicks = compoundTag.getInt(TAG_CHAT_TICKS);
 		awakeTicks = compoundTag.getInt(TAG_AWAKE_TICKS);
 		sleepTicks = compoundTag.getInt(TAG_SLEEP_TICKS);
+
 		if (compoundTag.contains(TAG_HOME_POS)) {
-			GlobalPos.CODEC.parse(NbtOps.INSTANCE, compoundTag.get(TAG_HOME_POS)).resultOrPartial(s -> EternalStarlight.LOGGER.warn("Failed to parse Boarwarf home pos: {}", s)).ifPresent(pos -> this.homePos = pos);
+			ResourceKey<Level> dimensionKey = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(compoundTag.getCompound(TAG_HOME_POS).getString("dimension")));
+			BlockPos pos = BlockPos.of(compoundTag.getCompound(TAG_HOME_POS).getLong("pos"));
+			this.homePos = GlobalPos.of(dimensionKey, pos);
 		}
+
 		if (this.offers == null) {
 			this.offers = new MerchantOffers();
 			this.addTrades();
@@ -151,12 +154,14 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 	@Override
 	public void addAdditionalSaveData(CompoundTag compoundTag) {
 		super.addAdditionalSaveData(compoundTag);
+
 		if (!this.level().isClientSide) {
-			MerchantOffers merchantOffers = this.getOffers();
-			if (!merchantOffers.isEmpty()) {
-				compoundTag.put(TAG_OFFERS, MerchantOffers.CODEC.encodeStart(this.registryAccess().createSerializationContext(NbtOps.INSTANCE), merchantOffers).getOrThrow());
+			MerchantOffers offers = this.getOffers();
+			if (!offers.isEmpty()) {
+				compoundTag.put(TAG_OFFERS, offers.createTag());
 			}
 		}
+
 		compoundTag.putString(TAG_TYPE, getTypeId().toString());
 		compoundTag.putString(TAG_PROFESSION, getProfessionId().toString());
 		compoundTag.putInt(TAG_RESTOCK_COOLDOWN, restockCooldown);
@@ -164,7 +169,11 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 		compoundTag.putInt(TAG_CHAT_TICKS, chatTicks);
 		compoundTag.putInt(TAG_AWAKE_TICKS, awakeTicks);
 		compoundTag.putInt(TAG_SLEEP_TICKS, sleepTicks);
-		compoundTag.put(TAG_HOME_POS, GlobalPos.CODEC.encodeStart(NbtOps.INSTANCE, homePos).getOrThrow());
+
+		CompoundTag home = new CompoundTag();
+		home.putString("dimension", homePos.dimension().location().toString());
+		home.putLong("pos", homePos.pos().asLong());
+		compoundTag.put(TAG_HOME_POS, home);
 	}
 
 	@Override
@@ -189,18 +198,19 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 			.add(Attributes.MOVEMENT_SPEED, 0.5D);
 	}
 
-	@Nullable
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
 		homePos = GlobalPos.of(level.getLevel().dimension(), blockPosition());
 
-		level().registryAccess().registryOrThrow(ESRegistries.BOARWARF_TYPE).forEach((type) -> {
-			if (type.biome().value() == level.getBiome(blockPosition()).value()) {
-				setBoarwarfType(type);
-			}
-		});
+		level.registryAccess()
+			.registryOrThrow(ESRegistries.BOARWARF_TYPE)
+			.forEach(type -> {
+				if (type.biome().value() == level.getBiome(blockPosition()).value()) {
+					setBoarwarfType(type);
+				}
+			});
 
-		return super.finalizeSpawn(level, instance, spawnType, data);
+		return super.finalizeSpawn(level, instance, spawnType, data, tag);
 	}
 
 	@Override
@@ -256,7 +266,7 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 
 	public void angerNearbyAstralGolems(LivingEntity target, boolean replaceCurrentTarget) {
 		for (AstralGolem golem : level().getEntitiesOfClass(AstralGolem.class, getBoundingBox().inflate(30))) {
-			if ((replaceCurrentTarget || golem.getTarget() == null) && !(target instanceof Player player && player.hasInfiniteMaterials())) {
+			if ((replaceCurrentTarget || golem.getTarget() == null) && !(target instanceof Player player && player.getAbilities().instabuild)) {
 				golem.setTarget(target);
 			}
 		}
@@ -305,7 +315,7 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 			angerNearbyAstralGolems(livingEntity, true);
 		}
 		if (source.getEntity() instanceof Player player) {
-			if (!player.hasInfiniteMaterials()) {
+			if (!player.getAbilities().instabuild) {
 				int credit = (int) (getBoarwarfCredit(player) - amount);
 				if (credit > -10000) {
 					setBoarwarfCredit(player, credit);
@@ -318,7 +328,7 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 	@Override
 	public void die(DamageSource source) {
 		if (source.getEntity() instanceof Player player) {
-			if (!player.hasInfiniteMaterials()) {
+			if (!player.getAbilities().instabuild) {
 				int credit = getBoarwarfCredit(player) - 20;
 				if (credit > -10000) {
 					setBoarwarfCredit(player, credit);

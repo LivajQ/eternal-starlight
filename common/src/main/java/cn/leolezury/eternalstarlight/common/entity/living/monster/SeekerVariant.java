@@ -7,9 +7,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biome;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public record SeekerVariant(ResourceLocation texture, ResourceLocation textureFull, ResourceLocation glowTexture, ResourceLocation glowTextureFull, ResourceLocation tentacleTexture, ResourceLocation tentacleTextureFull, ResourceLocation tentacleEndTexture, ResourceLocation tentacleEndTextureFull, int particleColor, HolderSet<Biome> biomes) {
@@ -32,8 +32,8 @@ public record SeekerVariant(ResourceLocation texture, ResourceLocation textureFu
 
 	public static Holder<SeekerVariant> getSpawnVariant(RegistryAccess registryAccess, Holder<Biome> holder) {
 		Registry<SeekerVariant> registry = registryAccess.registryOrThrow(ESRegistries.SEEKER_VARIANT);
-		Optional<Holder.Reference<SeekerVariant>> optional = registry.holders().filter(reference -> reference.value().biomes().contains(holder)).findFirst().or(() -> registry.getHolder(ESSeekerVariants.LUNAR));
-		Objects.requireNonNull(registry);
-		return optional.or(registry::getAny).orElseThrow();
+		Optional<Holder.Reference<SeekerVariant>> optional = registry.holders().filter(ref -> ref.value().biomes().contains(holder)).findFirst().or(() -> registry.getHolder(ESSeekerVariants.LUNAR));
+		return optional.or(() -> registry.getRandom(RandomSource.create())).orElseThrow();
 	}
+
 }

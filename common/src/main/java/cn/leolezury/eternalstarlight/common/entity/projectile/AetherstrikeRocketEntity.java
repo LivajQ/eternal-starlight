@@ -69,9 +69,9 @@ public class AetherstrikeRocketEntity extends Projectile implements ItemSupplier
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(ITEM, getDefaultItem())
-			.define(SHOT_AT_ANGLE, false);
+	protected void defineSynchedData() {
+		this.entityData.define(ITEM, getDefaultItem());
+		this.entityData.define(SHOT_AT_ANGLE, false);
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class AetherstrikeRocketEntity extends Projectile implements ItemSupplier
 
 		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 		if (!this.noPhysics) {
-			this.hitTargetOrDeflectSelf(hitResult);
+			this.onHit(hitResult);
 			this.hasImpulse = true;
 		}
 
@@ -112,7 +112,7 @@ public class AetherstrikeRocketEntity extends Projectile implements ItemSupplier
 		this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.FIREWORK_ROCKET_LARGE_BLAST, SoundSource.AMBIENT, 25.0F, 0.95F + this.random.nextFloat() * 0.1F);
 		if (level() instanceof ServerLevel serverLevel && serverLevel.dimension().location().equals(ESDimensions.STARLIGHT_KEY.location())) {
 			for (int i = 0; i < 4; i++) {
-				Vec3 vec3 = position().offsetRandom(getRandom(), 1.5f);
+				Vec3 vec3 = position().offsetRandom(level().getRandom(), 1.5f);
 				for (int s = 0; s < serverLevel.players().size(); s++) {
 					ServerPlayer serverPlayer = serverLevel.players().get(s);
 					serverLevel.sendParticles(serverPlayer, ESExplosionParticleOptions.AETHERSENT, true, vec3.x, vec3.y, vec3.z, 3, 0, 0, 0, 0);
@@ -122,7 +122,7 @@ public class AetherstrikeRocketEntity extends Projectile implements ItemSupplier
 				Vec3 speed = new Vec3((this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F, (this.random.nextFloat() - this.random.nextFloat()) * 0.1F).normalize();
 				ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ExplosionShockParticleOptions.AETHERSENT, getEyePosition().x + speed.x * 1.2, getEyePosition().y + speed.y * 1.2, getEyePosition().z + speed.z * 1.2, speed.x, speed.y, speed.z));
 			}
-			if (getRandom().nextFloat() < 0.6 && level().canSeeSky(blockPosition())) {
+			if (level().getRandom().nextFloat() < 0.6 && level().canSeeSky(blockPosition())) {
 				ESWeatherUtil.getOrCreateWeathers(serverLevel).setActiveWeather(ESWeathers.METEOR_SHOWER.get(), ESWeathers.METEOR_SHOWER.get().weatherProperties().duration().sample(serverLevel.getRandom()));
 				if (getOwner() instanceof Player player) {
 					player.getCooldowns().addCooldown(getItem().getItem(), 2400);
@@ -159,7 +159,8 @@ public class AetherstrikeRocketEntity extends Projectile implements ItemSupplier
 		super.addAdditionalSaveData(compound);
 		compound.putInt(TAG_LIFE, this.life);
 		compound.putInt(TAG_LIFETIME, this.lifetime);
-		compound.put(TAG_ITEM, this.getItem().save(this.registryAccess()));
+		compound.put(TAG_ITEM, this.getItem().save(new CompoundTag()));
+
 		compound.putBoolean(TAG_SHOT_AT_ANGLE, this.entityData.get(SHOT_AT_ANGLE));
 	}
 
@@ -168,8 +169,11 @@ public class AetherstrikeRocketEntity extends Projectile implements ItemSupplier
 		super.readAdditionalSaveData(compound);
 		this.life = compound.getInt(TAG_LIFE);
 		this.lifetime = compound.getInt(TAG_LIFETIME);
+
 		if (compound.contains(TAG_ITEM, 10)) {
-			this.entityData.set(ITEM, ItemStack.parse(this.registryAccess(), compound.getCompound(TAG_ITEM)).orElseGet(AetherstrikeRocketEntity::getDefaultItem));
+			this.entityData.set(ITEM,
+				ItemStack.of(compound.getCompound(TAG_ITEM))
+			);
 		} else {
 			this.entityData.set(ITEM, getDefaultItem());
 		}

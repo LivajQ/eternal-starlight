@@ -48,7 +48,7 @@ public class FrozenTube extends ThrowableProjectile implements TrailOwner {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+	protected void defineSynchedData() {
 
 	}
 

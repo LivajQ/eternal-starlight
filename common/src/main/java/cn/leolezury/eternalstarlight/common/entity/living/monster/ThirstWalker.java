@@ -93,11 +93,10 @@ public class ThirstWalker extends Monster implements MultiBehaviorUser, NeutralM
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(BEHAVIOR_STATE, 0)
-			.define(BEHAVIOR_TICKS, 0)
-			.define(INTENTIONAL_ATTACK, false);
+	protected void defineSynchedData() {
+		this.entityData.define(BEHAVIOR_STATE, 0);
+		this.entityData.define(BEHAVIOR_TICKS, 0);
+		this.entityData.define(INTENTIONAL_ATTACK, false);
 	}
 
 	@Override
@@ -105,7 +104,7 @@ public class ThirstWalker extends Monster implements MultiBehaviorUser, NeutralM
 		this.goalSelector.addGoal(0, new FloatGoal(this));
 		this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0, false) {
 			@Override
-			protected void checkAndPerformAttack(LivingEntity livingEntity) {
+			protected void checkAndPerformAttack(LivingEntity target, double distanceToTarget) {
 
 			}
 		});

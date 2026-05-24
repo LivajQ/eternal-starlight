@@ -65,9 +65,9 @@ public class Gleech extends Monster {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(LARVAL, false);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(LARVAL, false);
 	}
 
 	@Override
@@ -205,9 +205,9 @@ public class Gleech extends Monster {
 	}
 
 	@Override
-	protected void dropCustomDeathLoot(ServerLevel serverLevel, DamageSource damageSource, boolean bl) {
-		super.dropCustomDeathLoot(serverLevel, damageSource, bl);
-		if (damageSource.getEntity() instanceof CrystallizedMoth && getRandom().nextInt(15) == 0) {
+	protected void dropCustomDeathLoot(DamageSource source, int lootingLevel, boolean recentlyHit) {
+		super.dropCustomDeathLoot(source, lootingLevel, recentlyHit);
+		if (source.getEntity() instanceof CrystallizedMoth && getRandom().nextInt(15) == 0) {
 			spawnAtLocation(ESItems.MUSIC_DISC_SACRED_DESERT.get());
 		}
 	}

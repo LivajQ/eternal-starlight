@@ -36,7 +36,7 @@ public class ThrownStarfire extends ThrowableItemProjectile {
 				createExplosionParticles(serverLevel, position().add(0, getBbHeight() / 2, 0), 12, 1);
 				for (LivingEntity entity : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(3))) {
 					if (ESEntityUtil.shouldHarm(getOwner(), entity)) {
-						entity.addEffect(new MobEffectInstance(ESMobEffects.STARFIRE.asHolder(), 200));
+						entity.addEffect(new MobEffectInstance(ESMobEffects.STARFIRE.get(), 200));
 						createExplosionParticles(serverLevel, entity.position().add(0, entity.getBbHeight() / 2, 0), 10, 0.25);
 					}
 				}

@@ -53,8 +53,8 @@ public class EnergySpark extends ThrowableProjectile implements TrailOwner {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		builder.define(SPAWNED_TICKS, 0);
+	protected void defineSynchedData() {
+		this.entityData.define(SPAWNED_TICKS, 0);
 	}
 
 	@Nullable
@@ -88,13 +88,13 @@ public class EnergySpark extends ThrowableProjectile implements TrailOwner {
 				targetId = null;
 			}
 			Vec3 targetPos = getOwner() instanceof Player ?
-				position().add(getRandom().nextInt(-10, 11), getRandom().nextInt(-10, 11), getRandom().nextInt(-10, 11))
+				position().add(level().getRandom().nextInt(-10, 11), level().getRandom().nextInt(-10, 11), level().getRandom().nextInt(-10, 11))
 				: position().add(getDeltaMovement().normalize());
 			if (target != null && (getOwner() instanceof Player || tickCount < 80)) {
 				targetPos = target.position().add(0, target.getBbHeight() / 2, 0);
 			}
 			if (getSpawnedTicks() <= 40 && tickCount % 2 == 0 && getOwner() instanceof Player) {
-				Vec3 delta = new Vec3(getRandom().nextFloat() - 0.5, getRandom().nextFloat() - 0.5, getRandom().nextFloat() - 0.5);
+				Vec3 delta = new Vec3(level().getRandom().nextFloat() - 0.5, level().getRandom().nextFloat() - 0.5, level().getRandom().nextFloat() - 0.5);
 				double length = this.getDeltaMovement().length();
 				this.setDeltaMovement(this.getDeltaMovement().add(delta.normalize().scale(Math.max(length * 0.05, 0.005))).normalize().scale(length));
 			}
@@ -121,8 +121,8 @@ public class EnergySpark extends ThrowableProjectile implements TrailOwner {
 	}
 
 	@Override
-	protected void applyGravity() {
-
+	protected float getGravity() {
+		return 0.0F;
 	}
 
 	@Override
