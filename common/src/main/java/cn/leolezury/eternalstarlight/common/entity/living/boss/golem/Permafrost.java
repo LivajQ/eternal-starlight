@@ -259,7 +259,7 @@ public class Permafrost extends ESBoss {
 			if (!onGround() && smokePos.distanceTo(position()) < getBbHeight()) {
 				Vec3 pos = smokePos.subtract(0, 13d / 16d, 0);
 				for (int i = 0; i < 5; i++) {
-					level().addParticle(ParticleTypes.WHITE_SMOKE, pos.x + (getBbWidth() / 2f) * (getRandom().nextFloat() - 0.5f), pos.y, pos.z + (getBbWidth() / 2f) * (getRandom().nextFloat() - 0.5f), 0, -0.15, 0);
+					level().addParticle(ParticleTypes.SMOKE, pos.x + (getBbWidth() / 2f) * (getRandom().nextFloat() - 0.5f), pos.y, pos.z + (getBbWidth() / 2f) * (getRandom().nextFloat() - 0.5f), 0, -0.15, 0);
 				}
 			}
 			idleAnimationState.startIfStopped(tickCount);

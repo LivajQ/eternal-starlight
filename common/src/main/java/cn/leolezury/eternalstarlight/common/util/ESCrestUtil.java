@@ -6,13 +6,13 @@ import cn.leolezury.eternalstarlight.common.network.ParticlePacket;
 import cn.leolezury.eternalstarlight.common.particle.OrbitalTrailParticleOptions;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
-import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -41,12 +41,19 @@ public class ESCrestUtil {
 	public static boolean giveCrest(Player player, Crest.Instance crest) {
 		List<Crest.Instance> set = getOwnedCrests(player);
 		List<Crest.Instance> crests = new ArrayList<>(set);
+
+		ResourceKey<Crest> key = crest.crest()
+			.unwrapKey()
+			.orElseThrow(() -> new IllegalStateException("Crest holder has no key: " + crest));
+
 		for (Crest.Instance instance : crests) {
-			if (instance.crest().is(crest.crest()) && instance.level() >= crest.level()) {
+			if (instance.crest().is(key) && instance.level() >= crest.level()) {
 				return false;
 			}
 		}
-		crests.removeIf(c -> c.crest().is(crest.crest()));
+
+		crests.removeIf(c -> c.crest().is(key));
+
 		crests.add(crest);
 		setOwnedCrests(player, crests);
 		return true;
@@ -54,14 +61,14 @@ public class ESCrestUtil {
 
 	public static boolean upgradeCrest(Player player, ResourceKey<Crest> key) {
 		int maxLevel = 0;
-		Optional<Holder.Reference<Crest>> holder = player.registryAccess().registryOrThrow(ESRegistries.CREST).getHolder(key);
+		Optional<Holder.Reference<Crest>> holder = player.level().registryAccess().registryOrThrow(ESRegistries.CREST).getHolder(key);
 		if (holder.isPresent()) {
 			maxLevel = holder.get().value().maxLevel();
 		}
 		if (getCrestLevel(player, key) + 1 > maxLevel) {
 			return false;
 		}
-		Optional<Crest.Instance> instance = Crest.Instance.of(player.registryAccess(), key, getCrestLevel(player, key) + 1);
+		Optional<Crest.Instance> instance = Crest.Instance.of(player.level().registryAccess(), key, getCrestLevel(player, key) + 1);
 		return instance.isPresent() && giveCrest(player, instance.get());
 	}
 
@@ -73,49 +80,67 @@ public class ESCrestUtil {
 	public static boolean removeCrest(Player player, Holder<Crest> crest, boolean owned) {
 		List<Crest.Instance> set = owned ? getOwnedCrests(player) : getCrests(player);
 		List<Crest.Instance> crests = new ArrayList<>(set);
-		if (crests.stream().noneMatch(c -> c.crest().is(crest))) {
+
+		ResourceKey<Crest> key = crest.unwrapKey()
+			.orElseThrow(() -> new IllegalStateException("Crest holder has no key: " + crest));
+
+		if (crests.stream().noneMatch(c -> c.crest().is(key))) {
 			return false;
 		}
-		crests.removeIf(c -> c.crest().is(crest));
+
+		crests.removeIf(c -> c.crest().is(key));
+
 		if (owned) {
 			setOwnedCrests(player, crests);
 		} else {
 			setCrests(player, crests);
 		}
+
 		return true;
 	}
 
 	public static List<Crest.Instance> mergeCrests(List<Crest.Instance> first, List<Crest.Instance> second) {
 		List<Crest.Instance> result = new ArrayList<>(first);
+
 		for (Crest.Instance instance : second) {
+
+			ResourceKey<Crest> key = instance.crest().unwrapKey().orElseThrow(() -> new IllegalStateException("Crest holder has no key: " + instance));
+
 			boolean hasSame = false;
 			int level = instance.level();
+
 			for (int i = 0; i < result.size(); i++) {
-				if (result.get(i).crest().is(instance.crest())) {
-					level = Math.max(level, result.get(i).level());
+				Crest.Instance existing = result.get(i);
+
+				if (existing.crest().is(key)) {
+					level = Math.max(level, existing.level());
 					result.set(i, new Crest.Instance(instance.crest(), level));
 					hasSame = true;
 				}
 			}
+
 			if (!hasSame) {
 				result.add(instance);
 			}
 		}
+
 		return result;
 	}
 
 	public static int getCrestLevel(Player player, ResourceKey<Crest> key) {
-		Optional<Holder.Reference<Crest>> crest = player.registryAccess().registryOrThrow(ESRegistries.CREST).getHolder(key);
+		Optional<Holder.Reference<Crest>> crest = player.level().registryAccess().registryOrThrow(ESRegistries.CREST).getHolder(key);
 		return crest.map(ref -> getCrestLevel(player, ref)).orElse(0);
 	}
 
 	public static int getCrestLevel(Player player, Holder<Crest> crest) {
-		List<Crest.Instance> set = getOwnedCrests(player);
-		for (Crest.Instance instance : set) {
-			if (instance.crest().is(crest)) {
+		ResourceKey<Crest> key = crest.unwrapKey().orElseThrow(() -> new IllegalStateException("Crest holder has no key: " + crest));
+
+		for (Crest.Instance instance : getOwnedCrests(player)) {
+			if (instance.crest().is(key)) {
 				return instance.level();
 			}
 		}
+
 		return 0;
 	}
 
@@ -159,7 +184,7 @@ public class ESCrestUtil {
 		List<Crest.Instance> activeCrests = new ArrayList<>();
 		set.forEach(crest -> {
 			boolean doEffects = false;
-			if (player.hasInfiniteMaterials()) {
+			if (player.getAbilities().instabuild) {
 				doEffects = true;
 			} else {
 				Inventory inventory = player.getInventory();
@@ -168,7 +193,7 @@ public class ESCrestUtil {
 					if (stack.is(crest.crest().value().type().getCrystalsTag())) {
 						doEffects = true;
 						if (player.tickCount % 60 == 0) {
-							stack.hurtAndBreak(crest.level(), player, EquipmentSlot.MAINHAND);
+							stack.hurtAndBreak(crest.level(), player, p -> LivingEntity.getEquipmentSlotForItem(stack));
 						}
 						break;
 					}
@@ -177,13 +202,14 @@ public class ESCrestUtil {
 			if (doEffects) {
 				activeCrests.add(crest);
 				crest.crest().value().effects().ifPresent(effects ->
-					effects.forEach(mobEffect -> player.addEffect(new MobEffectInstance(mobEffect.effect(), 20, mobEffect.level() + (crest.level() - 1) * mobEffect.levelAddition())))
+					effects.forEach(mobEffect -> player.addEffect(new MobEffectInstance(mobEffect.effect().value(), 20, mobEffect.level() + (crest.level() - 1) * mobEffect.levelAddition())))
 				);
 				crest.crest().value().attributeModifiers().ifPresent(modifiers ->
 					modifiers.forEach(modifier -> {
 						AttributeInstance instance = player.getAttributes().getInstance(modifier.attribute());
-						if (instance != null && !instance.hasModifier(modifier.id())) {
-							instance.addPermanentModifier(modifier.getModifier(crest.level()));
+						AttributeModifier attrModifier = modifier.getModifier(crest.level());
+						if (instance != null && !instance.hasModifier(attrModifier)) {
+							instance.addPermanentModifier(attrModifier);
 						}
 					})
 				);
@@ -194,8 +220,9 @@ public class ESCrestUtil {
 			crest.crest().value().attributeModifiers().ifPresent(modifiers ->
 				modifiers.forEach(modifier -> {
 					AttributeInstance instance = player.getAttributes().getInstance(modifier.attribute());
-					if (instance != null && instance.hasModifier(modifier.id())) {
-						instance.removeModifier(modifier.id());
+					AttributeModifier attrModifier = modifier.getModifier(crest.level());
+					if (instance != null && instance.hasModifier(attrModifier)) {
+						instance.removeModifier(attrModifier.getId());
 					}
 				})
 			);

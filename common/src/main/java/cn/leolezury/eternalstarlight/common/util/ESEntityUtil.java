@@ -11,7 +11,6 @@ import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.LevelAccessor;
@@ -26,7 +25,7 @@ import java.util.List;
 
 public class ESEntityUtil {
 	public static RaytraceResult raytrace(LevelAccessor level, CollisionContext context, Vec3 from, Vec3 to) {
-		BlockHitResult hitResult = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, context));
+		BlockHitResult hitResult = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
 		RaytraceResult result = new RaytraceResult(new ArrayList<>(), hitResult.getType() == HitResult.Type.BLOCK ? hitResult : null);
 		List<Entity> entities = level.getEntitiesOfClass(Entity.class, new AABB(from, to).inflate(1));
 		for (Entity entity : entities) {
@@ -78,7 +77,7 @@ public class ESEntityUtil {
 	}
 
 	public static VillagerTrades.ItemListing simpleTrade(ItemStack cost, ItemStack result, int maxUses) {
-		return (entity, random) -> new MerchantOffer(new ItemCost(cost.getItem(), cost.getCount()), result, maxUses, 0, 0);
+		return (entity, random) -> new MerchantOffer(cost, ItemStack.EMPTY, result, maxUses, 0, 0);
 	}
 
 	public static void givePlayerItem(Player player, ItemStack stack) {

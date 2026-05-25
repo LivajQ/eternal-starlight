@@ -50,7 +50,8 @@ public class LunarMonstrosityThornPhase extends BehaviorPhase<LunarMonstrosity> 
 				entity.level().addFreshEntity(skull);
 				if (entity.level() instanceof ServerLevel serverLevel) {
 					for (int i = 0; i < 7; i++) {
-						serverLevel.sendParticles(ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER_OMINOUS, skull.getRandomX(1), skull.getRandomY(), skull.getRandomZ(1), 5, 0, 0, 0, 0);
+						//serverLevel.sendParticles(ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER_OMINOUS, skull.getRandomX(1), skull.getRandomY(), skull.getRandomZ(1), 5, 0, 0, 0, 0);
+						serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, skull.getRandomX(1), skull.getRandomY(), skull.getRandomZ(1), 5, 0, 0, 0, 0);
 					}
 				}
 			}

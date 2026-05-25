@@ -273,7 +273,7 @@ public class StarlightGolem extends ESBoss implements RayAttackUser {
 		++deathAnimationTime;
 		if (deathAnimationTime == 110 && !level().isClientSide()) {
 			level().broadcastEntityEvent(this, (byte) 60);
-			playSound(SoundEvents.GENERIC_EXPLODE.value());
+			playSound(SoundEvents.GENERIC_EXPLODE);
 			if (level() instanceof ServerLevel serverLevel) {
 				serverLevel.sendParticles(ESExplosionParticleOptions.ENERGY, getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
 				serverLevel.sendParticles(ESExplosionParticleOptions.ENERGY_BLAST, getX(), getY() + getBbHeight() / 2, getZ(), 5, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
@@ -388,7 +388,7 @@ public class StarlightGolem extends ESBoss implements RayAttackUser {
 			if (!possiblePositions.isEmpty()) {
 				BlockPos firePos = possiblePositions.get(getRandom().nextInt(possiblePositions.size()));
 				EnergizedFlame energizedFlame = ESEntities.ENERGIZED_FLAME.get().create(level());
-				energizedFlame.setPos(firePos.getBottomCenter());
+				energizedFlame.setPos(Vec3.atBottomCenterOf(firePos));
 				energizedFlame.setOwner(this);
 				level().addFreshEntity(energizedFlame);
 				possiblePositions.remove(firePos);

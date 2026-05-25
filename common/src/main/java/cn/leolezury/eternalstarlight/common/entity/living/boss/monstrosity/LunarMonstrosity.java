@@ -50,7 +50,6 @@ import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
@@ -283,7 +282,7 @@ public class LunarMonstrosity extends ESBoss implements RayAttackUser {
 				setBehaviorTicks(0);
 			}
 		}
-		float actualAmount = source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) || isOnFire() || hasEffect(ESMobEffects.STARFIRE.asHolder()) || getBehaviorState() == LunarMonstrosityStunPhase.ID ? amount : Math.min(3, amount);
+		float actualAmount = source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) || isOnFire() || hasEffect(ESMobEffects.STARFIRE.get()) || getBehaviorState() == LunarMonstrosityStunPhase.ID ? amount : Math.min(3, amount);
 		boolean success = super.hurt(source, actualAmount);
 		if (getPhase() == 0 && getHealth() / getMaxHealth() < 0.5) {
 			setPhase(1);
@@ -295,7 +294,7 @@ public class LunarMonstrosity extends ESBoss implements RayAttackUser {
 
 	@Override
 	public boolean addEffect(MobEffectInstance instance, @Nullable Entity entity) {
-		if (instance.getEffect().is(MobEffects.POISON)) {
+		if (instance.getEffect() == MobEffects.POISON) {
 			return false;
 		}
 		return super.addEffect(instance, entity);
@@ -315,9 +314,9 @@ public class LunarMonstrosity extends ESBoss implements RayAttackUser {
 			if (!this.level().isClientSide) {
 				setRemainingFireTicks(Math.max(getRemainingFireTicks(), getPhase() == 0 ? 100 : 20));
 				if (!itemStack.isDamageableItem()) {
-					itemStack.consume(1, player);
+					itemStack.shrink(1);
 				} else {
-					itemStack.hurtAndBreak(1, player, getSlotForHand(hand));
+					itemStack.hurtAndBreak(1, player, p -> getEquipmentSlotForItem(itemStack));
 				}
 			}
 			return InteractionResult.sidedSuccess(this.level().isClientSide);
@@ -327,12 +326,12 @@ public class LunarMonstrosity extends ESBoss implements RayAttackUser {
 	}
 
 	@Override
-	public EntityDimensions getDefaultDimensions(Pose pose) {
-		return getBehaviorState() == LunarMonstrositySneakPhase.ID ? super.getDefaultDimensions(pose).scale(0.1f) : super.getDefaultDimensions(pose);
+	public EntityDimensions getDimensions(Pose pose) {
+		return getBehaviorState() == LunarMonstrositySneakPhase.ID ? super.getDimensions(pose).scale(0.1f) : super.getDimensions(pose);
 	}
 
 	public AABB getNormalStateBoundingBox() {
-		return super.getDefaultDimensions(getPose()).makeBoundingBox(position());
+		return super.getDimensions(getPose()).makeBoundingBox(position());
 	}
 
 	@Override
@@ -398,8 +397,9 @@ public class LunarMonstrosity extends ESBoss implements RayAttackUser {
 	}
 
 	@Override
-	public boolean ignoreExplosion(Explosion explosion) {
-		LivingEntity cause = explosion.getIndirectSourceEntity();
+	public boolean ignoreExplosion() {
+		//LivingEntity cause = explosion.getIndirectSourceEntity();
+		Entity cause = this.getLastHurtByMob();
 		return cause != null && cause.getType().is(ESTags.EntityTypes.LUNAR_MONSTROSITY_ALLIES);
 	}
 

@@ -17,7 +17,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.behavior.LongJumpUtil;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -72,13 +71,15 @@ public class StarlightGolemSmashPhase extends BehaviorPhase<StarlightGolem> {
 		}
 		if (entity.getBehaviorTicks() == 37 && entity.getPhase() == 1 && target != null) {
 			for (int i : Util.shuffledCopy(ALLOWED_ANGLES, entity.getRandom())) {
-				Optional<Vec3> optional = LongJumpUtil.calculateJumpVectorForAngle(entity, ESMathUtil.rotationToPosition(entity.position(), 1, pitch, yaw), 0.75F, i, false);
+				Optional<Vec3> optional = calculateJumpVectorForAngle(entity, ESMathUtil.rotationToPosition(entity.position(), 1, pitch, yaw), 0.75F, i);
+
 				if (optional.isPresent()) {
 					entity.hurtMarked = true;
 					entity.addDeltaMovement(optional.get());
 				}
 			}
 		}
+
 		if (entity.getBehaviorTicks() == 40 && entity.level() instanceof ServerLevel serverLevel) {
 			ScreenShakeVfx.createInstance(entity.level().dimension(), entity.position(), 40, 50, 0.24f, 0.5f, 3, 5.5f).send(serverLevel);
 		}
@@ -102,9 +103,9 @@ public class StarlightGolemSmashPhase extends BehaviorPhase<StarlightGolem> {
 								}
 							}
 						} else {
-							float blockPitch = ESMathUtil.positionToPitch(shockwavePos.getBottomCenter(), pos.getCenter());
-							float blockYaw = ESMathUtil.positionToYaw(shockwavePos.getBottomCenter(), pos.getCenter());
-							if (!visited.contains(pos) && !entity.level().getBlockState(pos).isAir() && Math.abs(Mth.wrapDegrees(pitch - blockPitch)) < 75 && Math.abs(Mth.wrapDegrees(yaw - blockYaw)) < 30 && pos.getCenter().distanceTo(shockwavePos.getBottomCenter()) <= radius && pos.getCenter().distanceTo(shockwavePos.getBottomCenter()) >= radius - 1) {
+							float blockPitch = ESMathUtil.positionToPitch(Vec3.atBottomCenterOf(shockwavePos), pos.getCenter());
+							float blockYaw = ESMathUtil.positionToYaw(Vec3.atBottomCenterOf(shockwavePos), pos.getCenter());
+							if (!visited.contains(pos) && !entity.level().getBlockState(pos).isAir() && Math.abs(Mth.wrapDegrees(pitch - blockPitch)) < 75 && Math.abs(Mth.wrapDegrees(yaw - blockYaw)) < 30 && pos.getCenter().distanceTo(Vec3.atBottomCenterOf(shockwavePos)) <= radius && pos.getCenter().distanceTo(Vec3.atBottomCenterOf(shockwavePos)) >= radius - 1) {
 								boolean above = entity.level().getBlockState(pos.above()).isAir();
 								boolean below = entity.level().getBlockState(pos.below()).isAir();
 								if (above || below) {
@@ -137,6 +138,33 @@ public class StarlightGolemSmashPhase extends BehaviorPhase<StarlightGolem> {
 			}
 		}
 	}
+
+	private static Optional<Vec3> calculateJumpVectorForAngle(LivingEntity entity, Vec3 target, float velocity, int angleDegrees) {
+		Vec3 start = entity.position();
+		Vec3 diff = target.subtract(start);
+
+		double horizontalDist = Math.sqrt(diff.x * diff.x + diff.z * diff.z);
+		double angle = Math.toRadians(angleDegrees);
+
+		double y = diff.y;
+		double v = velocity;
+
+		double cos = Math.cos(angle);
+		double sin = Math.sin(angle);
+
+		double denom = horizontalDist * Math.tan(angle) - y;
+		if (denom <= 0) {
+			return Optional.empty();
+		}
+
+		double speed = v / cos;
+		double vx = (diff.x / horizontalDist) * speed * cos;
+		double vz = (diff.z / horizontalDist) * speed * cos;
+		double vy = speed * sin;
+
+		return Optional.of(new Vec3(vx, vy, vz));
+	}
+
 
 	@Override
 	public boolean canContinue(StarlightGolem entity) {

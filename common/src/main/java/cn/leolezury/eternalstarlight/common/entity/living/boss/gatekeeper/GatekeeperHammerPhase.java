@@ -33,7 +33,8 @@ public class GatekeeperHammerPhase extends BehaviorPhase<TheGatekeeper> {
 				e.hurtMarked = true;
 				e.addDeltaMovement(e.position().subtract(entity.position()).normalize().multiply(0.6, 0.5, 0.6));
 			});
-			entity.playSound(SoundEvents.MACE_SMASH_GROUND_HEAVY);
+			//entity.playSound(SoundEvents.MACE_SMASH_GROUND_HEAVY);
+			entity.playSound(SoundEvents.ANVIL_FALL);
 			entity.hurtMarked = true;
 			entity.addDeltaMovement(target.position().subtract(entity.position()).normalize().scale(0.7));
 		}

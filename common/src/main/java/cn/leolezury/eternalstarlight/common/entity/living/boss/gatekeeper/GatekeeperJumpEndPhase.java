@@ -41,7 +41,8 @@ public class GatekeeperJumpEndPhase extends BehaviorPhase<TheGatekeeper> {
 		}
 		if (entity.getBehaviorTicks() == 2) {
 			boolean hammer = entity.getMainHandItem().getItem() instanceof HammerItem;
-			entity.playSound(SoundEvents.MACE_SMASH_GROUND_HEAVY);
+			//entity.playSound(SoundEvents.MACE_SMASH_GROUND_HEAVY);
+			entity.playSound(SoundEvents.ANVIL_FALL);
 			BlockHitResult toGround = level.clip(new ClipContext(entity.position().add(0, entity.getBbHeight(), 0), entity.position().subtract(0, 0.5, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, entity));
 			if (toGround.getType() != HitResult.Type.MISS && level instanceof ServerLevel serverLevel) {
 				ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(RingExplosionParticleOptions.SHOCKWAVE, entity.getX(), entity.getY(), entity.getZ(), 0, 0.1, 0));

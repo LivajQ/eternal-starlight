@@ -20,16 +20,12 @@ import cn.leolezury.eternalstarlight.common.util.ESBookUtil;
 import cn.leolezury.eternalstarlight.common.util.ESCrestUtil;
 import cn.leolezury.eternalstarlight.common.util.ESEntityUtil;
 import cn.leolezury.eternalstarlight.common.util.ModelSnapshot;
+import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.DataResult;
-import net.minecraft.Util;
-import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -48,6 +44,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
@@ -56,7 +54,6 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.decoration.Painting;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.Npc;
@@ -64,8 +61,6 @@ import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.trading.Merchant;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
@@ -190,25 +185,29 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(STAND_DIRECTION, Direction.UP);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(STAND_DIRECTION, Direction.UP);
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compoundTag) {
-		super.readAdditionalSaveData(compoundTag);
-		if (compoundTag.contains(TAG_OFFERS)) {
-			DataResult<MerchantOffers> parsed = MerchantOffers.CODEC.parse(this.registryAccess().createSerializationContext(NbtOps.INSTANCE), compoundTag.get(TAG_OFFERS));
-			parsed.resultOrPartial(Util.prefix("Failed to load offers: ", EternalStarlight.LOGGER::warn)).ifPresent((merchantOffers) -> this.offers = merchantOffers);
+	public void readAdditionalSaveData(CompoundTag tag) {
+		super.readAdditionalSaveData(tag);
+
+		if (tag.contains(TAG_OFFERS, CompoundTag.TAG_COMPOUND)) {
+			this.offers = new MerchantOffers(tag.getCompound(TAG_OFFERS));
 		}
-		gatekeeperName = compoundTag.getString(TAG_GATEKEEPER_NAME);
-		fightTarget = compoundTag.getString(TAG_FIGHT_TARGET);
-		if (compoundTag.contains(TAG_STANDARD_FIGHT)) {
-			standardFight = compoundTag.getBoolean(TAG_STANDARD_FIGHT);
+
+		gatekeeperName = tag.getString(TAG_GATEKEEPER_NAME);
+		fightTarget = tag.getString(TAG_FIGHT_TARGET);
+
+		if (tag.contains(TAG_STANDARD_FIGHT)) {
+			standardFight = tag.getBoolean(TAG_STANDARD_FIGHT);
 		}
-		restockCooldown = compoundTag.getInt(TAG_RESTOCK_COOLDOWN);
+
+		restockCooldown = tag.getInt(TAG_RESTOCK_COOLDOWN);
 		bossEvent.setId(getUUID());
+
 		if (this.offers == null) {
 			this.offers = new MerchantOffers();
 			this.addTrades();
@@ -216,20 +215,24 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compoundTag) {
-		super.addAdditionalSaveData(compoundTag);
+	public void addAdditionalSaveData(CompoundTag tag) {
+		super.addAdditionalSaveData(tag);
+
 		if (!this.level().isClientSide) {
-			MerchantOffers merchantOffers = this.getOffers();
-			if (!merchantOffers.isEmpty()) {
-				compoundTag.put(TAG_OFFERS, MerchantOffers.CODEC.encodeStart(this.registryAccess().createSerializationContext(NbtOps.INSTANCE), merchantOffers).getOrThrow());
+			MerchantOffers offers = this.getOffers();
+			if (!offers.isEmpty()) {
+				tag.put(TAG_OFFERS, offers.createTag());
 			}
 		}
-		compoundTag.putString(TAG_GATEKEEPER_NAME, gatekeeperName);
+
+		tag.putString(TAG_GATEKEEPER_NAME, gatekeeperName);
+
 		if (fightTarget != null) {
-			compoundTag.putString(TAG_FIGHT_TARGET, fightTarget);
+			tag.putString(TAG_FIGHT_TARGET, fightTarget);
 		}
-		compoundTag.putBoolean(TAG_STANDARD_FIGHT, standardFight);
-		compoundTag.putInt(TAG_RESTOCK_COOLDOWN, restockCooldown);
+
+		tag.putBoolean(TAG_STANDARD_FIGHT, standardFight);
+		tag.putInt(TAG_RESTOCK_COOLDOWN, restockCooldown);
 	}
 
 	@Override
@@ -250,7 +253,7 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.5D, false) {
 			@Override
-			protected void checkAndPerformAttack(LivingEntity livingEntity) {
+			protected void checkAndPerformAttack(LivingEntity livingEntity, double d) {
 
 			}
 		});
@@ -326,11 +329,11 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 		if (getBehaviorState() == GatekeeperBowPhase.ID
 			&& getBehaviorTicks() >= 6
 			&& getBehaviorTicks() <= 26) {
-			int useDuration = getMainHandItem().getUseDuration(this);
+			int useDuration = getMainHandItem().getUseDuration();
 			return useDuration - (getBehaviorTicks() - 6);
 		}
 		if (getBehaviorState() == GatekeeperBowComboPhase.ID) {
-			int useDuration = getMainHandItem().getUseDuration(this);
+			int useDuration = getMainHandItem().getUseDuration();
 			if (getBehaviorTicks() >= 5 && getBehaviorTicks() <= 20) {
 				return useDuration - Math.round((getBehaviorTicks() - 5) * 1.3f);
 			}
@@ -450,7 +453,7 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 	@Override
 	protected InteractionResult mobInteract(Player player, InteractionHand interactionHand) {
 		if (!level().isClientSide && player instanceof ServerPlayer serverPlayer && serverPlayer.getServer() != null && getTradingPlayer() == null && !isActivated() && getTarget() == null && getFightTarget().isEmpty()) {
-			AdvancementHolder killDragon = serverPlayer.getServer().getAdvancements().get(ResourceLocation.withDefaultNamespace("end/kill_dragon"));
+			Advancement killDragon = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("minecraft:end/kill_dragon"));
 			if (killDragon != null && serverPlayer.getAdvancements().getOrStartProgress(killDragon).isDone() && !isPlayerPermitted(serverPlayer)) {
 				permitPlayer(serverPlayer);
 				ItemStack lootBag = getBossLootBag();
@@ -500,7 +503,7 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 
 	public static boolean isPlayerPermitted(ServerPlayer player) {
 		if (player.getServer() != null) {
-			AdvancementHolder challenge = player.getServer().getAdvancements().get(EternalStarlight.id("challenge_gatekeeper"));
+			Advancement challenge = player.getServer().getAdvancements().getAdvancement(EternalStarlight.id("challenge_gatekeeper"));
 			boolean challenged = challenge != null && player.getAdvancements().getOrStartProgress(challenge).isDone();
 			if (challenged) {
 				return true;
@@ -553,7 +556,7 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 		}
 		if (getBehaviorState() == GatekeeperEatPhase.ID && source.getEntity() != null) {
 			healInterrupted = true;
-			healInterruptedIndirect = !source.isDirect();
+			healInterruptedIndirect = source.getDirectEntity() == null;
 		}
 		return super.hurt(source, amount);
 	}
@@ -567,38 +570,67 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 		if (getInitialPos().dimension() != level().dimension()) {
 			return;
 		}
+
 		Vec3 initialPos = getInitialPos().pos();
 		BlockPos blockPos = BlockPos.containing(initialPos);
+
 		if (initialPos.distanceTo(position()) > 15) {
-			if (level().noBlockCollision(this, getBoundingBox().move(blockPos.getBottomCenter().subtract(position())))) {
-				setPos(blockPos.getBottomCenter());
+
+			if (level().noCollision(this, getBoundingBox().move(Vec3.atBottomCenterOf(blockPos).subtract(position())))) {
+				setPos(Vec3.atBottomCenterOf(blockPos));
 				return;
 			}
+
 			for (int i = 0; i < 64; i++) {
-				BlockPos startPos = blockPos.offset(getRandom().nextInt(31) - 15, getRandom().nextInt(31) - 15, getRandom().nextInt(31) - 15);
+				BlockPos startPos = blockPos.offset(
+					getRandom().nextInt(31) - 15,
+					getRandom().nextInt(31) - 15,
+					getRandom().nextInt(31) - 15
+				);
+
 				boolean successful = false;
 				double finalY = startPos.getY();
+
 				if (level().getBlockState(startPos).isAir()) {
-					BlockHitResult result = level().clip(new ClipContext(startPos.getCenter(), startPos.getCenter().add(0, -15, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+					BlockHitResult result = level().clip(new ClipContext(
+						Vec3.atCenterOf(startPos),
+						Vec3.atCenterOf(startPos).add(0, -15, 0),
+						ClipContext.Block.COLLIDER,
+						ClipContext.Fluid.NONE,
+						this
+					));
+
 					if (result.getType() != HitResult.Type.MISS) {
 						finalY = result.getLocation().y;
 						successful = true;
 					}
+
 				} else {
 					int currentDiff = 0;
-					while (!(level().noBlockCollision(this, getBoundingBox().move(startPos.getBottomCenter().subtract(position())))) && currentDiff < 15) {
+					while (!level().noCollision(this, getBoundingBox().move(Vec3.atBottomCenterOf(startPos).subtract(position())))
+						&& currentDiff < 15) {
 						startPos = startPos.above();
 						currentDiff++;
 					}
-					if (level().noBlockCollision(this, getBoundingBox().move(startPos.getBottomCenter().subtract(position())))) {
-						BlockHitResult result = level().clip(new ClipContext(startPos.getCenter(), startPos.getCenter().add(0, -15, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+
+					if (level().noCollision(this, getBoundingBox().move(Vec3.atBottomCenterOf(startPos).subtract(position())))) {
+						BlockHitResult result = level().clip(new ClipContext(
+							Vec3.atCenterOf(startPos),
+							Vec3.atCenterOf(startPos).add(0, -15, 0),
+							ClipContext.Block.COLLIDER,
+							ClipContext.Fluid.NONE,
+							this
+						));
+
 						if (result.getType() != HitResult.Type.MISS) {
 							finalY = result.getLocation().y;
 							successful = true;
 						}
 					}
 				}
+
 				Vec3 target = new Vec3(startPos.getX() + 0.5, finalY, startPos.getZ() + 0.5);
+
 				if (successful && initialPos.distanceTo(target) <= 15) {
 					if (ESPlatform.INSTANCE.postTeleportEvent(this, target)) {
 						setPos(target);
@@ -624,7 +656,7 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 			averageZ = averageZ / recentPositions.size();
 			Vec3 averagePos = new Vec3(averageX, averageY, averageZ);
 			return recentPositions.stream().allMatch(pos ->
-				pos.getBottomCenter().distanceTo(averagePos) < 5);
+				Vec3.atBottomCenterOf(pos).distanceTo(averagePos) < 5);
 		}
 		return false;
 	}
@@ -718,11 +750,19 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 	public ItemStack getGatekeeperHammer() {
 		LivingEntity target = getTarget();
 		if (target instanceof ServerPlayer serverPlayer && isPlayerPermitted(serverPlayer) && ESDataAttachments.GATEKEEPER_CHALLENGE_COUNT.getData(target) > 0) {
-			ItemStack mace = Items.MACE.getDefaultInstance();
-			ItemAttributeModifiers morningStarAttributes = ESItems.GLISTERING_MORNING_STAR.get().getDefaultInstance().get(DataComponents.ATTRIBUTE_MODIFIERS);
-			mace.set(DataComponents.ATTRIBUTE_MODIFIERS, morningStarAttributes);
-			return mace;
+			// TODO no mace so replace with whatever later
+			// ItemStack mace = Items.MACE.getDefaultInstance();
+			ItemStack weapon = Items.NETHERITE_AXE.getDefaultInstance();
+			ItemStack source = ESItems.GLISTERING_MORNING_STAR.get().getDefaultInstance();
+			Multimap<Attribute, AttributeModifier> mods = source.getAttributeModifiers(EquipmentSlot.MAINHAND);
+
+			for (Map.Entry<Attribute, AttributeModifier> entry : mods.entries()) {
+				weapon.addAttributeModifier(entry.getKey(), entry.getValue(), EquipmentSlot.MAINHAND);
+			}
+
+			return weapon;
 		}
+
 		return ESItems.GLISTERING_MORNING_STAR.get().getDefaultInstance();
 	}
 
@@ -740,8 +780,8 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 	}
 
 	@Override
-	protected EntityDimensions getDefaultDimensions(Pose pose) {
-		EntityDimensions dimensions = super.getDefaultDimensions(pose);
+	public EntityDimensions getDimensions(Pose pose) {
+		EntityDimensions dimensions = super.getDimensions(pose);
 		if (!isActivated() && getStandDirection().getAxis() == Direction.Axis.Y) {
 			return dimensions.scale(1, 0.7f);
 		}
@@ -803,19 +843,26 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 	}
 
 	protected void addTrades() {
-		MerchantOffers merchantoffers = this.getOffers();
-		this.addTrades(merchantoffers, GatekeeperTrades.TRADES, 50);
-		this.addTrades(merchantoffers, new VillagerTrades.ItemListing[]{
+		MerchantOffers offers = this.getOffers();
+
+		this.addTrades(offers, GatekeeperTrades.TRADES, 50);
+
+		this.addTrades(offers, new VillagerTrades.ItemListing[]{
 			ESEntityUtil.simpleTrade(
 				new ItemStack(ESItems.STARLIGHT_SILVER_COIN.get(), 10),
-				Util.make(() -> {
-					ItemStack stack = ESItems.STARLIT_PAINTING.get().getDefaultInstance();
-					stack.set(DataComponents.ENTITY_DATA, CustomData.EMPTY.update(level().registryAccess().createSerializationContext(NbtOps.INSTANCE), Painting.VARIANT_MAP_CODEC, level().registryAccess().registryOrThrow(Registries.PAINTING_VARIANT).getHolderOrThrow(ESPaintingVariants.GUARDIAN)).getOrThrow().update((compoundTag) -> compoundTag.putString("id", EternalStarlight.ID + ":painting")));
-					return stack;
-				}),
+				makeGuardianPainting(),
 				10
-			),
+			)
 		}, 50);
+	}
+
+	private ItemStack makeGuardianPainting() {
+		ItemStack stack = ESItems.STARLIT_PAINTING.get().getDefaultInstance();
+
+		CompoundTag entityTag = stack.getOrCreateTagElement("EntityTag");
+		entityTag.putString("variant", ESPaintingVariants.GUARDIAN.location().toString());
+
+		return stack;
 	}
 
 	protected void addTrades(MerchantOffers original, VillagerTrades.ItemListing[] newTrades, int maxNumbers) {

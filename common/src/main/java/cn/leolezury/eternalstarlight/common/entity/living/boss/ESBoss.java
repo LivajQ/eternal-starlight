@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.entity.living.boss;
 
-import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.block.LootChestBlock;
 import cn.leolezury.eternalstarlight.common.block.entity.LootChestBlockEntity;
 import cn.leolezury.eternalstarlight.common.block.entity.spawner.BossSpawnerBlockEntity;
@@ -14,12 +13,9 @@ import cn.leolezury.eternalstarlight.common.util.GlobalVec3;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -38,13 +34,11 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -120,42 +114,58 @@ public class ESBoss extends Monster implements MultiBehaviorUser {
 	}
 
 	@Override
-	protected void defineSynchedData(SynchedEntityData.Builder builder) {
-		super.defineSynchedData(builder);
-		builder.define(BEHAVIOR_STATE, 0)
-			.define(BEHAVIOR_TICKS, 0)
-			.define(PHASE, 0)
-			.define(ACTIVATED, true);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(BEHAVIOR_STATE, 0);
+		this.entityData.define(BEHAVIOR_TICKS, 0);
+		this.entityData.define(PHASE, 0);
+		this.entityData.define(ACTIVATED, true);
 	}
 
 	@Nullable
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
-		spawnGroupData = super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData);
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
+		spawnData = super.finalizeSpawn(level, difficulty, spawnType, spawnData, dataTag);
 		initializeBossOnFirstSpawn();
-		return spawnGroupData;
+		return spawnData;
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag compoundTag) {
-		super.readAdditionalSaveData(compoundTag);
-		if (compoundTag.contains(TAG_INITIAL_POS)) {
-			GlobalVec3.CODEC.parse(NbtOps.INSTANCE, compoundTag.get(TAG_INITIAL_POS)).resultOrPartial(s -> EternalStarlight.LOGGER.warn("Failed to parse boss initial pos: {}", s)).ifPresent(pos -> this.initialPos = pos);
+	public void readAdditionalSaveData(CompoundTag tag) {
+		super.readAdditionalSaveData(tag);
+
+		if (tag.contains(TAG_INITIAL_POS, CompoundTag.TAG_COMPOUND)) {
+			CompoundTag posTag = tag.getCompound(TAG_INITIAL_POS);
+
+			ResourceLocation dimId = new ResourceLocation(posTag.getString("dim"));
+			ResourceKey<Level> dim = ResourceKey.create(Registries.DIMENSION, dimId);
+
+			double x = posTag.getDouble("x");
+			double y = posTag.getDouble("y");
+			double z = posTag.getDouble("z");
+
+			this.initialPos = new GlobalVec3(dim, new Vec3(x, y, z));
 		}
-		spawned = compoundTag.getBoolean(TAG_SPAWNED);
-		setPhase(compoundTag.getInt(TAG_PHASE));
-		if (compoundTag.contains(TAG_ACTIVATED, CompoundTag.TAG_INT)) {
-			setActivated(compoundTag.getBoolean(TAG_ACTIVATED));
-		}
+
+		spawned = tag.getBoolean(TAG_SPAWNED);
+		setPhase(tag.getInt(TAG_PHASE));
+		setActivated(tag.getBoolean(TAG_ACTIVATED));
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag compoundTag) {
-		super.addAdditionalSaveData(compoundTag);
-		compoundTag.put(TAG_INITIAL_POS, GlobalVec3.CODEC.encodeStart(NbtOps.INSTANCE, initialPos).getOrThrow());
-		compoundTag.putBoolean(TAG_SPAWNED, spawned);
-		compoundTag.putInt(TAG_PHASE, getPhase());
-		compoundTag.putBoolean(TAG_ACTIVATED, isActivated());
+	public void addAdditionalSaveData(CompoundTag tag) {
+		super.addAdditionalSaveData(tag);
+
+		CompoundTag posTag = new CompoundTag();
+		posTag.putString("dim", initialPos.dimension().location().toString());
+		posTag.putDouble("x", initialPos.pos().x());
+		posTag.putDouble("y", initialPos.pos().y());
+		posTag.putDouble("z", initialPos.pos().z());
+		tag.put(TAG_INITIAL_POS, posTag);
+
+		tag.putBoolean(TAG_SPAWNED, spawned);
+		tag.putInt(TAG_PHASE, getPhase());
+		tag.putBoolean(TAG_ACTIVATED, isActivated());
 	}
 
 	@Override
