@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 
 public class SimpleTextToast implements Toast {
-	private static final ResourceLocation BACKGROUND_SPRITE = ResourceLocation.withDefaultNamespace("toast/advancement");
+	private static final ResourceLocation BACKGROUND_SPRITE = new ResourceLocation("minecraft", "toast/advancement");
 	private final Component title;
 	private final Component text;
 	private final ItemStack icon;
@@ -25,7 +25,7 @@ public class SimpleTextToast implements Toast {
 
 	@Override
 	public Toast.Visibility render(GuiGraphics guiGraphics, ToastComponent toastComponent, long timeSinceLastVisible) {
-		guiGraphics.blitSprite(BACKGROUND_SPRITE, 0, 0, this.width(), this.height());
+		guiGraphics.blit(BACKGROUND_SPRITE, 0, 0, 0, 0, this.width(), this.height());
 		List<FormattedCharSequence> list = toastComponent.getMinecraft().font.split(text, 125);
 		if (list.size() == 1) {
 			guiGraphics.drawString(toastComponent.getMinecraft().font, title, 30, 7, -1, false);

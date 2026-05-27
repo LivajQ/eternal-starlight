@@ -53,10 +53,35 @@ public class ExplosionShockParticle extends TextureSheetParticle {
 		float u1 = Easing.IN_OUT_QUAD.interpolate(Mth.abs(Math.min(age + partialTick, lifetime) / lifetime - 0.5f) * 2, this.getU1(), this.getU0());
 		float v0 = this.getV0();
 		float v1 = this.getV1();
-		consumer.addVertex(pose, start.add(sideOffset).toVector3f()).setColor(Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.x(), toColor.x()), Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.y(), toColor.y()), Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.z(), toColor.z()), 1).setUv(u0, v0).setLight(LightTexture.FULL_BRIGHT);
-		consumer.addVertex(pose, start.add(sideOffset.scale(-1)).toVector3f()).setColor(Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.x(), toColor.x()), Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.y(), toColor.y()), Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.z(), toColor.z()), 1).setUv(u0, v1).setLight(LightTexture.FULL_BRIGHT);
-		consumer.addVertex(pose, end.add(sideOffset.scale(-1)).toVector3f()).setColor(Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.x(), toColor.x()), Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.y(), toColor.y()), Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.z(), toColor.z()), 1).setUv(u1, v1).setLight(LightTexture.FULL_BRIGHT);
-		consumer.addVertex(pose, end.add(sideOffset).toVector3f()).setColor(Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.x(), toColor.x()), Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.y(), toColor.y()), Easing.IN_OUT_QUAD.interpolate(Math.min(age + partialTick, lifetime) / lifetime, fromColor.z(), toColor.z()), 1).setUv(u1, v0).setLight(LightTexture.FULL_BRIGHT);
+		float progress = Math.min(age + partialTick, lifetime) / lifetime;
+
+		float r = Easing.IN_OUT_QUAD.interpolate(progress, fromColor.x(), toColor.x());
+		float g = Easing.IN_OUT_QUAD.interpolate(progress, fromColor.y(), toColor.y());
+		float b = Easing.IN_OUT_QUAD.interpolate(progress, fromColor.z(), toColor.z());
+
+		consumer.vertex(pose.pose(), (float)(start.x + sideOffset.x), (float)(start.y + sideOffset.y), (float)(start.z + sideOffset.z))
+			.color(r, g, b, 1.0F)
+			.uv(u0, v0)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.endVertex();
+
+		consumer.vertex(pose.pose(), (float)(start.x - sideOffset.x), (float)(start.y - sideOffset.y), (float)(start.z - sideOffset.z))
+			.color(r, g, b, 1.0F)
+			.uv(u0, v1)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.endVertex();
+
+		consumer.vertex(pose.pose(), (float)(end.x - sideOffset.x), (float)(end.y - sideOffset.y), (float)(end.z - sideOffset.z))
+			.color(r, g, b, 1.0F)
+			.uv(u1, v1)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.endVertex();
+
+		consumer.vertex(pose.pose(), (float)(end.x + sideOffset.x), (float)(end.y + sideOffset.y), (float)(end.z + sideOffset.z))
+			.color(r, g, b, 1.0F)
+			.uv(u1, v0)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.endVertex();
 		stack.popPose();
 	}
 

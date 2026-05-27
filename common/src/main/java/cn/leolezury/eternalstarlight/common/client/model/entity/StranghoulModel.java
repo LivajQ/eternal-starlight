@@ -79,7 +79,7 @@ public class StranghoulModel<T extends Stranghoul> extends HumanoidModel<T> {
 	@Override
 	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		super.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-		if (entity.isAggressive() && entity.getWeaponItem().isEmpty()) {
+		if (entity.isAggressive() && entity.getMainHandItem().isEmpty()) {
 			AnimationUtils.animateZombieArms(this.leftArm, this.rightArm, true, this.attackTime, ageInTicks);
 		}
 		if (entity.isEating()) {

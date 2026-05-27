@@ -32,8 +32,8 @@ public class CrystalbornCatalystScreen extends AbstractContainerScreen<Crystalbo
 		int y = (this.height - this.imageHeight) / 2;
 		guiGraphics.blit(CONTAINER_BACKGROUND, x, y, 0, 0, this.imageWidth, this.imageHeight);
 		if (menu.getChargeProgress() > 0) {
-			int progress = (Mth.ceil(menu.getChargeProgress() * 13) + 1);
-			guiGraphics.blitSprite(PROGRESS, 14, 14, 0, 14 - progress, this.leftPos + 9, this.topPos + 34 - progress, 14, progress);
+			int progress = Mth.ceil(menu.getChargeProgress() * 13) + 1;
+			guiGraphics.blit(PROGRESS, this.leftPos + 9, this.topPos + 34 - progress, 0, 14 - progress, 14, progress);
 		}
 	}
 }

@@ -16,6 +16,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -25,6 +27,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 
 import java.util.*;
@@ -63,15 +66,28 @@ public class MobInfoBookComponent extends BookComponent<MobInfoBookComponent.Con
 			&& context.getMouseY() >= Math.max(centerY - entry.iconHeight() / 2, context.getContentY()) && context.getMouseY() <= Math.min(centerY + entry.iconHeight() / 2, context.getContentY() + context.getBookDefinition().height() - 2 * context.getBookDefinition().frameWidth())) {
 			List<Component> tooltip = new ArrayList<>();
 			if (entry.attribute().isPresent()) {
-				Optional<EntityType<?>> entityType = BuiltInRegistries.ENTITY_TYPE.getOptional(config.mob());
-				Optional<Holder.Reference<Attribute>> attribute = BuiltInRegistries.ATTRIBUTE.getHolder(entry.attribute().get());
-				if (entityType.isPresent() && attribute.isPresent() && Minecraft.getInstance().level != null) {
-					Entity entity = CACHED_ENTITY_SAMPLES.computeIfAbsent(entityType.get(), type -> type.create(Minecraft.getInstance().level));
+				Optional<EntityType<?>> entityType =
+					BuiltInRegistries.ENTITY_TYPE.getOptional(config.mob());
+
+				Attribute attribute =
+					BuiltInRegistries.ATTRIBUTE.get(entry.attribute().get());
+
+				if (entityType.isPresent() && attribute != null && Minecraft.getInstance().level != null) {
+					Entity entity = CACHED_ENTITY_SAMPLES.computeIfAbsent(
+						entityType.get(),
+						type -> type.create(Minecraft.getInstance().level)
+					);
+
 					if (entity instanceof LivingEntity living) {
-						AttributeInstance instance = living.getAttribute(attribute.get());
+						AttributeInstance instance = living.getAttribute(attribute);
 						if (instance != null) {
 							if (entry.attributeTextStyle().isPresent()) {
-								tooltip.add(Component.translatable(attribute.get().value().getDescriptionId()).append(": " + ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(instance.getValue())).withStyle(entry.attributeTextStyle().get()));
+								tooltip.add(
+									Component.translatable(attribute.getDescriptionId())
+										.append(": " + ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(instance.getValue()))
+										.withStyle(entry.attributeTextStyle().get())
+								);
+
 								if (!entry.text().toComponent().getString().isEmpty()) {
 									tooltip.add(Component.empty());
 								}
@@ -80,6 +96,7 @@ public class MobInfoBookComponent extends BookComponent<MobInfoBookComponent.Con
 					}
 				}
 			}
+
 			if (!entry.text().toComponent().getString().isEmpty()) {
 				List<FormattedCharSequence> list = context.getFont().split(entry.text().toComponent(), config.tooltipWidth());
 				list.forEach(s -> tooltip.add(new Component() {
@@ -90,7 +107,7 @@ public class MobInfoBookComponent extends BookComponent<MobInfoBookComponent.Con
 
 					@Override
 					public ComponentContents getContents() {
-						return PlainTextContents.EMPTY;
+						return LiteralContents.EMPTY;
 					}
 
 					@Override
@@ -129,10 +146,24 @@ public class MobInfoBookComponent extends BookComponent<MobInfoBookComponent.Con
 	}
 
 	public record Entry(BookContent text, Optional<ResourceLocation> attribute, Optional<Style> attributeTextStyle, int iconWidth, int iconHeight, ResourceLocation icon) {
-		public static final Codec<Entry> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
+		// may or may not work
+		private static final Codec<Style> STYLE_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			Codec.STRING.optionalFieldOf("color")
+				.forGetter(style -> Optional.ofNullable(style.getColor()).map(TextColor::serialize))
+		).apply(instance, optColor -> {
+			if (optColor.isPresent()) {
+				TextColor color = TextColor.parseColor(optColor.get());
+				if (color != null) {
+					return Style.EMPTY.withColor(color);
+				}
+			}
+			return Style.EMPTY;
+		}));
+
+		public static final Codec<Entry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			BookContent.CODEC.fieldOf("text").forGetter(Entry::text),
 			ResourceLocation.CODEC.optionalFieldOf("attribute").forGetter(Entry::attribute),
-			Style.Serializer.CODEC.optionalFieldOf("attribute_text_style").forGetter(Entry::attributeTextStyle),
+			STYLE_CODEC.optionalFieldOf("attribute_text_style").forGetter(Entry::attributeTextStyle),
 			Codec.INT.fieldOf("icon_width").forGetter(Entry::iconWidth),
 			Codec.INT.fieldOf("icon_height").forGetter(Entry::iconHeight),
 			ResourceLocation.CODEC.fieldOf("icon").forGetter(Entry::icon)

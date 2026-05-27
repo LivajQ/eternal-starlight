@@ -16,7 +16,6 @@ import cn.leolezury.eternalstarlight.common.entity.living.boss.gatekeeper.TheGat
 import cn.leolezury.eternalstarlight.common.entity.projectile.SoulitSpectator;
 import cn.leolezury.eternalstarlight.common.item.component.GuideBook;
 import cn.leolezury.eternalstarlight.common.network.*;
-import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.registry.ESParticles;
 import cn.leolezury.eternalstarlight.common.spell.ManaType;
@@ -43,7 +42,7 @@ import java.util.stream.Collectors;
 public class ClientSideHelper implements ClientHelper {
 	@Override
 	public void handleServerToClientSimpleAction(SimpleActionPacket packet) {
-		switch (packet.id()) {
+		switch (packet.id().getPath()) {
 			case SimpleActionPacket.S2C_CLEAR_WEATHER -> ClientWeatherState.weather = null;
 		}
 	}
@@ -303,7 +302,7 @@ public class ClientSideHelper implements ClientHelper {
 
 	@Override
 	public float handleMeteorShowerRainLevel() {
-		float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally());
+		float partialTick = Minecraft.getInstance().getFrameTime();
 		ClientWeatherState.levelTarget = 1;
 		return ClientWeatherState.getRainLevel(partialTick);
 	}

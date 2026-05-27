@@ -50,7 +50,7 @@ public class AethersentExplosionParticle extends NoRenderParticle {
 				level.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, true, pos.x, pos.y, pos.z, 0, 0.05, 0);
 			}
 			pos = basePos.offsetRandom(random, 2);
-			level.addParticle(ParticleTypes.WHITE_SMOKE, true, pos.x, pos.y, pos.z, 0, 0, 0);
+			level.addParticle(ParticleTypes.SMOKE, true, pos.x, pos.y, pos.z, 0, 0, 0);
 		}
 	}
 

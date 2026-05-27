@@ -62,7 +62,7 @@ public class SolarCreeperModel<T extends SolarCreeper> extends AnimatedEntityMod
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-		root().render(poseStack, vertexConsumer, packedLight, packedOverlay, FastColor.ARGB32.color(Math.round(FastColor.ARGB32.alpha(color) * alphaFactor), FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color)));
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float r, float g, float b, float a) {
+		root().render(poseStack, vertexConsumer, packedLight, packedOverlay, r, g, b, a);
 	}
 }

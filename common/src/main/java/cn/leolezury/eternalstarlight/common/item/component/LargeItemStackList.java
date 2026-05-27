@@ -92,6 +92,10 @@ public class LargeItemStackList extends AbstractList<LargeItemStackList.LargeIte
 			return out;
 		}
 
+		public ItemStack asItemStack() {
+			return item.copyWithCount(count);
+		}
+
 		public ItemStack splitMaxStack() {
 			return split(item.getMaxStackSize());
 		}

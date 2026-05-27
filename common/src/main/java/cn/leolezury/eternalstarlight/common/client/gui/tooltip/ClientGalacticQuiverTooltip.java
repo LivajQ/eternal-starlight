@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.List;
 
 public class ClientGalacticQuiverTooltip implements ClientTooltipComponent {
-	private static final ResourceLocation SLOT = ResourceLocation.withDefaultNamespace("container/slot");
+	private static final ResourceLocation SLOT = new ResourceLocation("minecraft", "container/slot");
 	private final List<LargeItemStackList.LargeItemStack> contents;
 
 	public ClientGalacticQuiverTooltip(List<LargeItemStackList.LargeItemStack> contents) {
@@ -42,7 +42,7 @@ public class ClientGalacticQuiverTooltip implements ClientTooltipComponent {
 	private void renderSlot(int x, int y, int itemIndex, GuiGraphics guiGraphics, Font font) {
 		if (itemIndex < this.contents.size()) {
 			LargeItemStackList.LargeItemStack stack = this.contents.get(itemIndex);
-			guiGraphics.blitSprite(SLOT, x, y, 0, 18, 18);
+			guiGraphics.blit(SLOT, x, y, 0, 0, 18, 18);
 			guiGraphics.renderItem(stack.getItem(), x + 1, y + 1, itemIndex);
 			guiGraphics.renderItemDecorations(font, stack.asItemStack(), x + 1, y + 1);
 		}

@@ -223,8 +223,8 @@ public class BookScreen extends Screen {
 	}
 
 	@Override
-	public boolean mouseScrolled(double x, double y, double scrollX, double scrollY) {
-		setScrollProgress(scrollProgress - (int) (scrollY * font.lineHeight));
+	public boolean mouseScrolled(double x, double y, double scrollY) {
+		setScrollProgress(scrollProgress - (int)(scrollY * font.lineHeight));
 		return true;
 	}
 
@@ -255,8 +255,8 @@ public class BookScreen extends Screen {
 	}
 
 	@Override
-	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-		super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+	public void renderBackground(GuiGraphics guiGraphics) {
+		super.renderBackground(guiGraphics);
 		guiGraphics.blit(book.textures().background(), getBaseX(), getBaseY(), 0, 0, book.width(), book.height(), book.width(), book.height());
 		guiGraphics.enableScissor(getContentX(), getContentY(), getContentX() + book.width() - 2 * book.frameWidth(), getContentY() + book.height() - 2 * book.frameWidth());
 		int startHeight = 0;
@@ -343,7 +343,7 @@ public class BookScreen extends Screen {
 	}
 
 	private int getScrollButtonHeight() {
-		return Math.clamp((int) (book.scrollbar().scrollbarHeight() * (double) (book.height() - 2 * book.frameWidth()) / (double) totalHeight), book.scrollbar().scrollButtonWidth(), book.scrollbar().scrollbarHeight());
+		return Mth.clamp((int) (book.scrollbar().scrollbarHeight() * (double) (book.height() - 2 * book.frameWidth()) / (double) totalHeight), book.scrollbar().scrollButtonWidth(), book.scrollbar().scrollbarHeight());
 	}
 
 	private record Stamp(ResourceLocation id, int progress) {

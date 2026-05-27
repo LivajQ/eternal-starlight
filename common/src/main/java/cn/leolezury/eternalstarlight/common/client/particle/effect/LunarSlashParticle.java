@@ -78,10 +78,44 @@ public class LunarSlashParticle extends TextureSheetParticle {
 				float u1 = this.getU1();
 				float v0 = this.getV0();
 				float v1 = this.getV1();
-				vertexConsumer.addVertex(pose, renderLastInnerPos.toVector3f()).setColor(128 / 255f, 156 / 255f, 240 / 255f, 1 - (i - 1) / (DIVISION / 2f)).setUv(u0, v0).setLight(LightTexture.FULL_BRIGHT);
-				vertexConsumer.addVertex(pose, renderLastOuterPos.toVector3f()).setColor(128 / 255f, 156 / 255f, 240 / 255f, 1 - (i - 1) / (DIVISION / 2f)).setUv(u0, v1).setLight(LightTexture.FULL_BRIGHT);
-				vertexConsumer.addVertex(pose, renderOuterPos.toVector3f()).setColor(128 / 255f, 156 / 255f, 240 / 255f, 1 - i / (DIVISION / 2f)).setUv(u1, v1).setLight(LightTexture.FULL_BRIGHT);
-				vertexConsumer.addVertex(pose, renderInnerPos.toVector3f()).setColor(128 / 255f, 156 / 255f, 240 / 255f, 1 - i / (DIVISION / 2f)).setUv(u1, v0).setLight(LightTexture.FULL_BRIGHT);
+				float alpha0 = 1 - (i - 1) / (DIVISION / 2f);
+				float alpha1 = 1 - i / (DIVISION / 2f);
+
+				consumer.vertex(pose.pose(),
+						(float) renderLastInnerPos.x,
+						(float) renderLastInnerPos.y,
+						(float) renderLastInnerPos.z)
+					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha0)
+					.uv(u0, v0)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.endVertex();
+
+				consumer.vertex(pose.pose(),
+						(float) renderLastOuterPos.x,
+						(float) renderLastOuterPos.y,
+						(float) renderLastOuterPos.z)
+					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha0)
+					.uv(u0, v1)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.endVertex();
+
+				consumer.vertex(pose.pose(),
+						(float) renderOuterPos.x,
+						(float) renderOuterPos.y,
+						(float) renderOuterPos.z)
+					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha1)
+					.uv(u1, v1)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.endVertex();
+
+				consumer.vertex(pose.pose(),
+						(float) renderInnerPos.x,
+						(float) renderInnerPos.y,
+						(float) renderInnerPos.z)
+					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha1)
+					.uv(u1, v0)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.endVertex();
 			}
 			lastYawOffset = yawOffset;
 			lastInnerPos = innerPos;

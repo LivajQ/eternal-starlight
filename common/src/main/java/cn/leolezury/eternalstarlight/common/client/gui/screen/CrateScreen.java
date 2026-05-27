@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class CrateScreen extends AbstractContainerScreen<CrateMenu> implements MenuAccess<CrateMenu> {
-	private static final ResourceLocation CONTAINER_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/gui/container/generic_54.png");
+	private static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation("minecraft", "textures/gui/container/generic_54.png");
 
 	public CrateScreen(CrateMenu menu, Inventory inventory, Component title) {
 		super(menu, inventory, title);

@@ -36,6 +36,6 @@ public class BookComponentRegistry {
 				return entry.getKey();
 			}
 		}
-		return ResourceLocation.withDefaultNamespace("unregistered");
+		return new ResourceLocation("minecraft", "unregistered");
 	}
 }

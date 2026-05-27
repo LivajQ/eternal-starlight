@@ -33,8 +33,9 @@ public class BookLoader extends SimpleJsonResourceReloadListener {
 		int loaded = 0;
 		for (Map.Entry<ResourceLocation, JsonElement> entry : jsons.entrySet()) {
 			try {
-				BookDefinition definition = BookDefinition.CODEC.parse(JsonOps.INSTANCE, entry.getValue())
-					.getOrThrow(JsonParseException::new);
+				BookDefinition definition = BookDefinition.CODEC
+					.parse(JsonOps.INSTANCE, entry.getValue())
+					.getOrThrow(false, msg -> { throw new JsonParseException(msg); });
 				books.put(entry.getKey(), definition);
 				loaded++;
 			} catch (Exception e) {

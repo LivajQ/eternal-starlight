@@ -21,7 +21,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.function.Consumer;
@@ -69,12 +69,12 @@ public class CrestButton extends Button {
 				Registry<Crest> registry = Minecraft.getInstance().level.registryAccess().registryOrThrow(ESRegistries.CREST);
 				MutableComponent nameComponent = Component.translatable(Util.makeDescriptionId("crest", registry.getKey(crest.crest().value())));
 				MutableComponent levelComponent = Component.translatable("enchantment.level." + crest.level());
-				MutableComponent typeComponent = Component.translatable(Util.makeDescriptionId("mana_type", EternalStarlight.id(crest.crest().value().type().getSerializedName()))).withColor(crest.crest().value().type().getColor());
+				MutableComponent typeComponent = Component.translatable(Util.makeDescriptionId("mana_type", EternalStarlight.id(crest.crest().value().type().getSerializedName()))).withStyle(style -> style.withColor(crest.crest().value().type().getColor()));
 				if (crest.crest().value().getSpell().isPresent()) {
 					AbstractSpell spell = crest.crest().value().getSpell().get();
 					MutableComponent spellTypeComponent = Component.translatable("tooltip." + EternalStarlight.ID + ".crest_spell_elements").withStyle(ChatFormatting.AQUA);
 					for (ManaType type : spell.spellProperties().types()) {
-						spellTypeComponent.append(" ").append(Component.translatable(Util.makeDescriptionId("mana_type", EternalStarlight.id(type.getSerializedName()))).withColor(type.getColor()));
+						spellTypeComponent.append(" ").append(Component.translatable(Util.makeDescriptionId("mana_type", EternalStarlight.id(type.getSerializedName()))).withStyle(style -> style.withColor(type.getColor())));
 					}
 					typeComponent.append("\n").append(spellTypeComponent);
 				}
@@ -96,25 +96,42 @@ public class CrestButton extends Button {
 	}
 
 	private void addModifierTooltip(Consumer<Component> consumer, Holder<Attribute> holder, AttributeModifier attributeModifier) {
-		double d = attributeModifier.amount();
+		double amount = attributeModifier.getAmount();
 
-		double e;
-		if (attributeModifier.operation() != AttributeModifier.Operation.ADD_MULTIPLIED_BASE && attributeModifier.operation() != AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL) {
-			if (holder.is(Attributes.KNOCKBACK_RESISTANCE)) {
-				e = d * 10.0;
+		double display;
+		AttributeModifier.Operation op = attributeModifier.getOperation();
+
+		if (op != AttributeModifier.Operation.MULTIPLY_BASE && op != AttributeModifier.Operation.MULTIPLY_TOTAL) {
+			if (holder.value() == Attributes.KNOCKBACK_RESISTANCE) {
+				display = amount * 10.0;
 			} else {
-				e = d;
+				display = amount;
 			}
 		} else {
-			e = d * 100.0;
+			display = amount * 100.0;
 		}
 
-		if (d > 0.0) {
-			consumer.accept(Component.translatable("attribute.modifier.plus." + attributeModifier.operation().id(), ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(e), Component.translatable(holder.value().getDescriptionId())).withStyle(holder.value().getStyle(true)));
-		} else if (d < 0.0) {
-			consumer.accept(Component.translatable("attribute.modifier.take." + attributeModifier.operation().id(), ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(-e), Component.translatable(holder.value().getDescriptionId())).withStyle(holder.value().getStyle(false)));
+		int opId = op.toValue();
+
+		if (amount > 0.0) {
+			consumer.accept(
+				Component.translatable(
+					"attribute.modifier.plus." + opId,
+					ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(display),
+					Component.translatable(holder.value().getDescriptionId())
+				).withStyle(ChatFormatting.BLUE)
+			);
+		} else if (amount < 0.0) {
+			consumer.accept(
+				Component.translatable(
+					"attribute.modifier.take." + opId,
+					ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(-display),
+					Component.translatable(holder.value().getDescriptionId())
+				).withStyle(ChatFormatting.RED)
+			);
 		}
 	}
+
 
 	public Crest.Instance getCrest() {
 		return crest;
@@ -143,7 +160,7 @@ public class CrestButton extends Button {
 
 	@Override
 	protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-		float partialTicks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally());
+		float partialTicks = Minecraft.getInstance().getFrameTime();
 		float x, y;
 		if (orbit) {
 			float currentAngle = Mth.lerp(partialTicks, prevAngle, angle);

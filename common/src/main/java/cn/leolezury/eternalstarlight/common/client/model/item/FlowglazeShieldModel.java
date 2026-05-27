@@ -37,8 +37,8 @@ public class FlowglazeShieldModel extends Model {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-		handle.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-		shield.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float r, float g, float b, float a) {
+		handle.render(poseStack, vertexConsumer, packedLight, packedOverlay, r, g, b, a);
+		shield.render(poseStack, vertexConsumer, packedLight, packedOverlay, r, g, b, a);
 	}
 }

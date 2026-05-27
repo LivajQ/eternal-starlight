@@ -34,7 +34,7 @@ public class ThermalSpringStoneArmorModel<T extends LivingEntity> extends Humano
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack stack, VertexConsumer builder, int packedLight, int packedOverlay, int color) {
-		super.renderToBuffer(stack, builder, LightTexture.FULL_BRIGHT, packedOverlay, color);
+	public void renderToBuffer(PoseStack stack, VertexConsumer builder, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+		super.renderToBuffer(stack, builder, packedLight, packedOverlay, red, green, blue, alpha);
 	}
 }

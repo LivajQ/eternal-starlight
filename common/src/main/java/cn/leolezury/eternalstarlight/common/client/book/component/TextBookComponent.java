@@ -33,8 +33,11 @@ public class TextBookComponent extends BookComponent<TextBookComponent.Config> {
 		for (int i = 0; i < list.size(); i++) {
 			int renderY = y + config.offset() + i * config.lineHeight();
 			float alpha = Math.abs(renderY - (context.getContentY() - context.getBookDefinition().frameWidth() + 0.5f * context.getBookDefinition().height())) / (0.5f * context.getBookDefinition().height() - context.getBookDefinition().frameWidth());
-			graphics.drawString(context.getFont(), list.get(i), x, renderY, FastColor.ARGB32.colorFromFloat(Mth.clamp(1.2f - alpha, 0.1f, 1), 0, 0, 0), true);
-		}
+			float a = Mth.clamp(1.2f - alpha, 0.1f, 1f);
+			int ai = (int)(a * 255f);
+			int color = FastColor.ARGB32.color(ai, 0, 0, 0);
+
+			graphics.drawString(context.getFont(), list.get(i), x, renderY, color, true);		}
 	}
 
 	@Override
@@ -49,7 +52,7 @@ public class TextBookComponent extends BookComponent<TextBookComponent.Config> {
 				if (style != null) {
 					ClickEvent event = style.getClickEvent();
 					if (event != null && event.getAction() == ClickEvent.Action.CHANGE_PAGE) {
-						context.jumpToComponent(ResourceLocation.parse(event.getValue()));
+						context.jumpToComponent(new ResourceLocation(event.getValue()));
 					}
 				}
 			}

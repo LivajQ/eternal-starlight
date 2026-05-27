@@ -28,10 +28,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,7 +59,7 @@ public class DisplayBookComponent extends BookComponent<DisplayBookComponent.Con
 		for (EntityDisplay display : config.entityDisplays()) {
 			LivingEntity entity = display.getEntity();
 			if (entity != null) {
-				InventoryScreen.renderEntityInInventory(graphics, x + display.x, y + display.y, display.scale, new Vector3f(), display.rotation, null, entity);
+				InventoryScreen.renderEntityInInventory(graphics, (x + display.x), (y + display.y), (int)display.scale, display.rotation, null, entity);
 			}
 		}
 		for (ItemDisplay display : config.itemDisplays()) {
@@ -162,7 +161,7 @@ public class DisplayBookComponent extends BookComponent<DisplayBookComponent.Con
 					if (style != null) {
 						ClickEvent event = style.getClickEvent();
 						if (event != null && event.getAction() == ClickEvent.Action.CHANGE_PAGE) {
-							context.jumpToComponent(ResourceLocation.parse(event.getValue()));
+							context.jumpToComponent(new ResourceLocation(event.getValue()));
 						}
 					}
 				}
@@ -272,7 +271,7 @@ public class DisplayBookComponent extends BookComponent<DisplayBookComponent.Con
 
 		public ItemStack getItemStack() {
 			if (cachedStack == null && Minecraft.getInstance().level != null) {
-				cachedStack = ItemStack.parseOptional(Minecraft.getInstance().level.registryAccess(), itemStackTag);
+				cachedStack = ItemStack.of(itemStackTag);
 			}
 			return cachedStack == null ? ItemStack.EMPTY : cachedStack;
 		}
@@ -297,7 +296,7 @@ public class DisplayBookComponent extends BookComponent<DisplayBookComponent.Con
 
 		private final Ingredient[][] ingredients = new Ingredient[3][3];
 		private final ResourceLocation recipeId;
-		private RecipeHolder<?> recipe;
+		private Recipe<?> recipe;
 		private final int x, y, slotWidth, slotHeight;
 		private boolean recipePlaced = false;
 
@@ -313,10 +312,10 @@ public class DisplayBookComponent extends BookComponent<DisplayBookComponent.Con
 			if (recipe == null && Minecraft.getInstance().level != null) {
 				recipe = Minecraft.getInstance().level.getRecipeManager().byKey(recipeId).orElse(null);
 			}
-			if (!recipePlaced && recipe != null && recipe.value().getType() == RecipeType.CRAFTING) {
+			if (!recipePlaced && recipe != null && recipe.getType() == RecipeType.CRAFTING) {
 				recipePlaced = true;
-				PlaceRecipe<Ingredient> placeRecipe = (ingredient, slot, maxAmount, x, y) -> ingredients[x][y] = ingredient;
-				placeRecipe.placeRecipe(3, 3, -1, recipe, recipe.value().getIngredients().iterator(), 0);
+				PlaceRecipe<Ingredient> placeRecipe = (ingredient, slot, maxAmount, x, y) -> ingredients[x][y] = ingredient.next();
+				placeRecipe.placeRecipe(3, 3, -1, recipe, recipe.getIngredients().iterator(), 0);
 			}
 			return ingredients;
 		}

@@ -109,11 +109,15 @@ accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context randomS
 # gatekeeper skin
 
 # render types
+accessible method net/minecraft/client/renderer/RenderType create (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
 
 # world visual effects
 
 # particle
 accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
+
+accessible field net/minecraft/client/particle/Particle stoppedByCollision Z
+accessible field net/minecraft/client/particle/ParticleEngine spriteSets Ljava/util/Map;
 
 # spellcasting camera
 
@@ -130,6 +134,7 @@ accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
 # player animator
 
 # gui
+accessible field net/minecraft/client/gui/components/AbstractWidget height I
 
 # freeze rendertype
 
@@ -138,3 +143,9 @@ accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
 # layer attachment
 
 # model utils
+extendable method net/minecraft/client/model/Model renderType (Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+accessible method net/minecraft/world/entity/Entity calculateViewVector (FF)Lnet/minecraft/world/phys/Vec3;
+accessible method net/minecraft/client/renderer/entity/player/PlayerRenderer setModelProperties (Lnet/minecraft/client/player/AbstractClientPlayer;)V
+accessible method net/minecraft/client/renderer/entity/player/PlayerRenderer scale (Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;F)V
+
+accessible field net/minecraft/client/model/geom/ModelPart children Ljava/util/Map;

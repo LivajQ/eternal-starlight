@@ -105,7 +105,7 @@ public class IndexBookComponent extends BookComponent<IndexBookComponent.Config>
 
 		public ItemStack getIcon() {
 			if (cachedIcon == null && Minecraft.getInstance().level != null) {
-				cachedIcon = ItemStack.parseOptional(Minecraft.getInstance().level.registryAccess(), icon);
+				cachedIcon = ItemStack.of(icon);
 			}
 			return cachedIcon == null ? ItemStack.EMPTY : cachedIcon;
 		}

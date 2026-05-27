@@ -121,7 +121,8 @@ public class AdvancedParticle extends TextureSheetParticle implements ParticleOp
 
 	@Override
 	public float getAge() {
-		return age + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally());
+		float pt = Minecraft.getInstance().getFrameTime();
+		return age + pt;
 	}
 
 	@Override

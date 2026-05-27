@@ -9,8 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public record ConfiguredBookComponent<C extends BookComponentConfig, B extends BookComponent<C>>(B component, C config) {
-	public static final Codec<ConfiguredBookComponent<?, ?>> CODEC = BookComponentRegistry.BY_NAME_CODEC
-		.dispatch(configured -> configured.component, BookComponent::getConfiguredCodec);
+	public static final Codec<ConfiguredBookComponent<?, ?>> CODEC = BookComponentRegistry.BY_NAME_CODEC.dispatch(
+			configured -> configured.component, comp -> comp.getConfiguredCodec().codec());
 
 	public boolean isEnabled(Set<ResourceLocation> unlocked) {
 		if (config().unlockConditions().isEmpty()) {

@@ -19,7 +19,10 @@ public class NpcDialogueChoiceButton extends Button {
 	}
 
 	public void reposition(int x, int y, int width) {
-		setRectangle(width, getIncrement(width), x, y);
+		this.setX(x);
+		this.setY(y);
+		this.setWidth(width);
+		this.height = getIncrement(width);
 	}
 
 	@Override

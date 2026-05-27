@@ -138,29 +138,39 @@ public class CrestSelectionScreen extends Screen {
 		int x = window.getGuiScaledWidth();
 		int y = window.getGuiScaledHeight();
 		Matrix4f matrix4f = guiGraphics.pose().last().pose();
+
 		ShaderInstance instance = ESShaders.getCrestSelectionGui();
 		if (instance != null) {
 			Uniform tickUniform = instance.getUniform("TickCount");
 			Uniform ratioUniform = instance.getUniform("Ratio");
+
 			if (tickUniform != null) {
-				tickUniform.set((float) tickCount + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally()));
+				float partialTicks = Minecraft.getInstance().getFrameTime();
+				tickUniform.set((float) tickCount + partialTicks);
 			}
+
 			if (ratioUniform != null) {
 				ratioUniform.set((float) y / x);
 			}
 		}
+
 		RenderSystem.setShader(ESShaders::getCrestSelectionGui);
-		BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-		bufferBuilder.addVertex(matrix4f, 0, 0, 0).setUv(0, 0);
-		bufferBuilder.addVertex(matrix4f, 0, y, 0).setUv(0, 1);
-		bufferBuilder.addVertex(matrix4f, x, y, 0).setUv(1, 1);
-		bufferBuilder.addVertex(matrix4f, x, 0, 0).setUv(1, 0);
-		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+
+		BufferBuilder buf = Tesselator.getInstance().getBuilder();
+		buf.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+
+		buf.vertex(matrix4f, 0, 0, 0).uv(0, 0).endVertex();
+		buf.vertex(matrix4f, 0, y, 0).uv(0, 1).endVertex();
+		buf.vertex(matrix4f, x, y, 0).uv(1, 1).endVertex();
+		buf.vertex(matrix4f, x, 0, 0).uv(1, 0).endVertex();
+
+		BufferUploader.drawWithShader(buf.end());
+
 		super.render(guiGraphics, i, j, f);
 	}
 
 	@Override
-	public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+	public void renderBackground(GuiGraphics guiGraphics) {
 
 	}
 

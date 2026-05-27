@@ -74,10 +74,41 @@ public class ElectricSparkParticle extends TextureSheetParticle {
 			float u1 = this.getU1();
 			float v0 = this.getV0();
 			float v1 = this.getV1();
-			vertexConsumer.addVertex(pose, start.add(sideOffset).toVector3f()).setColor(0.6F, 0.6F, 0.9F, 0.75F).setUv(u0, v0).setLight(LightTexture.FULL_BRIGHT);
-			vertexConsumer.addVertex(pose, start.add(sideOffset.scale(-1)).toVector3f()).setColor(0.6F, 0.6F, 0.9f, 0.75f).setUv(u0, v1).setLight(LightTexture.FULL_BRIGHT);
-			vertexConsumer.addVertex(pose, end.add(sideOffset.scale(-1)).toVector3f()).setColor(0.6F, 0.6F, 0.9f, 0.75f).setUv(u1, v1).setLight(LightTexture.FULL_BRIGHT);
-			vertexConsumer.addVertex(pose, end.add(sideOffset).toVector3f()).setColor(0.6F, 0.6F, 0.9f, 0.75f).setUv(u1, v0).setLight(LightTexture.FULL_BRIGHT);
+			vertexConsumer.vertex(pose.pose(),
+					(float) start.add(sideOffset).x,
+					(float) start.add(sideOffset).y,
+					(float) start.add(sideOffset).z)
+				.color(0.6F, 0.6F, 0.9F, 0.75F)
+				.uv(u0, v0)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.endVertex();
+
+			vertexConsumer.vertex(pose.pose(),
+					(float) start.add(sideOffset.scale(-1)).x,
+					(float) start.add(sideOffset.scale(-1)).y,
+					(float) start.add(sideOffset.scale(-1)).z)
+				.color(0.6F, 0.6F, 0.9F, 0.75F)
+				.uv(u0, v1)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.endVertex();
+
+			vertexConsumer.vertex(pose.pose(),
+					(float) end.add(sideOffset.scale(-1)).x,
+					(float) end.add(sideOffset.scale(-1)).y,
+					(float) end.add(sideOffset.scale(-1)).z)
+				.color(0.6F, 0.6F, 0.9F, 0.75F)
+				.uv(u1, v1)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.endVertex();
+
+			vertexConsumer.vertex(pose.pose(),
+					(float) end.add(sideOffset).x,
+					(float) end.add(sideOffset).y,
+					(float) end.add(sideOffset).z)
+				.color(0.6F, 0.6F, 0.9F, 0.75F)
+				.uv(u1, v0)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.endVertex();
 		}
 		stack.popPose();
 	}

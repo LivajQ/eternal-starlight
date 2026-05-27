@@ -66,15 +66,16 @@ public class YetiModel<T extends Yeti> extends AnimatedEntityModel<T> {
 			root.yScale = 0.8f;
 			root.zScale = 0.8f;
 		}
+		float pt = Minecraft.getInstance().getFrameTime();
 		switch (entity.getRollState()) {
 			case 1 -> {
 				this.animate(entity.rollStartAnimationState, YetiAnimation.ROLL_START, ageInTicks);
-				float rollAngle = Mth.rotLerp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally()), entity.prevRollAngle, entity.rollAngle);
+				float rollAngle = Mth.rotLerp(pt, entity.prevRollAngle, entity.rollAngle);
 				this.root.xRot = rollAngle * Mth.DEG_TO_RAD;
 			}
 			case 2 -> {
 				this.animate(entity.rollAnimationState, YetiAnimation.ROLL, ageInTicks);
-				float rollAngle = Mth.rotLerp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally()), entity.prevRollAngle, entity.rollAngle);
+				float rollAngle = Mth.rotLerp(pt, entity.prevRollAngle, entity.rollAngle);
 				this.root.xRot = rollAngle * Mth.DEG_TO_RAD;
 			}
 			case 3 -> {
@@ -84,6 +85,7 @@ public class YetiModel<T extends Yeti> extends AnimatedEntityModel<T> {
 				this.root.xRot = rollAngle * Mth.DEG_TO_RAD;
 			}
 		}
+
 		// from GuardianModel
 		Entity camera = Minecraft.getInstance().getCameraEntity();
 

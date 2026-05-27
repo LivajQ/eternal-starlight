@@ -107,7 +107,7 @@ public record BookText(boolean translation, String content) {
 	private static Component createText(String content, FormatState state) {
 		MutableComponent text = Component.literal(content);
 		if (state.color != null) {
-			text.withColor(state.color);
+			text = text.withStyle(style -> style.withColor(state.color));
 		}
 		if (state.style != null) {
 			text.withStyle(state.style);

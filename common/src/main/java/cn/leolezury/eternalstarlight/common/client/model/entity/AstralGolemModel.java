@@ -79,10 +79,10 @@ public class AstralGolemModel<T extends AstralGolem> extends HumanoidModel<T> {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-		head.render(poseStack, vertexConsumer, packedLight, packedOverlay, tintColor == -1 ? color : FastColor.ARGB32.multiply(color, tintColor));
-		body.render(poseStack, vertexConsumer, packedLight, packedOverlay, tintColor == -1 ? color : FastColor.ARGB32.multiply(color, tintColor));
-		rightArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, tintColor == -1 ? color : FastColor.ARGB32.multiply(color, tintColor));
-		leftArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, tintColor == -1 ? color : FastColor.ARGB32.multiply(color, tintColor));
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+		head.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		rightArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		leftArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
 	}
 }

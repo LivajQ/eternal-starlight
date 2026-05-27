@@ -48,7 +48,7 @@ public class LunarThornModel<T extends LunarThorn> extends EntityModel<T> {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-		thorn.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float r, float g, float b, float a) {
+		thorn.render(poseStack, vertexConsumer, packedLight, packedOverlay, r, g, b, a);
 	}
 }
