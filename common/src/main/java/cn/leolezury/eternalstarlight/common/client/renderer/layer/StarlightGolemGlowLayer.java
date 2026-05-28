@@ -32,11 +32,15 @@ public class StarlightGolemGlowLayer<T extends StarlightGolem> extends RenderLay
 			this.model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
 			this.model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 			VertexConsumer consumer = bufferSource.getBuffer(ESClientHandler.isHalloween ? GLOW_HALLOWEEN : GLOW);
-			int alpha = (int) (Math.max(0.0F, Mth.cos(ageInTicks * 0.1f + 3.1415927F)) * 255);
-			if (entity.deathAnimationTime > 0 || (entity.getPhase() == 1 && entity.tickCount % 20 <= entity.getRandom().nextInt(10))) {
-				alpha = 0;
+			float alpha = Math.max(0.0F, Mth.cos(ageInTicks * 0.1f + Mth.PI));
+
+			if (entity.deathAnimationTime > 0 ||
+				(entity.getPhase() == 1 && entity.tickCount % 20 <= entity.getRandom().nextInt(10))) {
+				alpha = 0.0F;
 			}
-			this.model.renderToBuffer(poseStack, consumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), FastColor.ARGB32.color(alpha, 255, 255, 255));
+
+			this.model.renderToBuffer(poseStack, consumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, alpha);
 		}
 	}
+
 }

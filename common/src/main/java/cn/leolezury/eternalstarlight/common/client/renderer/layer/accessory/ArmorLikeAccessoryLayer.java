@@ -84,7 +84,7 @@ public abstract class ArmorLikeAccessoryLayer<T extends LivingEntity, M extends 
 
 	private void renderModel(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, Model model, ResourceLocation texture) {
 		VertexConsumer vertexconsumer = bufferSource.getBuffer(RenderType.armorCutoutNoCull(texture));
-		model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
+		model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 	}
 
 	private A getAccessoryModel(EquipmentSlot slot) {

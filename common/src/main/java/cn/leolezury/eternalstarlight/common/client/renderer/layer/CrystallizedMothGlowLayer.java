@@ -28,7 +28,10 @@ public class CrystallizedMothGlowLayer<T extends CrystallizedMoth> extends Rende
 			getParentModel().copyPropertiesTo(this.model);
 			this.model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
 			this.model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-			this.model.renderToBuffer(poseStack, bufferSource.getBuffer(GLOW), packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), FastColor.ARGB32.color((int) (Math.max(0.0F, Mth.cos(ageInTicks * 0.01f + 3.1415927F)) * 255), 255, 255, 255));
+
+			float alpha = Math.max(0.0F, Mth.cos(ageInTicks * 0.01f + Mth.PI));
+			this.model.renderToBuffer(poseStack, bufferSource.getBuffer(GLOW), packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, alpha);
 		}
 	}
+
 }

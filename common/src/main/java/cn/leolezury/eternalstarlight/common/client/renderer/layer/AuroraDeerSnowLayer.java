@@ -20,7 +20,7 @@ public class AuroraDeerSnowLayer<T extends AuroraDeer> extends RenderLayer<T, Au
 	@Override
 	public void render(PoseStack stack, MultiBufferSource buffer, int packedLight, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		if (entity.hasSnow()) {
-			this.getParentModel().renderToBuffer(stack, buffer.getBuffer(SNOW), packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F));
+			this.getParentModel().renderToBuffer(stack, buffer.getBuffer(SNOW), packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
 		}
 	}
 }

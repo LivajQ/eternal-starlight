@@ -31,7 +31,7 @@ public class BoarwarfBiomeLayer<T extends Boarwarf> extends RenderLayer<T, Boarw
 			this.model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
 			this.model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 			VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityCutout(type.textureFull()));
-			this.model.renderToBuffer(poseStack, consumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F));
+			this.model.renderToBuffer(poseStack, consumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
 		}
 	}
 }

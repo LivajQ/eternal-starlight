@@ -19,6 +19,6 @@ public class SeekerGlowLayer<T extends Seeker, M extends SeekerModel<T>> extends
 	@Override
 	public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		VertexConsumer consumer = buffer.getBuffer(RenderType.eyes(entity.getVariant().value().glowTextureFull()));
-		this.getParentModel().renderToBuffer(poseStack, consumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+		this.getParentModel().renderToBuffer(poseStack, consumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1.0F,  1.0F, 1.0F, 1.0F);
 	}
 }

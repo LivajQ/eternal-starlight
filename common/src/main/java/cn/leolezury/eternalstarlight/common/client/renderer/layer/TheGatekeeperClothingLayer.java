@@ -7,15 +7,13 @@ import cn.leolezury.eternalstarlight.common.entity.living.boss.gatekeeper.TheGat
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.resources.PlayerSkin;
-import net.minecraft.client.resources.SkinManager;
+import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Optional;
@@ -36,19 +34,32 @@ public class TheGatekeeperClothingLayer<T extends TheGatekeeper> extends RenderL
 	public void render(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		TheGatekeeperModel<T> model = normalModel;
 		ResourceLocation texture = OVERLAY_TEXTURE;
-		SkinManager skinManager = Minecraft.getInstance().getSkinManager();
+
 		Optional<GameProfile> profile = TheGatekeeperRenderer.getGameProfile(entity);
+
 		if (profile.isPresent()) {
-			texture = skinManager.getInsecureSkin(profile.get()).model() == PlayerSkin.Model.SLIM ? SLIM_OVERLAY_TEXTURE : OVERLAY_TEXTURE;
-			model = skinManager.getInsecureSkin(profile.get()).model() == PlayerSkin.Model.SLIM ? slimModel : normalModel;
+			boolean slim = DefaultPlayerSkin.getSkinModelName(profile.get().getId()).equals("slim");
+			model = slim ? slimModel : normalModel;
+			texture = slim ? SLIM_OVERLAY_TEXTURE : OVERLAY_TEXTURE;
 		}
+
 		if (!entity.isInvisible()) {
 			model.alphaFactor = getParentModel().alphaFactor;
+
 			getParentModel().copyPropertiesTo(model);
 			model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
 			model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+
 			VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityTranslucent(texture));
-			model.renderToBuffer(poseStack, consumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F));
+
+			model.renderToBuffer(
+				poseStack,
+				consumer,
+				packedLight,
+				LivingEntityRenderer.getOverlayCoords(entity, 0.0F),
+				1.0F, 1.0F, 1.0F, 1.0F
+			);
 		}
 	}
+
 }

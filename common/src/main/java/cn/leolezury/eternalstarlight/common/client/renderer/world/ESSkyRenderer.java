@@ -39,7 +39,9 @@ public class ESSkyRenderer {
 		FogType fogType = camera.getFluidInCamera();
 		if (fogType != FogType.POWDER_SNOW && fogType != FogType.LAVA && !levelRenderer.doesMobEffectBlockSky(camera)) {
 			PoseStack poseStack = new PoseStack();
-			poseStack.mulPose(modelViewMatrix);
+			Quaternionf rotation = new Quaternionf();
+			modelViewMatrix.getNormalizedRotation(rotation);
+			poseStack.mulPose(rotation);
 
 			Vec3 vec3 = level.getSkyColor(minecraft.gameRenderer.getMainCamera().getPosition(), partialTicks);
 			float g = (float) vec3.x;
@@ -72,17 +74,25 @@ public class ESSkyRenderer {
 				l = fs[1];
 				float m = fs[2];
 				Matrix4f matrix4f3 = poseStack.last().pose();
-				BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-				bufferBuilder.addVertex(matrix4f3, 0.0F, 100.0F, 0.0F).setColor(k, l, m, fs[3]);
+
+				BufferBuilder bufferBuilder = tesselator.getBuilder();
+				bufferBuilder.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+				bufferBuilder
+					.vertex(matrix4f3, 0.0F, 100.0F, 0.0F)
+					.color(k, l, m, fs[3])
+					.endVertex();
 
 				for (int o = 0; o <= 16; ++o) {
 					p = (float) o * 6.2831855F / 16.0F;
 					q = Mth.sin(p);
 					r = Mth.cos(p);
-					bufferBuilder.addVertex(matrix4f3, q * 120.0F, r * 120.0F, -r * 40.0F * fs[3]).setColor(fs[0], fs[1], fs[2], 0.0F);
+					bufferBuilder
+						.vertex(matrix4f3, q * 120.0F, r * 120.0F, -r * 40.0F * fs[3])
+						.color(fs[0], fs[1], fs[2], 0.0F)
+						.endVertex();
 				}
 
-				BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+				BufferUploader.drawWithShader(bufferBuilder.end());
 				poseStack.popPose();
 			}
 
@@ -105,12 +115,18 @@ public class ESSkyRenderer {
 			l = 60.0F;
 			RenderSystem.setShader(GameRenderer::getPositionTexShader);
 			RenderSystem.setShaderTexture(0, DEAD_STAR_LOCATION);
-			BufferBuilder bufferBuilder2 = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-			bufferBuilder2.addVertex(matrix4f4, -l, 100.0F, -l).setUv(0.0F, 0.0F);
-			bufferBuilder2.addVertex(matrix4f4, l, 100.0F, -l).setUv(1.0F, 0.0F);
-			bufferBuilder2.addVertex(matrix4f4, l, 100.0F, l).setUv(1.0F, 1.0F);
-			bufferBuilder2.addVertex(matrix4f4, -l, 100.0F, l).setUv(0.0F, 1.0F);
-			BufferUploader.drawWithShader(bufferBuilder2.buildOrThrow());
+
+			BufferBuilder bufferBuilder2 = tesselator.getBuilder();
+			bufferBuilder2.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+			bufferBuilder2
+				.vertex(matrix4f4, -l, 100.0F, -l).uv(0.0F, 0.0F).endVertex();
+			bufferBuilder2
+				.vertex(matrix4f4,  l, 100.0F, -l).uv(1.0F, 0.0F).endVertex();
+			bufferBuilder2
+				.vertex(matrix4f4,  l, 100.0F,  l).uv(1.0F, 1.0F).endVertex();
+			bufferBuilder2
+				.vertex(matrix4f4, -l, 100.0F,  l).uv(0.0F, 1.0F).endVertex();
+			BufferUploader.drawWithShader(bufferBuilder2.end());
 
 			float v = 1.0f/*level.getStarBrightness(partialTicks) * j*/;
 			RenderSystem.setShaderColor(v, v, v, v);
@@ -125,16 +141,6 @@ public class ESSkyRenderer {
 			RenderSystem.defaultBlendFunc();
 			poseStack.popPose();
 			RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
-
-			/*double d = minecraft.player.getEyePosition(partialTicks).y - level.getLevelData().getHorizonHeight(level);
-			if (d < 0.0) {
-				poseStack.pushPose();
-				poseStack.translate(0.0F, 12.0F, 0.0F);
-				levelRenderer.darkBuffer.bind();
-				levelRenderer.darkBuffer.drawWithShader(poseStack.last().pose(), matrix, shaderInstance);
-				VertexBuffer.unbind();
-				poseStack.popPose();
-			}*/
 
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			RenderSystem.depthMask(true);
@@ -154,28 +160,39 @@ public class ESSkyRenderer {
 		VertexBuffer.unbind();
 	}
 
-	private static MeshData drawStars(Tesselator tesselator) {
+	private static BufferBuilder.RenderedBuffer drawStars(Tesselator tesselator) {
 		RandomSource randomSource = RandomSource.create(10842L);
 		float f = 100.0F;
-		BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+
+		BufferBuilder bufferBuilder = tesselator.getBuilder();
+		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
 
 		for (int j = 0; j < 3000; ++j) {
 			float g = randomSource.nextFloat() * 2.0F - 1.0F;
 			float h = randomSource.nextFloat() * 2.0F - 1.0F;
 			float k = randomSource.nextFloat() * 2.0F - 1.0F;
 			float l = 0.15F + randomSource.nextFloat() * 0.1F;
-			float m = Mth.lengthSquared(g, h, k);
+			float m = (float) Mth.lengthSquared(g, h, k);
+
 			if (!(m <= 0.010000001F) && !(m >= 1.0F)) {
-				Vector3f vector3f = (new Vector3f(g, h, k)).normalize(100.0F);
-				float n = (float) (randomSource.nextDouble() * 3.1415927410125732 * 2.0);
-				Quaternionf quaternionf = (new Quaternionf()).rotateTo(new Vector3f(0.0F, 0.0F, -1.0F), vector3f).rotateZ(n);
-				bufferBuilder.addVertex(vector3f.add((new Vector3f(l, -l, 0.0F)).rotate(quaternionf)));
-				bufferBuilder.addVertex(vector3f.add((new Vector3f(l, l, 0.0F)).rotate(quaternionf)));
-				bufferBuilder.addVertex(vector3f.add((new Vector3f(-l, l, 0.0F)).rotate(quaternionf)));
-				bufferBuilder.addVertex(vector3f.add((new Vector3f(-l, -l, 0.0F)).rotate(quaternionf)));
+				Vector3f vector3f = new Vector3f(g, h, k).normalize(f);
+				float n = (float)(randomSource.nextDouble() * Math.PI * 2.0);
+				Quaternionf quaternionf = new Quaternionf()
+					.rotateTo(new Vector3f(0.0F, 0.0F, -1.0F), vector3f)
+					.rotateZ(n);
+
+				Vector3f v1 = new Vector3f(l, -l, 0.0F).rotate(quaternionf).add(vector3f);
+				Vector3f v2 = new Vector3f(l,  l, 0.0F).rotate(quaternionf).add(vector3f);
+				Vector3f v3 = new Vector3f(-l, l, 0.0F).rotate(quaternionf).add(vector3f);
+				Vector3f v4 = new Vector3f(-l,-l, 0.0F).rotate(quaternionf).add(vector3f);
+
+				bufferBuilder.vertex(v1.x, v1.y, v1.z).endVertex();
+				bufferBuilder.vertex(v2.x, v2.y, v2.z).endVertex();
+				bufferBuilder.vertex(v3.x, v3.y, v3.z).endVertex();
+				bufferBuilder.vertex(v4.x, v4.y, v4.z).endVertex();
 			}
 		}
 
-		return bufferBuilder.buildOrThrow();
+		return bufferBuilder.end();
 	}
 }

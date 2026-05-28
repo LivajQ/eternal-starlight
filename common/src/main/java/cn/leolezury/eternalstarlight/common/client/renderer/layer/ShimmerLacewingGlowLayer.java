@@ -27,8 +27,14 @@ public class ShimmerLacewingGlowLayer<T extends ShimmerLacewing> extends RenderL
 			getParentModel().copyPropertiesTo(this.model);
 			this.model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
 			this.model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-			VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityTranslucentEmissive(entity.getVariant().value().glowTextureFull()));
-			this.model.renderToBuffer(poseStack, consumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), FastColor.ARGB32.color((int) (Math.max(0.0F, Mth.cos(ageInTicks * 0.1f + 3.1415927F)) * 255), 255, 255, 255));
+
+			VertexConsumer consumer =
+				bufferSource.getBuffer(RenderType.entityTranslucentEmissive(entity.getVariant().value().glowTextureFull()));
+
+			float alpha = Math.max(0.0F, Mth.cos(ageInTicks * 0.1f + Mth.PI));
+
+			this.model.renderToBuffer(poseStack, consumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, alpha);
 		}
 	}
+
 }

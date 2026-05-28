@@ -50,7 +50,7 @@ public class ESItemStackRenderer {
 			poseStack.scale(1.0F, -1.0F, -1.0F);
 			Material material = new Material(Sheets.SHIELD_SHEET, EternalStarlight.id("entity/shields/glacite_shield"));
 			VertexConsumer vertexConsumer = material.sprite().wrap(ItemRenderer.getFoilBufferDirect(bufferSource, GLACITE_SHIELD_MODEL.renderType(material.atlasLocation()), true, stack.hasFoil()));
-			GLACITE_SHIELD_MODEL.renderToBuffer(poseStack, vertexConsumer, light, overlay);
+			GLACITE_SHIELD_MODEL.renderToBuffer(poseStack, vertexConsumer, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
 			poseStack.popPose();
 		}
 		if (stack.is(ESItems.FLOWGLAZE_SHIELD.get())) {
@@ -61,7 +61,7 @@ public class ESItemStackRenderer {
 			poseStack.scale(1.0F, -1.0F, -1.0F);
 			Material material = new Material(Sheets.SHIELD_SHEET, EternalStarlight.id("entity/shields/flowglaze_shield"));
 			VertexConsumer vertexConsumer = material.sprite().wrap(ItemRenderer.getFoilBufferDirect(bufferSource, FLOWGLAZE_SHIELD_MODEL.renderType(material.atlasLocation()), true, stack.hasFoil()));
-			FLOWGLAZE_SHIELD_MODEL.renderToBuffer(poseStack, vertexConsumer, light, overlay);
+			FLOWGLAZE_SHIELD_MODEL.renderToBuffer(poseStack, vertexConsumer, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
 			poseStack.popPose();
 		}
 		if (stack.is(ESItems.MALARITE_SPEAR.get())) {
@@ -71,7 +71,7 @@ public class ESItemStackRenderer {
 			poseStack.pushPose();
 			poseStack.scale(1.0F, -1.0F, -1.0F);
 			VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(bufferSource, MALARITE_SPEAR_MODEL.renderType(MalariteSpearModel.TEXTURE), false, stack.hasFoil());
-			MALARITE_SPEAR_MODEL.renderToBuffer(poseStack, vertexConsumer, light, overlay);
+			MALARITE_SPEAR_MODEL.renderToBuffer(poseStack, vertexConsumer, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
 			poseStack.popPose();
 		}
 		if (stack.is(ESItems.PUNGENCY_FRUIT_SPEAR.get())) {
@@ -81,7 +81,7 @@ public class ESItemStackRenderer {
 			poseStack.pushPose();
 			poseStack.scale(1.0F, -1.0F, -1.0F);
 			VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(bufferSource, PUNGENCY_FRUIT_SPEAR_MODEL.renderType(PungencyFruitSpearModel.TEXTURE), false, stack.hasFoil());
-			PUNGENCY_FRUIT_SPEAR_MODEL.renderToBuffer(poseStack, vertexConsumer, light, overlay);
+			PUNGENCY_FRUIT_SPEAR_MODEL.renderToBuffer(poseStack, vertexConsumer, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
 			poseStack.popPose();
 		}
 		if (stack.is(ESItems.CRESCENT_SPEAR.get())) {
@@ -91,7 +91,7 @@ public class ESItemStackRenderer {
 			poseStack.pushPose();
 			poseStack.scale(1.0F, -1.0F, -1.0F);
 			VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(bufferSource, CRESCENT_SPEAR_MODEL.renderType(CrescentSpearModel.TEXTURE), false, stack.hasFoil());
-			CRESCENT_SPEAR_MODEL.renderToBuffer(poseStack, vertexConsumer, light, overlay);
+			CRESCENT_SPEAR_MODEL.renderToBuffer(poseStack, vertexConsumer, light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
 			poseStack.popPose();
 		}
 	}

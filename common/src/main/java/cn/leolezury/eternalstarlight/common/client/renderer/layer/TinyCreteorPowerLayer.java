@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.layers.EnergySwirlLayer;
 import net.minecraft.resources.ResourceLocation;
 
 public class TinyCreteorPowerLayer<T extends TinyCreteor> extends EnergySwirlLayer<T, TinyCreteorModel<T>> {
-	private static final ResourceLocation POWER_LOCATION = ResourceLocation.withDefaultNamespace("textures/entity/creeper/creeper_armor.png");
+	private static final ResourceLocation POWER_LOCATION = new ResourceLocation("minecraft", "textures/entity/creeper/creeper_armor.png");
 	private final TinyCreteorModel<T> model;
 
 	public TinyCreteorPowerLayer(RenderLayerParent<T, TinyCreteorModel<T>> parent, EntityModelSet modelSet) {
