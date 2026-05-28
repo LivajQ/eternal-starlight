@@ -47,7 +47,7 @@ public class AethersentMeteorRenderer extends EntityRenderer<AethersentMeteor> {
 		this.model.setupAnim(entity, 0, 0, bob, yRot, xRot);
 		RenderType renderType = this.model.renderType(getTextureLocation(entity));
 		VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
-		this.model.renderToBuffer(stack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+		this.model.renderToBuffer(stack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY,  1.0F, 1.0F, 1.0F, 1.0F);
 
 		stack.popPose();
 
@@ -79,7 +79,7 @@ public class AethersentMeteorRenderer extends EntityRenderer<AethersentMeteor> {
 				stack.translate(0.0F, -1.5F, 0.0F);
 				renderType = ESRenderType.entityTranslucentGlow(getTextureLocation(entity));
 				vertexConsumer = bufferSource.getBuffer(renderType);
-				model.renderToBuffer(stack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+				model.renderToBuffer(stack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY,  1.0F, 1.0F, 1.0F, 1.0F);
 				stack.popPose();
 			}
 			model.alphaFactor = 1;

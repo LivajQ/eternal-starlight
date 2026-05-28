@@ -12,6 +12,8 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 public class EnergySparkRenderer extends EntityRenderer<EnergySpark> {
 	private static final ResourceLocation TEXTURE_LOCATION = EternalStarlight.id("textures/entity/energy_spark.png");
@@ -39,12 +41,16 @@ public class EnergySparkRenderer extends EntityRenderer<EnergySpark> {
 	}
 
 	private static void vertex(VertexConsumer consumer, PoseStack.Pose pose, int packedLight, float x, float y, float u, float v) {
-		consumer.addVertex(pose, x, y, 0.0F)
-			.setColor(-1)
-			.setUv(u, v)
-			.setOverlay(OverlayTexture.NO_OVERLAY)
-			.setLight(packedLight)
-			.setNormal(pose, 0.0F, 1.0F, 0.0F);
+		Matrix4f poseMat = pose.pose();
+		Matrix3f normalMat = pose.normal();
+
+		consumer.vertex(poseMat, x, y, 0.0F)
+			.color(1.0F, 1.0F, 1.0F, 1.0F)
+			.uv(u, v)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(packedLight)
+			.normal(normalMat, 0.0F, 1.0F, 0.0F)
+			.endVertex();
 	}
 
 	@Override

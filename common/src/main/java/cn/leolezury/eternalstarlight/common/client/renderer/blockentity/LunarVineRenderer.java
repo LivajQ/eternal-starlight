@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
@@ -37,21 +38,50 @@ public class LunarVineRenderer implements BlockEntityRenderer<LunarVineBlockEnti
 		stack.scale(-1.0F, -1.0F, 1.0F);
 		stack.translate(-0.5F, -1.5F, 0.5F);
 		stack.mulPose(Axis.YP.rotationDegrees(vine.getBlockState().getValue(LunarVineBlock.FACING).toYRot()));
+
 		if (vine.getLevel() != null) {
-			BlockPos attachPos = vine.getBlockPos().relative(vine.getBlockState().getValue(LunarVineBlock.FACING));
-			boolean upperSturdy = vine.getLevel().getBlockState(attachPos.above()).isFaceSturdy(vine.getLevel(), attachPos.above(), vine.getBlockState().getValue(LunarVineBlock.FACING).getOpposite());
-			boolean lowerSturdy = vine.getLevel().getBlockState(attachPos.below()).isFaceSturdy(vine.getLevel(), attachPos.below(), vine.getBlockState().getValue(LunarVineBlock.FACING).getOpposite());
-			this.vineModel.applyVisibility(upperSturdy && vine.getLevel().isEmptyBlock(vine.getBlockPos().above()), lowerSturdy && vine.getLevel().isEmptyBlock(vine.getBlockPos().below()));
+			Direction facing = vine.getBlockState().getValue(LunarVineBlock.FACING);
+			BlockPos attachPos = vine.getBlockPos().relative(facing);
+
+			BlockPos upperPos = attachPos.above();
+			BlockPos lowerPos = attachPos.below();
+
+			boolean upperSturdy = vine.getLevel().getBlockState(upperPos)
+				.isFaceSturdy(vine.getLevel(), upperPos, facing.getOpposite());
+			boolean lowerSturdy = vine.getLevel().getBlockState(lowerPos)
+				.isFaceSturdy(vine.getLevel(), lowerPos, facing.getOpposite());
+
+			this.vineModel.applyVisibility(
+				upperSturdy && vine.getLevel().isEmptyBlock(vine.getBlockPos().above()),
+				lowerSturdy && vine.getLevel().isEmptyBlock(vine.getBlockPos().below())
+			);
 		}
-		this.vineModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(VINE_TEXTURE)), light, overlay);
+
+		this.vineModel.renderToBuffer(
+			stack,
+			bufferSource.getBuffer(RenderType.entityCutoutNoCull(VINE_TEXTURE)),
+			light,
+			overlay,
+			1.0F, 1.0F, 1.0F, 1.0F
+		);
+
 		for (LunarVineBlockEntity.Flower flower : vine.getOrCreateFlowers()) {
 			stack.pushPose();
 			stack.translate(flower.pos().x, flower.pos().y, flower.pos().z);
 			this.flowerModel.root.xRot = flower.xRot() * Mth.DEG_TO_RAD;
 			this.flowerModel.root.yRot = flower.yRot() * Mth.DEG_TO_RAD;
-			this.flowerModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(FLOWER_TEXTURE)), light, overlay);
+
+			this.flowerModel.renderToBuffer(
+				stack,
+				bufferSource.getBuffer(RenderType.entityCutoutNoCull(FLOWER_TEXTURE)),
+				light,
+				overlay,
+				1.0F, 1.0F, 1.0F, 1.0F
+			);
+
 			stack.popPose();
 		}
+
 		stack.popPose();
 	}
 
@@ -96,8 +126,8 @@ public class LunarVineRenderer implements BlockEntityRenderer<LunarVineBlockEnti
 		}
 
 		@Override
-		public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, int color) {
-			this.root.render(stack, consumer, light, overlay, color);
+		public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, float r, float g, float b, float a) {
+			this.root.render(stack, consumer, light, overlay, r, g, b, a);
 		}
 	}
 
@@ -148,8 +178,8 @@ public class LunarVineRenderer implements BlockEntityRenderer<LunarVineBlockEnti
 		}
 
 		@Override
-		public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, int color) {
-			this.root.render(stack, consumer, light, overlay, color);
+		public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, float r, float g, float b, float a) {
+			this.root.render(stack, consumer, light, overlay, r, g, b, a);
 		}
 	}
 }

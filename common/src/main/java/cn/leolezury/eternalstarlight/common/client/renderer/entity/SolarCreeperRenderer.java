@@ -1,6 +1,7 @@
 package cn.leolezury.eternalstarlight.common.client.renderer.entity;
 
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
+import cn.leolezury.eternalstarlight.common.client.ESRenderType;
 import cn.leolezury.eternalstarlight.common.client.model.entity.OrbModel;
 import cn.leolezury.eternalstarlight.common.client.model.entity.SolarCreeperModel;
 import cn.leolezury.eternalstarlight.common.entity.living.boss.creeper.SolarCreeper;
@@ -17,6 +18,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 public class SolarCreeperRenderer<T extends SolarCreeper> extends MobRenderer<T, SolarCreeperModel<T>> {
@@ -36,6 +39,13 @@ public class SolarCreeperRenderer<T extends SolarCreeper> extends MobRenderer<T,
 		int state = entity.getBehaviorState();
 		float animationTicks = entity.getAnimationTicks(partialTicks);
 		float bodyScale = 1, sunScale = 0, shineScale = 0;
+
+		if (entity.getBehaviorState() == SolarCreeperIntroPhase.ID) {
+			this.shadowRadius = 0.0F;
+		} else {
+			this.shadowRadius = 0.5F;
+		}
+
 		if (state == SolarCreeperIntroPhase.ID) {
 			bodyScale = SolarCreeperIntroPhase.BODY_SCALE.calculate(animationTicks / SolarCreeperIntroPhase.DURATION);
 			sunScale = 2 * SolarCreeperIntroPhase.SUN_SCALE.calculate(animationTicks / SolarCreeperIntroPhase.DURATION);
@@ -58,7 +68,7 @@ public class SolarCreeperRenderer<T extends SolarCreeper> extends MobRenderer<T,
 			RenderType renderType = this.sunModel.renderType(SUN_TEXTURE);
 			VertexConsumer vertexConsumer = buffer.getBuffer(renderType);
 			this.sunModel.setupAnim(entity, 0, 0, getBob(entity, partialTicks), 0, 0);
-			this.sunModel.renderToBuffer(poseStack, vertexConsumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+			this.sunModel.renderToBuffer(poseStack, vertexConsumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 			poseStack.popPose();
 		}
 		if (shineScale > 0) {
@@ -67,13 +77,58 @@ public class SolarCreeperRenderer<T extends SolarCreeper> extends MobRenderer<T,
 			poseStack.scale(shineScale, shineScale, shineScale);
 			poseStack.mulPose(new Quaternionf(this.entityRenderDispatcher.cameraOrientation()).rotateY(Mth.PI));
 			PoseStack.Pose pose = poseStack.last();
-			VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.dragonRays());
+			//VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.dragonRays());
+			//TODO see if fits
+			VertexConsumer vertexConsumer = buffer.getBuffer(ESRenderType.entityTranslucentGlow(SUN_TEXTURE));
+
+			Matrix4f poseMat = pose.pose();
+			Matrix3f normalMat = pose.normal();
+
 			for (int i = 0; i < 5; i++) {
-				vertexConsumer.addVertex(pose, 0, 0, 0).setColor(FastColor.ARGB32.color(255, 255, 213, 74));
+				int c0 = FastColor.ARGB32.color(255, 255, 213, 74);
+				float r0 = FastColor.ARGB32.red(c0) / 255f;
+				float g0 = FastColor.ARGB32.green(c0) / 255f;
+				float b0 = FastColor.ARGB32.blue(c0) / 255f;
+				float a0 = FastColor.ARGB32.alpha(c0) / 255f;
+
+				vertexConsumer.vertex(poseMat, 0f, 0f, 0f)
+					.color(r0, g0, b0, a0)
+					.uv(0f, 0f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
 				float angle = i * Mth.TWO_PI / 5 + (animationTicks / SolarCreeperIntroPhase.DURATION) * Mth.PI * 1.5f;
-				vertexConsumer.addVertex(pose, Mth.sin(angle) * entity.getBbHeight() * 3, Mth.cos(angle) * entity.getBbHeight() * 3, 0).setColor(FastColor.ARGB32.color(0, 255, 213, 74));
+
+				int c1 = FastColor.ARGB32.color(0, 255, 213, 74);
+				float r1 = FastColor.ARGB32.red(c1) / 255f;
+				float g1 = FastColor.ARGB32.green(c1) / 255f;
+				float b1 = FastColor.ARGB32.blue(c1) / 255f;
+				float a1 = FastColor.ARGB32.alpha(c1) / 255f;
+
+				float x1 = Mth.sin(angle) * entity.getBbHeight() * 3;
+				float y1 = Mth.cos(angle) * entity.getBbHeight() * 3;
+
+				vertexConsumer.vertex(poseMat, x1, y1, 0f)
+					.color(r1, g1, b1, a1)
+					.uv(0f, 1f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
 				float largerAngle = angle + Mth.TWO_PI / 12;
-				vertexConsumer.addVertex(pose, Mth.sin(largerAngle) * entity.getBbHeight() * 3, Mth.cos(largerAngle) * entity.getBbHeight() * 3, 0).setColor(FastColor.ARGB32.color(0, 255, 213, 74));
+				float x2 = Mth.sin(largerAngle) * entity.getBbHeight() * 3;
+				float y2 = Mth.cos(largerAngle) * entity.getBbHeight() * 3;
+
+				vertexConsumer.vertex(poseMat, x2, y2, 0f)
+					.color(r1, g1, b1, a1)
+					.uv(1f, 1f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
 			}
 			poseStack.popPose();
 		}
@@ -95,10 +150,12 @@ public class SolarCreeperRenderer<T extends SolarCreeper> extends MobRenderer<T,
 		return shineScale;
 	}
 
+	/*
 	@Override
 	protected float getShadowRadius(T mob) {
 		return mob.getBehaviorState() == SolarCreeperIntroPhase.ID ? 0 : super.getShadowRadius(mob);
 	}
+	 */
 
 	@Override
 	public ResourceLocation getTextureLocation(T entity) {

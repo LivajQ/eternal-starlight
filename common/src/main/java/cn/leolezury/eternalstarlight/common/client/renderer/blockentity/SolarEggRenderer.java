@@ -29,11 +29,14 @@ public class SolarEggRenderer implements BlockEntityRenderer<SolarEggBlockEntity
 	@Override
 	public void render(SolarEggBlockEntity egg, float partialTicks, PoseStack stack, MultiBufferSource bufferSource, int light, int overlay) {
 		BlockState state = egg.getBlockState();
+
 		if (state.getValue(SolarEggBlock.X_OFFSET) == 1 && state.getValue(SolarEggBlock.Y_OFFSET) == 0 && state.getValue(SolarEggBlock.Z_OFFSET) == 1) {
 			stack.pushPose();
 			stack.scale(-1.0F, -1.0F, 1.0F);
 			stack.translate(-0.5F, -1.5F, 0.5F);
-			this.eggModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(EGG_TEXTURE)), light, overlay);
+
+			this.eggModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(EGG_TEXTURE)), light, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
+
 			stack.popPose();
 		}
 	}
@@ -58,8 +61,8 @@ public class SolarEggRenderer implements BlockEntityRenderer<SolarEggBlockEntity
 		}
 
 		@Override
-		public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, int color) {
-			this.root.render(stack, consumer, light, overlay, color);
+		public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, float r, float g, float b, float a) {
+			this.root.render(stack, consumer, light, overlay, r, g, b, a);
 		}
 	}
 

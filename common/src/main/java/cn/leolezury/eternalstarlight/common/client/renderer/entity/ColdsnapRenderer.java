@@ -34,7 +34,7 @@ public class ColdsnapRenderer extends WhipRenderer<Coldsnap> {
 		this.model.setupAnim(entity, 0, 0, bob, 0, 0);
 		RenderType renderType = this.model.renderType(getTextureLocation(entity));
 		VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(buffer, renderType, false, entity.isFoil());
-		this.model.renderToBuffer(stack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
+		this.model.renderToBuffer(stack, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
 		if (bob - entity.lastParticleTick > 0.1) {
 			entity.tipPositions.offer(getWhipTipPosition(entity, partialTicks));

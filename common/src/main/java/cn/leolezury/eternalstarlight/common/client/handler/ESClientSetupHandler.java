@@ -471,63 +471,63 @@ public class ESClientSetupHandler {
 
 		SkullBlockRenderer.SKIN_BY_TYPE.put(ESSkullType.TANGLED, TangledSkullRenderer.ENTITY_TEXTURE);
 
-		ItemProperties.register(ESItems.STARFALL_LONGBOW.get(), ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.STARFALL_LONGBOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
 				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
 			}
 		});
-		ItemProperties.register(ESItems.STARFALL_LONGBOW.get(), ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.STARFALL_LONGBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
 		ItemProperties.register(ESItems.GALACTIC_QUIVER.get(), EternalStarlight.id("arrows"), (stack, level, entity, i) -> GalacticQuiverItem.hasArrows(stack) ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.GLACITE_SHIELD.get(), ResourceLocation.withDefaultNamespace("blocking"), (itemStack, clientLevel, livingEntity, i) -> livingEntity != null && livingEntity.isUsingItem() && livingEntity.getUseItem() == itemStack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.GLACITE_SHIELD.get(), new ResourceLocation("minecraft", "blocking"), (itemStack, clientLevel, livingEntity, i) -> livingEntity != null && livingEntity.isUsingItem() && livingEntity.getUseItem() == itemStack ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.DEEPSILVER_BRUSH.get(), ResourceLocation.withDefaultNamespace("brushing"), (stack, level, entity, i) -> entity != null && entity.getUseItem() == stack ? (float) (entity.getUseItemRemainingTicks() % 10) / 10.0F : 0.0F);
+		ItemProperties.register(ESItems.DEEPSILVER_BRUSH.get(), new ResourceLocation("minecraft", "brushing"), (stack, level, entity, i) -> entity != null && entity.getUseItem() == stack ? (float) (entity.getUseItemRemainingTicks() % 10) / 10.0F : 0.0F);
 
-		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
 				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack, entity);
 			}
 		});
-		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
-		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
-		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("firework"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), new ResourceLocation("minecraft", "charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), new ResourceLocation("minecraft", "firework"), (stack, level, entity, i) -> {
 			ChargedProjectiles chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
 			return chargedProjectiles != null && chargedProjectiles.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
 		});
 
-		ItemProperties.register(ESItems.MALARITE_SPEAR.get(), ResourceLocation.withDefaultNamespace("throwing"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.MALARITE_SPEAR.get(), new ResourceLocation("minecraft", "throwing"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.PUNGENCY_FRUIT_SPEAR.get(), ResourceLocation.withDefaultNamespace("throwing"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.PUNGENCY_FRUIT_SPEAR.get(), new ResourceLocation("minecraft", "throwing"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
 				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack, entity);
 			}
 		});
-		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
-		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
-		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("firework"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), new ResourceLocation("minecraft", "charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), new ResourceLocation("minecraft", "firework"), (stack, level, entity, i) -> {
 			ChargedProjectiles chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
 			return chargedProjectiles != null && chargedProjectiles.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
 		});
 
-		ItemProperties.register(ESItems.FLOWGLAZE_BOW.get(), ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.FLOWGLAZE_BOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
 				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
 			}
 		});
-		ItemProperties.register(ESItems.FLOWGLAZE_BOW.get(), ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.FLOWGLAZE_BOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.FLOWGLAZE_SHIELD.get(), ResourceLocation.withDefaultNamespace("blocking"), (itemStack, clientLevel, livingEntity, i) -> livingEntity != null && livingEntity.isUsingItem() && livingEntity.getUseItem() == itemStack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.FLOWGLAZE_SHIELD.get(), new ResourceLocation("minecraft", "blocking"), (itemStack, clientLevel, livingEntity, i) -> livingEntity != null && livingEntity.isUsingItem() && livingEntity.getUseItem() == itemStack ? 1.0F : 0.0F);
 
 		ItemProperties.register(ESItems.CANDLASH.get(), EternalStarlight.id("extended"), (stack, level, entity, i) -> {
 			if (entity == null || level == null) {
@@ -550,16 +550,16 @@ public class ESClientSetupHandler {
 		ItemProperties.register(ESItems.DAGGER_OF_HUNGER.get(), EternalStarlight.id("hunger_state"), (stack, level, entity, i) -> {CompoundTag tag = stack.getTag();float hunger = tag != null ? tag.getFloat("HungerLevel") : 0f;float clamped = Mth.clamp(hunger, -1f, 1f);return Math.min(2f, (clamped + 1f) * 1.5f) / 2f;});
 
 
-		ItemProperties.register(ESItems.GLISTERING_GREATSWORD.get(), ResourceLocation.withDefaultNamespace("blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.GLISTERING_GREATSWORD.get(), new ResourceLocation("minecraft", "blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.GLISTERING_BOW.get(), ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.GLISTERING_BOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
 				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
 			}
 		});
-		ItemProperties.register(ESItems.GLISTERING_BOW.get(), ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.GLISTERING_BOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
 		ItemProperties.register(ESItems.COLDSNAP.get(), EternalStarlight.id("extended"), (stack, level, entity, i) -> {
 			if (entity == null || level == null) {
@@ -569,62 +569,62 @@ public class ESClientSetupHandler {
 			}
 		});
 
-		ItemProperties.register(ESItems.GOLEM_STEEL_GREATSWORD.get(), ResourceLocation.withDefaultNamespace("blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.GOLEM_STEEL_GREATSWORD.get(), new ResourceLocation("minecraft", "blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
 				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack, entity);
 			}
 		});
-		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
-		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
-		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("firework"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), new ResourceLocation("minecraft", "charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), new ResourceLocation("minecraft", "firework"), (stack, level, entity, i) -> {
 			ChargedProjectiles chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
 			return chargedProjectiles != null && chargedProjectiles.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
 		});
 
-		ItemProperties.register(ESItems.CRYSTAL_GREATSWORD.get(), ResourceLocation.withDefaultNamespace("blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.CRYSTAL_GREATSWORD.get(), new ResourceLocation("minecraft", "blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
 				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack, entity);
 			}
 		});
-		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
-		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
-		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("firework"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), new ResourceLocation("minecraft", "charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), new ResourceLocation("minecraft", "firework"), (stack, level, entity, i) -> {
 			ChargedProjectiles chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
 			return chargedProjectiles != null && chargedProjectiles.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
 		});
 
-		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
 				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack, entity);
 			}
 		});
-		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
-		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
-		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), ResourceLocation.withDefaultNamespace("firework"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), new ResourceLocation("minecraft", "charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), new ResourceLocation("minecraft", "firework"), (stack, level, entity, i) -> {
 			ChargedProjectiles chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
 			return chargedProjectiles != null && chargedProjectiles.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
 		});
 
-		ItemProperties.register(ESItems.MOONRING_BOW.get(), ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.MOONRING_BOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
 				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
 			}
 		});
-		ItemProperties.register(ESItems.MOONRING_BOW.get(), ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.MOONRING_BOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.MOONRING_GREATSWORD.get(), ResourceLocation.withDefaultNamespace("blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.MOONRING_GREATSWORD.get(), new ResourceLocation("minecraft", "blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
 		ItemProperties.register(ESItems.CHAIN_OF_SOULS.get(), EternalStarlight.id("extended"), (stack, level, entity, i) -> {
 			if (entity == null || level == null) {
@@ -640,18 +640,18 @@ public class ESClientSetupHandler {
 			}
 		});
 
-		ItemProperties.register(ESItems.CRESCENT_SPEAR.get(), ResourceLocation.withDefaultNamespace("throwing"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.CRESCENT_SPEAR.get(), new ResourceLocation("minecraft", "throwing"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.BONEMORE.get(), ResourceLocation.withDefaultNamespace("blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.BONEMORE.get(), new ResourceLocation("minecraft", "blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 
-		ItemProperties.register(ESItems.BOW_OF_BLOOD.get(), ResourceLocation.withDefaultNamespace("pull"), (stack, level, entity, i) -> {
+		ItemProperties.register(ESItems.BOW_OF_BLOOD.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
 				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
 			}
 		});
-		ItemProperties.register(ESItems.BOW_OF_BLOOD.get(), ResourceLocation.withDefaultNamespace("pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+		ItemProperties.register(ESItems.BOW_OF_BLOOD.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
 	}
 
 	public static void registerBlockColors(BlockColorRegisterStrategy strategy) {

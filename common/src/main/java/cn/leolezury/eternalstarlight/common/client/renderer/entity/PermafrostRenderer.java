@@ -63,7 +63,7 @@ public class PermafrostRenderer<T extends Permafrost> extends MobRenderer<T, Per
 				poseStack.translate(0.0F, -1.5F, 0.0F);
 				RenderType renderType = ESRenderType.entityTranslucentNoDepth(getTextureLocation(entity));
 				VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
-				getModel().renderToBuffer(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
+				getModel().renderToBuffer(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 				poseStack.popPose();
 			}
 			getModel().alphaFactor = 1;

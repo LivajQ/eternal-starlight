@@ -68,23 +68,61 @@ public class TrailRenderer {
 			float toAlpha = solid ? 1 : Mth.clamp(a * to.progressFactor(), 0, 1);
 
 			if (particleFormat) {
-				consumer.addVertex(pose, (float) fromUpper.x(), (float) fromUpper.y(), (float) fromUpper.z())
-					.setUv(Mth.lerp(from.progressFactor(), u0, u1), v0).setColor(r, g, b, fromAlpha).setLight(light);
-				consumer.addVertex(pose, (float) toUpper.x(), (float) toUpper.y(), (float) toUpper.z())
-					.setUv(Mth.lerp(to.progressFactor(), u0, u1), v0).setColor(r, g, b, toAlpha).setLight(light);
-				consumer.addVertex(pose, (float) toLower.x(), (float) toLower.y(), (float) toLower.z())
-					.setUv(Mth.lerp(to.progressFactor(), u0, u1), v1).setColor(r, g, b, toAlpha).setLight(light);
-				consumer.addVertex(pose, (float) fromLower.x(), (float) fromLower.y(), (float) fromLower.z())
-					.setUv(Mth.lerp(from.progressFactor(), u0, u1), v1).setColor(r, g, b, fromAlpha).setLight(light);
+				consumer.vertex(pose.pose(), (float) fromUpper.x(), (float) fromUpper.y(), (float) fromUpper.z())
+					.color(r, g, b, fromAlpha)
+					.uv(Mth.lerp(from.progressFactor(), u0, u1), v0)
+					.uv2(light)
+					.endVertex();
+
+				consumer.vertex(pose.pose(), (float) toUpper.x(), (float) toUpper.y(), (float) toUpper.z())
+					.color(r, g, b, toAlpha)
+					.uv(Mth.lerp(to.progressFactor(), u0, u1), v0)
+					.uv2(light)
+					.endVertex();
+
+				consumer.vertex(pose.pose(), (float) toLower.x(), (float) toLower.y(), (float) toLower.z())
+					.color(r, g, b, toAlpha)
+					.uv(Mth.lerp(to.progressFactor(), u0, u1), v1)
+					.uv2(light)
+					.endVertex();
+
+				consumer.vertex(pose.pose(), (float) fromLower.x(), (float) fromLower.y(), (float) fromLower.z())
+					.color(r, g, b, fromAlpha)
+					.uv(Mth.lerp(from.progressFactor(), u0, u1), v1)
+					.uv2(light)
+					.endVertex();
 			} else {
-				consumer.addVertex(pose, (float) fromUpper.x(), (float) fromUpper.y(), (float) fromUpper.z())
-					.setColor(r, g, b, fromAlpha).setUv(Mth.lerp(from.progressFactor(), u0, u1), v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
-				consumer.addVertex(pose, (float) toUpper.x(), (float) toUpper.y(), (float) toUpper.z())
-					.setColor(r, g, b, toAlpha).setUv(Mth.lerp(to.progressFactor(), u0, u1), v0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
-				consumer.addVertex(pose, (float) toLower.x(), (float) toLower.y(), (float) toLower.z())
-					.setColor(r, g, b, toAlpha).setUv(Mth.lerp(to.progressFactor(), u0, u1), v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
-				consumer.addVertex(pose, (float) fromLower.x(), (float) fromLower.y(), (float) fromLower.z())
-					.setColor(r, g, b, fromAlpha).setUv(Mth.lerp(from.progressFactor(), u0, u1), v1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+				consumer.vertex(pose.pose(), (float) fromUpper.x(), (float) fromUpper.y(), (float) fromUpper.z())
+					.color(r, g, b, fromAlpha)
+					.uv(Mth.lerp(from.progressFactor(), u0, u1), v0)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(light)
+					.normal(pose.normal(), 0, 1, 0)
+					.endVertex();
+
+				consumer.vertex(pose.pose(), (float) toUpper.x(), (float) toUpper.y(), (float) toUpper.z())
+					.color(r, g, b, toAlpha)
+					.uv(Mth.lerp(to.progressFactor(), u0, u1), v0)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(light)
+					.normal(pose.normal(), 0, 1, 0)
+					.endVertex();
+
+				consumer.vertex(pose.pose(), (float) toLower.x(), (float) toLower.y(), (float) toLower.z())
+					.color(r, g, b, toAlpha)
+					.uv(Mth.lerp(to.progressFactor(), u0, u1), v1)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(light)
+					.normal(pose.normal(), 0, 1, 0)
+					.endVertex();
+
+				consumer.vertex(pose.pose(), (float) fromLower.x(), (float) fromLower.y(), (float) fromLower.z())
+					.color(r, g, b, fromAlpha)
+					.uv(Mth.lerp(from.progressFactor(), u0, u1), v1)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(light)
+					.normal(pose.normal(), 0, 1, 0)
+					.endVertex();
 			}
 		}
 	}

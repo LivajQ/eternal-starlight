@@ -19,8 +19,8 @@ public class LuminoFishRenderer<T extends Luminofish> extends MobRenderer<T, Lum
 	}
 
 	@Override
-	protected void setupRotations(T livingEntity, PoseStack poseStack, float f, float g, float h, float i) {
-		super.setupRotations(livingEntity, poseStack, f, g, h, i);
+	protected void setupRotations(T livingEntity, PoseStack poseStack, float f, float g, float h) {
+		super.setupRotations(livingEntity, poseStack, f, g, h);
 		if (!livingEntity.isInWater()) {
 			poseStack.translate(0.1F, 0.1F, -0.1F);
 			poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));

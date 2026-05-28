@@ -64,10 +64,15 @@ public class AlloyFurnaceRenderer implements BlockEntityRenderer<AlloyFurnaceBlo
 				stack.scale(1 + (float) Math.cos(animationTicks * 3.25) * overheatAmplitude * 0.02f, 1 + (float) Math.cos(animationTicks * 2.25) * overheatAmplitude * 0.02f, 1 + (float) Math.cos(animationTicks * 3.25) * overheatAmplitude * 0.02f);
 			}
 			int overheatColor = FastColor.ARGB32.lerp(overheatAmplitude, -1, 0xffee7044);
-			this.furnaceModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityTranslucent(oxidized ? OXIDIZED_FURNACE_TEXTURE : FURNACE_TEXTURE)), lightWithOverheat, overlay, overheatColor);
-			this.furnaceModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityCutoutNoCull((oxidized ? OXIDIZED_FAN_TEXTURES : FAN_TEXTURES).get((blockEntity.isCooling() ? blockEntity.clientAnimationTicks / 2 : 0) % (oxidized ? OXIDIZED_FAN_TEXTURES : FAN_TEXTURES).size()))), lightWithOverheat, overlay, overheatColor);
+			float r = FastColor.ARGB32.red(overheatColor) / 255f;
+			float g = FastColor.ARGB32.green(overheatColor) / 255f;
+			float b = FastColor.ARGB32.blue(overheatColor) / 255f;
+			float a = FastColor.ARGB32.alpha(overheatColor) / 255f;
+
+			this.furnaceModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityTranslucent(oxidized ? OXIDIZED_FURNACE_TEXTURE : FURNACE_TEXTURE)), lightWithOverheat, overlay, r, g, b, a);
+			this.furnaceModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityCutoutNoCull((oxidized ? OXIDIZED_FAN_TEXTURES : FAN_TEXTURES).get((blockEntity.isCooling() ? blockEntity.clientAnimationTicks / 2 : 0) % (oxidized ? OXIDIZED_FAN_TEXTURES : FAN_TEXTURES).size()))), lightWithOverheat, overlay, r, g, b, a);
 			if (blockEntity.isLit()) {
-				this.furnaceModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(LIT_TEXTURES.get((blockEntity.clientAnimationTicks / 2) % LIT_TEXTURES.size()))), LightTexture.FULL_BRIGHT, overlay);
+				this.furnaceModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(LIT_TEXTURES.get((blockEntity.clientAnimationTicks / 2) % LIT_TEXTURES.size()))), LightTexture.FULL_BRIGHT, overlay, 1f, 1f, 1f, 1f);
 			}
 			stack.popPose();
 		}
@@ -100,8 +105,8 @@ public class AlloyFurnaceRenderer implements BlockEntityRenderer<AlloyFurnaceBlo
 		}
 
 		@Override
-		public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, int color) {
-			this.root.render(stack, consumer, light, overlay, color);
+		public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, float r, float g, float b, float a) {
+			this.root.render(stack, consumer, light, overlay, r, g, b, a);
 		}
 	}
 

@@ -17,6 +17,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 public abstract class LaserBeamRenderer<T extends RayAttack> extends EntityRenderer<T> {
 	public LaserBeamRenderer(EntityRendererProvider.Context context) {
@@ -85,15 +87,87 @@ public abstract class LaserBeamRenderer<T extends RayAttack> extends EntityRende
 		VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(getTextureLocation(laserBeam)));
 
 		Vec3 bodyEndDiff = diff.normalize().scale(diff.length() - getEndLength());
-		consumer.addVertex(pose, sideOffset.toVector3f()).setColor(-1).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-		consumer.addVertex(pose, sideOffset.scale(-1).toVector3f()).setColor(-1).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-		consumer.addVertex(pose, bodyEndDiff.add(sideOffset.scale(-1)).toVector3f()).setColor(-1).setUv(0.1f / getTextureWidth(), 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-		consumer.addVertex(pose, bodyEndDiff.add(sideOffset).toVector3f()).setColor(-1).setUv(0.1f / getTextureWidth(), 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
 
-		consumer.addVertex(pose, bodyEndDiff.add(sideOffset).toVector3f()).setColor(-1).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-		consumer.addVertex(pose, bodyEndDiff.add(sideOffset.scale(-1)).toVector3f()).setColor(-1).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-		consumer.addVertex(pose, diff.add(sideOffset.scale(-1)).toVector3f()).setColor(-1).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-		consumer.addVertex(pose, diff.add(sideOffset).toVector3f()).setColor(-1).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
+		Matrix4f poseMat = pose.pose();
+		Matrix3f normalMat = pose.normal();
+
+		float r = 1f, g = 1f, b = 1f, a = 1f;
+
+		consumer.vertex(poseMat, (float)sideOffset.x, (float)sideOffset.y, (float)sideOffset.z)
+			.color(r, g, b, a)
+			.uv(0f, 0f)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.normal(normalMat, 0f, 1f, 0f)
+			.endVertex();
+
+		consumer.vertex(poseMat, (float)(sideOffset.scale(-1).x), (float)(sideOffset.scale(-1).y), (float)(sideOffset.scale(-1).z))
+			.color(r, g, b, a)
+			.uv(0f, 1f)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.normal(normalMat, 0f, 1f, 0f)
+			.endVertex();
+
+		consumer.vertex(poseMat, (float)(bodyEndDiff.add(sideOffset.scale(-1)).x),
+				(float)(bodyEndDiff.add(sideOffset.scale(-1)).y),
+				(float)(bodyEndDiff.add(sideOffset.scale(-1)).z))
+			.color(r, g, b, a)
+			.uv(0.1f / getTextureWidth(), 1f)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.normal(normalMat, 0f, 1f, 0f)
+			.endVertex();
+
+		consumer.vertex(poseMat, (float)(bodyEndDiff.add(sideOffset).x),
+				(float)(bodyEndDiff.add(sideOffset).y),
+				(float)(bodyEndDiff.add(sideOffset).z))
+			.color(r, g, b, a)
+			.uv(0.1f / getTextureWidth(), 0f)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.normal(normalMat, 0f, 1f, 0f)
+			.endVertex();
+
+		consumer.vertex(poseMat, (float)(bodyEndDiff.add(sideOffset).x),
+				(float)(bodyEndDiff.add(sideOffset).y),
+				(float)(bodyEndDiff.add(sideOffset).z))
+			.color(r, g, b, a)
+			.uv(0f, 0f)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.normal(normalMat, 0f, 1f, 0f)
+			.endVertex();
+
+		consumer.vertex(poseMat, (float)(bodyEndDiff.add(sideOffset.scale(-1)).x),
+				(float)(bodyEndDiff.add(sideOffset.scale(-1)).y),
+				(float)(bodyEndDiff.add(sideOffset.scale(-1)).z))
+			.color(r, g, b, a)
+			.uv(0f, 1f)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.normal(normalMat, 0f, 1f, 0f)
+			.endVertex();
+
+		consumer.vertex(poseMat, (float)(diff.add(sideOffset.scale(-1)).x),
+				(float)(diff.add(sideOffset.scale(-1)).y),
+				(float)(diff.add(sideOffset.scale(-1)).z))
+			.color(r, g, b, a)
+			.uv(1f, 1f)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.normal(normalMat, 0f, 1f, 0f)
+			.endVertex();
+
+		consumer.vertex(poseMat, (float)(diff.add(sideOffset).x),
+				(float)(diff.add(sideOffset).y),
+				(float)(diff.add(sideOffset).z))
+			.color(r, g, b, a)
+			.uv(1f, 0f)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(LightTexture.FULL_BRIGHT)
+			.normal(normalMat, 0f, 1f, 0f)
+			.endVertex();
 
 		stack.popPose();
 	}

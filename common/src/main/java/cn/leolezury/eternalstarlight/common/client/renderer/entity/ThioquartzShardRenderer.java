@@ -11,6 +11,8 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 public class ThioquartzShardRenderer extends EntityRenderer<ThioquartzShard> {
@@ -37,12 +39,16 @@ public class ThioquartzShardRenderer extends EntityRenderer<ThioquartzShard> {
 	}
 
 	private static void vertex(VertexConsumer consumer, PoseStack.Pose pose, int packedLight, float x, int y, int u, int v) {
-		consumer.addVertex(pose, x - 0.5F, y - 0.25F, 0.0F)
-			.setColor(-1)
-			.setUv(u, v)
-			.setOverlay(OverlayTexture.NO_OVERLAY)
-			.setLight(packedLight)
-			.setNormal(pose, 0.0F, 1.0F, 0.0F);
+		Matrix4f poseMat = pose.pose();
+		Matrix3f normalMat = pose.normal();
+
+		consumer.vertex(poseMat, x - 0.5F, y - 0.25F, 0.0F)
+			.color(1.0F, 1.0F, 1.0F, 1.0F)
+			.uv((float) u, (float) v)
+			.overlayCoords(OverlayTexture.NO_OVERLAY)
+			.uv2(packedLight)
+			.normal(normalMat, 0.0F, 1.0F, 0.0F)
+			.endVertex();
 	}
 
 	@Override

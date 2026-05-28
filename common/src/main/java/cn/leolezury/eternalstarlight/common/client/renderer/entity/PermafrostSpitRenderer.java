@@ -42,7 +42,7 @@ public class PermafrostSpitRenderer extends EntityRenderer<PermafrostSpit> {
 		spitModel.setupAnim(entity, 0, 0, bob, yRot, xRot);
 		RenderType renderType = spitModel.renderType(getTextureLocation(entity));
 		VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
-		spitModel.renderToBuffer(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
+		spitModel.renderToBuffer(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
 		poseStack.popPose();
 

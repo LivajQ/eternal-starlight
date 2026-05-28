@@ -42,7 +42,7 @@ public class LunarSporeRenderer extends EntityRenderer<LunarSpore> {
 		this.model.setupAnim(entity, 0, 0, bob, yRot, xRot);
 		RenderType renderType = this.model.renderType(getTextureLocation(entity));
 		VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
-		this.model.renderToBuffer(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
+		this.model.renderToBuffer(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
 		poseStack.popPose();
 

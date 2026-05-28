@@ -10,6 +10,7 @@ import cn.leolezury.eternalstarlight.common.entity.living.boss.gatekeeper.TheGat
 import cn.leolezury.eternalstarlight.common.util.ModelPartPose;
 import cn.leolezury.eternalstarlight.common.util.ModelSnapshot;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
@@ -21,7 +22,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.resources.SkinManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -62,8 +63,11 @@ public class TheGatekeeperRenderer<T extends TheGatekeeper> extends MobRenderer<
 
 	@Override
 	public void render(T entity, float entityYaw, float partialTicks, PoseStack stack, MultiBufferSource bufferSource, int packedLight) {
-		SkinManager skinManager = Minecraft.getInstance().getSkinManager();
-		getGameProfile(entity).ifPresent(p -> model = skinManager.getInsecureSkin(p).model() == PlayerSkin.Model.SLIM ? slimModel : normalModel);
+		this.shadowRadius = entity.getBehaviorState() == GatekeeperTeleportPhase.ID ? 0.0F : 0.5F;
+		getGameProfile(entity).ifPresent(p -> {
+			boolean slim = DefaultPlayerSkin.getSkinModelName(p.getId()).equals("slim");
+			model = slim ? slimModel : normalModel;
+		});
 		if (entity.getBehaviorState() == GatekeeperTeleportPhase.ID) {
 			entity.teleportAnimationState.updateTime(entity.tickCount + partialTicks, 1);
 			float progress = Math.min((1 - Math.abs(Mth.clamp((float) entity.teleportAnimationState.getAccumulatedTime() / 1000f * 20f, 0, 37) / 37 - 0.5f) * 2) * 1.5f, 1);
@@ -115,7 +119,7 @@ public class TheGatekeeperRenderer<T extends TheGatekeeper> extends MobRenderer<
 				stack.translate(0.0F, -1.5F, 0.0F);
 				RenderType renderType = ESRenderType.entityTranslucentNoDepth(getTextureLocation(entity));
 				VertexConsumer vertexConsumer = bufferSource.getBuffer(renderType);
-				getModel().renderToBuffer(stack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+				getModel().renderToBuffer(stack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 				stack.popPose();
 			}
 			getModel().alphaFactor = 1;
@@ -123,41 +127,61 @@ public class TheGatekeeperRenderer<T extends TheGatekeeper> extends MobRenderer<
 	}
 
 	@Override
-	protected void renderNameTag(T entity, Component displayName, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, float partialTick) {
+	protected void renderNameTag(T entity, Component displayName, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 		if (!renderingPhantom) {
-			super.renderNameTag(entity, displayName, poseStack, bufferSource, packedLight, partialTick);
+			super.renderNameTag(entity, displayName, poseStack, bufferSource, packedLight);
 		}
 	}
 
+	/*
 	@Override
 	protected float getShadowRadius(T mob) {
 		return mob.getBehaviorState() == GatekeeperTeleportPhase.ID ? 0 : super.getShadowRadius(mob);
 	}
+	 */
 
 	@Override
 	public ResourceLocation getTextureLocation(T entity) {
 		ResourceLocation texture = model == slimModel ? SLIM_ENTITY_TEXTURE : ENTITY_TEXTURE;
-		SkinManager skinManager = Minecraft.getInstance().getSkinManager();
+
 		Optional<GameProfile> profile = getGameProfile(entity);
 		if (profile.isPresent()) {
-			PlayerSkin playerSkin = skinManager.getOrLoad(profile.get()).getNow(null);
-			if (playerSkin != null && !playerSkin.texture().getPath().startsWith("textures/entity/player/")) {
-				texture = playerSkin.texture();
+			SkinManager skinManager = Minecraft.getInstance().getSkinManager();
+			Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> textures =
+				skinManager.getInsecureSkinInformation(profile.get());
+
+			MinecraftProfileTexture skin = textures.get(MinecraftProfileTexture.Type.SKIN);
+			if (skin != null) {
+				texture = skinManager.registerTexture(skin, MinecraftProfileTexture.Type.SKIN);
 			}
 		}
+
 		return texture;
 	}
 
 	public static Optional<GameProfile> getGameProfile(TheGatekeeper entity) {
-		if (entity.getCustomName() != null) {
-			String customName = entity.getCustomName().getString();
-			if (!PROFILES.containsKey(customName)) {
-				SkullBlockEntity.fetchGameProfile(customName).thenAccept((optional) -> optional.ifPresent(p -> PROFILES.put(customName, p)));
-			}
-			if (PROFILES.containsKey(customName)) {
-				return Optional.ofNullable(PROFILES.get(customName));
-			}
+		if (entity.getCustomName() == null)
+			return Optional.empty();
+
+		String name = entity.getCustomName().getString();
+
+		// Already loaded (or loading placeholder)
+		if (PROFILES.containsKey(name)) {
+			return Optional.ofNullable(PROFILES.get(name));
 		}
+
+		// Mark as loading to avoid duplicate requests
+		PROFILES.put(name, null);
+
+		GameProfile profile = new GameProfile(null, name);
+
+		SkullBlockEntity.updateGameprofile(profile, updated -> {
+			if (updated != null) {
+				PROFILES.put(name, updated);
+			}
+		});
+
 		return Optional.empty();
 	}
+
 }

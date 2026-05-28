@@ -52,7 +52,7 @@ public class ScreenShake {
 	public float getYawOffset() {
 		Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
 		LocalPlayer player = Minecraft.getInstance().player;
-		float partialTicks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally());
+		float partialTicks = Minecraft.getInstance().getFrameTime();
 		float time = player != null ? player.tickCount + partialTicks : 0;
 		float distance = (float) pos.distanceTo(camera.getPosition());
 		if (distance > radius || (player != null && !player.level().dimension().location().equals(dimension))) {
@@ -66,7 +66,7 @@ public class ScreenShake {
 	public float getPitchOffset() {
 		Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
 		LocalPlayer player = Minecraft.getInstance().player;
-		float partialTicks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally());
+		float partialTicks = Minecraft.getInstance().getFrameTime();
 		float time = player != null ? player.tickCount + partialTicks : 0;
 		float distance = (float) pos.distanceTo(camera.getPosition());
 		if (distance > radius || (player != null && !player.level().dimension().location().equals(dimension))) {

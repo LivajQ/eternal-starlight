@@ -17,6 +17,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +47,7 @@ public class BallLightningRenderer extends EntityRenderer<BallLightning> {
 
 		this.model.prepareMobModel(entity, 0, 0, partialTicks);
 		this.model.setupAnim(entity, 0, 0, bob, yRot, xRot);
-		this.model.renderToBuffer(poseStack, bufferSource.getBuffer(model.renderType(getTextureLocation(entity))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+		this.model.renderToBuffer(poseStack, bufferSource.getBuffer(model.renderType(getTextureLocation(entity))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,  1.0F, 1.0F, 1.0F, 1.0F);
 		poseStack.popPose();
 
 		Entity target = entity.level().getEntity(entity.getTargetId());
@@ -66,7 +68,7 @@ public class BallLightningRenderer extends EntityRenderer<BallLightning> {
 				Mth.lerp(partialTicks, target.zo, target.getZ())
 			);
 			List<Vec3> segments = new ArrayList<>();
-			int numSegments = Math.round(((float) startPos.distanceTo(destPos) / 1.25f) * (entity.getRandom().nextFloat() * 0.5f + 1));
+			int numSegments = Math.round(((float) startPos.distanceTo(destPos) / 1.25f) * (entity.level().getRandom().nextFloat() * 0.5f + 1));
 			float segmentLength = (float) (destPos.subtract(startPos).length() / numSegments);
 			Vec3 increment = destPos.subtract(startPos).scale((double) 1 / numSegments);
 			segments.add(startPos);
@@ -74,7 +76,7 @@ public class BallLightningRenderer extends EntityRenderer<BallLightning> {
 				if (i == numSegments - 1) {
 					segments.add(startPos.add(increment.scale((i + 1))));
 				} else {
-					segments.add(startPos.add(increment.scale((i + 1))).add(new Vec3(entity.getRandom().nextDouble() - 0.5, entity.getRandom().nextDouble() - 0.5, entity.getRandom().nextDouble() - 0.5).normalize().scale(segmentLength / 6)));
+					segments.add(startPos.add(increment.scale((i + 1))).add(new Vec3(entity.level().getRandom().nextDouble() - 0.5, entity.level().getRandom().nextDouble() - 0.5, entity.level().getRandom().nextDouble() - 0.5).normalize().scale(segmentLength / 6)));
 				}
 			}
 			// add a full connection
@@ -88,10 +90,57 @@ public class BallLightningRenderer extends EntityRenderer<BallLightning> {
 				Vec3 sight = camPos.subtract(start).scale(-1);
 				Vec3 sideOffset = offset.cross(sight).normalize().scale(i == segments.size() - 2 ? 0.035 : 0.03);
 				PoseStack.Pose pose = poseStack.last();
-				vertexConsumer.addVertex(pose, start.subtract(pos).add(sideOffset).toVector3f()).setColor(0.6F, 1, 1, 1).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
-				vertexConsumer.addVertex(pose, start.subtract(pos).add(sideOffset.scale(-1)).toVector3f()).setColor(0.6F, 1, 1, 1).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
-				vertexConsumer.addVertex(pose, end.subtract(pos).add(sideOffset.scale(-1)).toVector3f()).setColor(0.6F, 1, 1, 1).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
-				vertexConsumer.addVertex(pose, end.subtract(pos).add(sideOffset).toVector3f()).setColor(0.6F, 1, 1, 1).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
+				Matrix4f poseMat = pose.pose();
+				Matrix3f normalMat = pose.normal();
+
+				float r = 0.6F;
+				float g = 1.0F;
+				float b = 1.0F;
+				float a = 1.0F;
+
+				vertexConsumer.vertex(poseMat,
+						(float)(start.subtract(pos).add(sideOffset).x),
+						(float)(start.subtract(pos).add(sideOffset).y),
+						(float)(start.subtract(pos).add(sideOffset).z))
+					.color(r, g, b, a)
+					.uv(0f, 0f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(light)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
+				vertexConsumer.vertex(poseMat,
+						(float)(start.subtract(pos).add(sideOffset.scale(-1)).x),
+						(float)(start.subtract(pos).add(sideOffset.scale(-1)).y),
+						(float)(start.subtract(pos).add(sideOffset.scale(-1)).z))
+					.color(r, g, b, a)
+					.uv(0f, 1f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(light)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
+				vertexConsumer.vertex(poseMat,
+						(float)(end.subtract(pos).add(sideOffset.scale(-1)).x),
+						(float)(end.subtract(pos).add(sideOffset.scale(-1)).y),
+						(float)(end.subtract(pos).add(sideOffset.scale(-1)).z))
+					.color(r, g, b, a)
+					.uv(1f, 1f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(light)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
+				vertexConsumer.vertex(poseMat,
+						(float)(end.subtract(pos).add(sideOffset).x),
+						(float)(end.subtract(pos).add(sideOffset).y),
+						(float)(end.subtract(pos).add(sideOffset).z))
+					.color(r, g, b, a)
+					.uv(1f, 0f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(light)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
 			}
 		}
 

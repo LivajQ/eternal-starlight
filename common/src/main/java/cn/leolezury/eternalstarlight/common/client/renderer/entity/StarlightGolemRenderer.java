@@ -15,6 +15,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -24,6 +25,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.Map;
@@ -50,14 +53,72 @@ public class StarlightGolemRenderer<T extends StarlightGolem> extends MobRendere
 			poseStack.scale(deathProgress + Mth.cos((entity.tickCount + partialTicks) * 4f) * 0.2f * deathProgress, deathProgress + Mth.cos((entity.tickCount + partialTicks) * 4f) * 0.2f * deathProgress, deathProgress + Mth.cos((entity.tickCount + partialTicks) * 4f) * 0.2f * deathProgress);
 			poseStack.mulPose(new Quaternionf(this.entityRenderDispatcher.cameraOrientation()).rotateY(Mth.PI));
 			PoseStack.Pose pose = poseStack.last();
-			VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.dragonRays());
+			//VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.dragonRays());
+			//TODO also check if fits
+			VertexConsumer vertexConsumer = buffer.getBuffer(ESRenderType.entityTranslucentGlow(getTextureLocation(entity)));
+
+			Matrix4f poseMat = pose.pose();
+			Matrix3f normalMat = pose.normal();
+
+
 			for (int i = 0; i < 5; i++) {
-				vertexConsumer.addVertex(pose, 0, 0, 0).setColor(FastColor.ARGB32.colorFromFloat(Easing.IN_OUT_SINE.interpolate(deathProgress, 0.5F, 1.0F), 1.0F, 1.0F, 1.0F));
+				float aF = Easing.IN_OUT_SINE.interpolate(deathProgress, 0.5F, 1.0F);
+				float rF = 1.0F;
+				float gF = 1.0F;
+				float bF = 1.0F;
+
+				int a = (int)(aF * 255f);
+				int r = (int)(rF * 255f);
+				int g = (int)(gF * 255f);
+				int b = (int)(bF * 255f);
+
+				int c0 = FastColor.ARGB32.color(a, r, g, b);
+
+				float r0 = FastColor.ARGB32.red(c0) / 255f;
+				float g0 = FastColor.ARGB32.green(c0) / 255f;
+				float b0 = FastColor.ARGB32.blue(c0) / 255f;
+				float a0 = FastColor.ARGB32.alpha(c0) / 255f;
+
+				vertexConsumer.vertex(poseMat, 0f, 0f, 0f)
+					.color(r0, g0, b0, a0)
+					.uv(0f, 0f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
 				float angle = i * Mth.TWO_PI / 5 + deathProgress * Mth.PI * 1.5f;
-				vertexConsumer.addVertex(pose, Mth.sin(angle) * entity.getBbHeight() * 3, Mth.cos(angle) * entity.getBbHeight() * 3, 0).setColor(FastColor.ARGB32.color(0, 64, 106, 125));
+
+				int c1 = FastColor.ARGB32.color(0, 64, 106, 125);
+				float r1 = FastColor.ARGB32.red(c1) / 255f;
+				float g1 = FastColor.ARGB32.green(c1) / 255f;
+				float b1 = FastColor.ARGB32.blue(c1) / 255f;
+				float a1 = FastColor.ARGB32.alpha(c1) / 255f;
+
+				float x1 = Mth.sin(angle) * entity.getBbHeight() * 3;
+				float y1 = Mth.cos(angle) * entity.getBbHeight() * 3;
+
+				vertexConsumer.vertex(poseMat, x1, y1, 0f)
+					.color(r1, g1, b1, a1)
+					.uv(0f, 1f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
 				float largerAngle = angle + deathProgress * Mth.TWO_PI / 8;
-				vertexConsumer.addVertex(pose, Mth.sin(largerAngle) * entity.getBbHeight() * 3, Mth.cos(largerAngle) * entity.getBbHeight() * 3, 0).setColor(FastColor.ARGB32.color(0, 64, 106, 125));
+				float x2 = Mth.sin(largerAngle) * entity.getBbHeight() * 3;
+				float y2 = Mth.cos(largerAngle) * entity.getBbHeight() * 3;
+
+				vertexConsumer.vertex(poseMat, x2, y2, 0f)
+					.color(r1, g1, b1, a1)
+					.uv(1f, 1f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
 			}
+
 			poseStack.popPose();
 		}
 		super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
@@ -90,7 +151,7 @@ public class StarlightGolemRenderer<T extends StarlightGolem> extends MobRendere
 				poseStack.translate(0.0F, -1.5F, 0.0F);
 				RenderType renderType = ESRenderType.entityTranslucentNoDepth(getTextureLocation(entity));
 				VertexConsumer vertexConsumer = buffer.getBuffer(renderType);
-				getModel().renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY);
+				getModel().renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
 				poseStack.popPose();
 			}
 			getModel().alphaFactor = 1;

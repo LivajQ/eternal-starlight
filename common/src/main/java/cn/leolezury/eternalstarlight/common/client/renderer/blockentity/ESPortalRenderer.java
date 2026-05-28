@@ -14,6 +14,8 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 public class ESPortalRenderer<T extends ESPortalBlockEntity> implements BlockEntityRenderer<T> {
 	public ESPortalRenderer(BlockEntityRendererProvider.Context context) {
@@ -21,21 +23,84 @@ public class ESPortalRenderer<T extends ESPortalBlockEntity> implements BlockEnt
 	}
 
 	@Override
-	public void render(T portal, float f, PoseStack stack, MultiBufferSource bufferSource, int light, int overlay) {
+	public void render(T portal, float partialTicks, PoseStack stack, MultiBufferSource bufferSource, int light, int overlay) {
 		if (ESConfig.INSTANCE.enablePortalShader && portal.getBlockState().getValue(ESPortalBlock.CENTER)) {
-			VertexConsumer vertexConsumer = ESClientHandler.AFTER_LEVEL_BUFFER_SOURCE.getBuffer(ESRenderType.PORTAL);
+			VertexConsumer consumer = ESClientHandler.AFTER_LEVEL_BUFFER_SOURCE.getBuffer(ESRenderType.PORTAL);
 			PoseStack.Pose pose = stack.last();
-			float radius = 0.6f * portal.getBlockState().getValue(ESPortalBlock.SIZE) * (Math.min(portal.getClientSideTickCount() + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally()), 60f) / 60f);
+			Matrix4f poseMat = pose.pose();
+			Matrix3f normalMat = pose.normal();
+
+			float framePartial = Minecraft.getInstance().getFrameTime();
+			float radius = 0.6f
+				* portal.getBlockState().getValue(ESPortalBlock.SIZE)
+				* (Math.min(portal.getClientSideTickCount() + framePartial, 60f) / 60f);
+
+			float r = 1f, g = 1f, b = 1f, a = 1f;
+
 			if (portal.getBlockState().getValue(ESPortalBlock.AXIS) == Direction.Axis.X) {
-				vertexConsumer.addVertex(pose, -radius, -radius, 0.5f).setColor(1, 1, 1, 1).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-				vertexConsumer.addVertex(pose, -radius, 1 + radius, 0.5f).setColor(1, 1, 1, 1).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-				vertexConsumer.addVertex(pose, 1 + radius, 1 + radius, 0.5f).setColor(1, 1, 1, 1).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-				vertexConsumer.addVertex(pose, 1 + radius, -radius, 0.5f).setColor(1, 1, 1, 1).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
+				consumer.vertex(poseMat, -radius, -radius, 0.5f)
+					.color(r, g, b, a)
+					.uv(0f, 0f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
+				consumer.vertex(poseMat, -radius, 1f + radius, 0.5f)
+					.color(r, g, b, a)
+					.uv(0f, 1f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
+				consumer.vertex(poseMat, 1f + radius, 1f + radius, 0.5f)
+					.color(r, g, b, a)
+					.uv(1f, 1f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
+				consumer.vertex(poseMat, 1f + radius, -radius, 0.5f)
+					.color(r, g, b, a)
+					.uv(1f, 0f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
 			} else {
-				vertexConsumer.addVertex(pose, 0.5f, -radius, -radius).setColor(1, 1, 1, 1).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-				vertexConsumer.addVertex(pose, 0.5f, 1 + radius, -radius).setColor(1, 1, 1, 1).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-				vertexConsumer.addVertex(pose, 0.5f, 1 + radius, 1 + radius).setColor(1, 1, 1, 1).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-				vertexConsumer.addVertex(pose, 0.5f, -radius, 1 + radius).setColor(1, 1, 1, 1).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
+				consumer.vertex(poseMat, 0.5f, -radius, -radius)
+					.color(r, g, b, a)
+					.uv(0f, 0f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
+				consumer.vertex(poseMat, 0.5f, 1f + radius, -radius)
+					.color(r, g, b, a)
+					.uv(0f, 1f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
+				consumer.vertex(poseMat, 0.5f, 1f + radius, 1f + radius)
+					.color(r, g, b, a)
+					.uv(1f, 1f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
+
+				consumer.vertex(poseMat, 0.5f, -radius, 1f + radius)
+					.color(r, g, b, a)
+					.uv(1f, 0f)
+					.overlayCoords(OverlayTexture.NO_OVERLAY)
+					.uv2(LightTexture.FULL_BRIGHT)
+					.normal(normalMat, 0f, 1f, 0f)
+					.endVertex();
 			}
 		}
 	}

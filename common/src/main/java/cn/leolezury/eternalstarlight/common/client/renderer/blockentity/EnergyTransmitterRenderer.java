@@ -18,6 +18,8 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 
 public class EnergyTransmitterRenderer<T extends EnergyTransmitterBlockEntity> implements BlockEntityRenderer<T> {
 	public static final ResourceLocation ENERGY_TRANSMITTER_TEXTURE = EternalStarlight.id("textures/entity/energy_transmitter.png");
@@ -32,21 +34,71 @@ public class EnergyTransmitterRenderer<T extends EnergyTransmitterBlockEntity> i
 		BlockState state = blockEntity.getBlockState();
 		BlockState inputState = blockEntity.getInputState();
 		Direction inputFacing = inputState.hasProperty(EnergyTransmitterBlock.FACING) ? inputState.getValue(EnergyTransmitterBlock.FACING) : Direction.UP;
-		int receiverPower = state.hasProperty(EnergyTransmitterBlock.POWER) ? state.getValue(EnergyTransmitterBlock.POWER) : 0;
+
+		int receiverPower = state.hasProperty(EnergyTransmitterBlock.POWER)
+			? state.getValue(EnergyTransmitterBlock.POWER)
+			: 0;
+
 		if (!inputOffset.equals(Vec3i.ZERO) && receiverPower > 0) {
+
 			Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
 			Vec3 sight = camera.getPosition().subtract(blockEntity.getBlockPos().getCenter());
-			Vec3 start = new Vec3(0.5, 0.5, 0.5).add(new Vec3(state.getValue(EnergyTransmitterBlock.FACING).step()).scale(-0.125));
-			Vec3 end = Vec3.atCenterOf(inputOffset).add(new Vec3(inputFacing.step()).scale(-0.125));
+
+			Vec3 start = new Vec3(0.5, 0.5, 0.5)
+				.add(new Vec3(state.getValue(EnergyTransmitterBlock.FACING).step()).scale(-0.125));
+
+			Vec3 end = Vec3.atCenterOf(inputOffset)
+				.add(new Vec3(inputFacing.step()).scale(-0.125));
+
 			Vec3 sideOffset = end.subtract(start).cross(sight).normalize().scale(1.0 / 32.0);
+
 			PoseStack.Pose pose = poseStack.last();
-			VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(ENERGY_TRANSMITTER_TEXTURE));
-			vertexConsumer.addVertex(pose, start.add(sideOffset).toVector3f()).setColor(-1).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-			vertexConsumer.addVertex(pose, start.add(sideOffset.scale(-1)).toVector3f()).setColor(-1).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-			vertexConsumer.addVertex(pose, end.add(sideOffset.scale(-1)).toVector3f()).setColor(-1).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
-			vertexConsumer.addVertex(pose, end.add(sideOffset).toVector3f()).setColor(-1).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(pose, 0.0F, 1.0F, 0.0F);
+			Matrix4f poseMat = pose.pose();
+			Matrix3f normalMat = pose.normal();
+
+			VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(ENERGY_TRANSMITTER_TEXTURE));
+
+			float r = 1f, g = 1f, b = 1f, a = 1f;
+
+			Vec3 p0 = start.add(sideOffset);
+			Vec3 p1 = start.add(sideOffset.scale(-1));
+			Vec3 p2 = end.add(sideOffset.scale(-1));
+			Vec3 p3 = end.add(sideOffset);
+
+			consumer.vertex(poseMat, (float)p0.x, (float)p0.y, (float)p0.z)
+				.color(r, g, b, a)
+				.uv(0f, 0f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
+
+			consumer.vertex(poseMat, (float)p1.x, (float)p1.y, (float)p1.z)
+				.color(r, g, b, a)
+				.uv(0f, 1f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
+
+			consumer.vertex(poseMat, (float)p2.x, (float)p2.y, (float)p2.z)
+				.color(r, g, b, a)
+				.uv(1f, 1f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
+
+			consumer.vertex(poseMat, (float)p3.x, (float)p3.y, (float)p3.z)
+				.color(r, g, b, a)
+				.uv(1f, 0f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
 		}
 	}
+
 
 	@Override
 	public boolean shouldRenderOffScreen(T blockEntity) {

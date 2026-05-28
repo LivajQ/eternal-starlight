@@ -22,6 +22,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
@@ -66,17 +67,73 @@ public class ChainOfSoulsRenderer extends EntityRenderer<ChainOfSouls> {
 			stack.mulPose(new Quaternionf().rotationZ((yRot - 90) * Mth.DEG_TO_RAD));
 			stack.mulPose(new Quaternionf().rotationX(-xRot * Mth.DEG_TO_RAD));
 			VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(ENTITY_TEXTURE));
-			Matrix4f pose = stack.last().pose();
+			Matrix4f poseMat = stack.last().pose();
+			Matrix3f normalMat = stack.last().normal();
+			float r = 1f, g = 1f, b = 1f, a = 1f;
 
-			vertexConsumer.addVertex(pose, -0.5f, 0, 0).setColor(-1).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0.0F, 1.0F, 0.0F);
-			vertexConsumer.addVertex(pose, 0.5f, 0, 0).setColor(-1).setUv(0.5f, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0.0F, 1.0F, 0.0F);
-			vertexConsumer.addVertex(pose, 0.5f, length, 0).setColor(-1).setUv(0.5f, length / 2).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0.0F, 1.0F, 0.0F);
-			vertexConsumer.addVertex(pose, -0.5f, length, 0).setColor(-1).setUv(0, length / 2).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0.0F, 1.0F, 0.0F);
+			vertexConsumer.vertex(poseMat, -0.5f, 0f, 0f)
+				.color(r, g, b, a)
+				.uv(0f, 0f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
 
-			vertexConsumer.addVertex(pose, 0, 0, -0.5f).setColor(-1).setUv(0.5f, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0.0F, 1.0F, 0.0F);
-			vertexConsumer.addVertex(pose, 0, 0, 0.5f).setColor(-1).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0.0F, 1.0F, 0.0F);
-			vertexConsumer.addVertex(pose, 0, length, 0.5f).setColor(-1).setUv(1, length / 2).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0.0F, 1.0F, 0.0F);
-			vertexConsumer.addVertex(pose, 0, length, -0.5f).setColor(-1).setUv(0.5f, length / 2).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0.0F, 1.0F, 0.0F);
+			vertexConsumer.vertex(poseMat, 0.5f, 0f, 0f)
+				.color(r, g, b, a)
+				.uv(0.5f, 0f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
+
+			vertexConsumer.vertex(poseMat, 0.5f, length, 0f)
+				.color(r, g, b, a)
+				.uv(0.5f, length / 2f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
+
+			vertexConsumer.vertex(poseMat, -0.5f, length, 0f)
+				.color(r, g, b, a)
+				.uv(0f, length / 2f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
+
+			vertexConsumer.vertex(poseMat, 0f, 0f, -0.5f)
+				.color(r, g, b, a)
+				.uv(0.5f, 0f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
+
+			vertexConsumer.vertex(poseMat, 0f, 0f, 0.5f)
+				.color(r, g, b, a)
+				.uv(1f, 0f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
+
+			vertexConsumer.vertex(poseMat, 0f, length, 0.5f)
+				.color(r, g, b, a)
+				.uv(1f, length / 2f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
+
+			vertexConsumer.vertex(poseMat, 0f, length, -0.5f)
+				.color(r, g, b, a)
+				.uv(0.5f, length / 2f)
+				.overlayCoords(OverlayTexture.NO_OVERLAY)
+				.uv2(LightTexture.FULL_BRIGHT)
+				.normal(normalMat, 0f, 1f, 0f)
+				.endVertex();
 
 			if (attachedToBlock) {
 				stack.popPose();
@@ -88,7 +145,7 @@ public class ChainOfSoulsRenderer extends EntityRenderer<ChainOfSouls> {
 
 			RenderType renderType = this.model.renderType(getTextureLocation(chain));
 			vertexConsumer = buffer.getBuffer(renderType);
-			this.model.renderToBuffer(stack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
+			this.model.renderToBuffer(stack, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
 			stack.popPose();
 		}

@@ -9,6 +9,7 @@ import cn.leolezury.eternalstarlight.common.client.model.animation.definition.Me
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -39,24 +40,71 @@ public class MechanicalSpawnerRenderer implements BlockEntityRenderer<Mechanical
 	@Override
 	public void render(MechanicalSpawnerBlockEntity blockEntity, float partialTick, PoseStack stack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
 		MechanicalSpawner spawner = blockEntity.getSpawner();
+
 		stack.pushPose();
 		stack.translate(0.0F, -1.0F, 0.0F);
+
 		stack.pushPose();
 		stack.scale(-1.0F, -1.0F, 1.0F);
 		stack.translate(-0.5F, -1.501F, 0.5F);
 		stack.scale(0.99F, 0.99F, 0.99F);
 		stack.mulPose(Axis.YP.rotationDegrees(blockEntity.getBlockState().getValue(MechanicalSpawnerBlock.FACING).toYRot() + 180));
+
 		this.spawnerModel.root().getAllParts().forEach(ModelPart::resetPose);
-		this.spawnerModel.animate(blockEntity.idleAnimationState, MechanicalSpawnerAnimation.IDLE, blockEntity.clientTickCount + partialTick, 1.0F, Mth.lerp(partialTick, spawner.getOAnimationScale(), spawner.getAnimationScale()));
-		this.spawnerModel.renderToBuffer(stack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(SPAWNER_TEXTURE)), packedLight, packedOverlay);
+		this.spawnerModel.animate(
+			blockEntity.idleAnimationState,
+			MechanicalSpawnerAnimation.IDLE,
+			blockEntity.clientTickCount + partialTick,
+			1.0F,
+			Mth.lerp(partialTick, spawner.getOAnimationScale(), spawner.getAnimationScale())
+		);
+
+		this.spawnerModel.renderToBuffer(
+			stack,
+			bufferSource.getBuffer(RenderType.entityCutoutNoCull(SPAWNER_TEXTURE)),
+			packedLight,
+			packedOverlay,
+			1.0F, 1.0F, 1.0F, 1.0F
+		);
+
 		stack.popPose();
+
 		Level level = blockEntity.getLevel();
 		if (level != null) {
 			Entity entity = spawner.getOrCreateDisplayEntity(level, blockEntity.getBlockPos());
 			if (entity != null) {
-				SpawnerRenderer.renderEntityInSpawner(partialTick, stack, bufferSource, packedLight, entity, this.entityRenderer, spawner.getOSpin(), spawner.getSpin());
+
+				float spin = (float) spawner.getSpin();
+				float oSpin = (float) spawner.getOSpin();
+				float rotation = Mth.lerp(partialTick, oSpin, spin);
+
+				stack.pushPose();
+
+				stack.translate(0.5D, 0.0D, 0.5D);
+				stack.scale(0.53125F, 0.53125F, 0.53125F);
+				stack.translate(0.0D, 1.5D, 0.0D);
+				stack.mulPose(Axis.YP.rotationDegrees(rotation));
+				stack.mulPose(Axis.XP.rotationDegrees(-30.0F));
+
+				EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+				dispatcher.setRenderShadow(false);
+
+				dispatcher.render(
+					entity,
+					0.0D, 0.0D, 0.0D,
+					0.0F,
+					partialTick,
+					stack,
+					bufferSource,
+					packedLight
+				);
+
+				dispatcher.setRenderShadow(true);
+
+				stack.popPose();
 			}
 		}
+
 		stack.popPose();
 	}
 
@@ -90,8 +138,8 @@ public class MechanicalSpawnerRenderer implements BlockEntityRenderer<Mechanical
 		}
 
 		@Override
-		public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, int color) {
-			this.root.render(stack, consumer, light, overlay, color);
+		public void renderToBuffer(PoseStack stack, VertexConsumer consumer, int light, int overlay, float r, float g, float b, float a) {
+			this.root.render(stack, consumer, light, overlay, r, g, b, a);
 		}
 	}
 

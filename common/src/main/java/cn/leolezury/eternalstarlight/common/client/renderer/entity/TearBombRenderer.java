@@ -1,6 +1,7 @@
 package cn.leolezury.eternalstarlight.common.client.renderer.entity;
 
 import cn.leolezury.eternalstarlight.common.entity.misc.TearBomb;
+import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -40,7 +41,7 @@ public class TearBombRenderer extends EntityRenderer<TearBomb> {
 		stack.mulPose(Axis.YP.rotationDegrees(-90.0F));
 		stack.translate(-0.5F, -0.5F, 0.5F);
 		stack.mulPose(Axis.YP.rotationDegrees(90.0F));
-		TntMinecartRenderer.renderWhiteSolidBlock(this.blockRenderer, bomb.getBlockState(), stack, bufferSource, packedLight, fuse / 5 % 2 == 0);
+		TntMinecartRenderer.renderWhiteSolidBlock(this.blockRenderer, ESBlocks.TEAR_BOMB.get().defaultBlockState(), stack, bufferSource, packedLight, fuse / 5 % 2 == 0);
 		stack.popPose();
 		super.render(bomb, yaw, partialTicks, stack, bufferSource, packedLight);
 	}

@@ -5,8 +5,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import java.util.*;
@@ -109,11 +113,24 @@ public class BoltRenderer {
 
 		public void render(Matrix4f matrix, VertexConsumer buffer, Timestamp timestamp) {
 			float lifeScale = timestamp.subtract(createdTimestamp).value() / bolt.getLifespan();
-			BoltEffect.FadeFunction.RenderBounds bounds = bolt.getFadeFunction().getRenderBounds(renderQuads.size(), lifeScale);
+			BoltEffect.FadeFunction.RenderBounds bounds =
+				bolt.getFadeFunction().getRenderBounds(renderQuads.size(), lifeScale);
+
+			float r = bolt.getColor().r();
+			float g = bolt.getColor().g();
+			float b = bolt.getColor().b();
+			float a = bolt.getColor().a();
+
 			for (int i = bounds.start(); i < bounds.end(); i++) {
-				renderQuads.get(i).getVecs().forEach(v -> buffer.addVertex(matrix, (float) v.x, (float) v.y, (float) v.z)
-					.setColor(bolt.getColor().r(), bolt.getColor().g(), bolt.getColor().b(), bolt.getColor().a())
-				);
+				for (Vec3 v : renderQuads.get(i).getVecs()) {
+					buffer.vertex(matrix, (float)v.x, (float)v.y, (float)v.z)
+						.color(r, g, b, a)
+						.uv(0f, 0f)
+						.overlayCoords(OverlayTexture.NO_OVERLAY)
+						.uv2(LightTexture.FULL_BRIGHT)
+						.normal(new Matrix3f(matrix), 0f, 1f, 0f)
+						.endVertex();
+				}
 			}
 		}
 

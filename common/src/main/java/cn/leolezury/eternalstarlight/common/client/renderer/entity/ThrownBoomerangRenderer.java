@@ -26,7 +26,7 @@ public class ThrownBoomerangRenderer<T extends ThrownBoomerang> extends EntityRe
 	@Override
 	public void render(T entity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource multiBufferSource, int light) {
 		poseStack.pushPose();
-		ItemStack itemStack = entity.getPickupItemStackOrigin();
+		ItemStack itemStack = entity.getWeaponItem();
 		BakedModel bakedModel = this.itemRenderer.getModel(itemStack, entity.level(), null, entity.getId());
 		poseStack.translate(0, entity.getBbHeight() / 2, 0);
 		poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) - 90.0F));
