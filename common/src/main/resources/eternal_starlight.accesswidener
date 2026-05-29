@@ -16,6 +16,9 @@ accessible method net/minecraft/world/level/levelgen/feature/treedecorators/Tree
 accessible method net/minecraft/world/level/levelgen/feature/trunkplacers/TrunkPlacerType <init> (Lcom/mojang/serialization/Codec;)V
 accessible method net/minecraft/world/level/levelgen/feature/foliageplacers/FoliagePlacerType <init> (Lcom/mojang/serialization/Codec;)V
 
+accessible field net/minecraft/server/level/ServerPlayerGameMode isDestroyingBlock Z
+accessible field net/minecraft/server/level/ServerPlayerGameMode destroyPos Lnet/minecraft/core/BlockPos;
+
 accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 
 # client init
@@ -75,6 +78,7 @@ accessible method net/minecraft/advancements/CriteriaTriggers register (Lnet/min
 #entities
 extendable method net/minecraft/world/entity/LivingEntity getEyeHeight (Lnet/minecraft/world/entity/Pose;Lnet/minecraft/world/entity/EntityDimensions;)F
 accessible method net/minecraft/world/entity/projectile/Projectile <init> (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V
+accessible method net/minecraft/world/entity/projectile/AbstractArrow getPickupItem ()Lnet/minecraft/world/item/ItemStack;
 
 accessible field net/minecraft/world/entity/projectile/AbstractArrow inGround Z
 

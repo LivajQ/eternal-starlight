@@ -18,9 +18,9 @@ import cn.leolezury.eternalstarlight.common.entity.living.monster.*;
 import cn.leolezury.eternalstarlight.common.entity.living.npc.boarwarf.Boarwarf;
 import cn.leolezury.eternalstarlight.common.entity.living.npc.boarwarf.golem.AstralGolem;
 import cn.leolezury.eternalstarlight.common.entity.misc.ESBoat;
+import cn.leolezury.eternalstarlight.common.entity.projectile.*;
 import cn.leolezury.eternalstarlight.common.item.dispenser.BucketDispenseItemBehavior;
 import cn.leolezury.eternalstarlight.common.item.dispenser.ESBoatDispenseItemBehavior;
-import cn.leolezury.eternalstarlight.common.network.ESPackets;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.registry.ESEntities;
@@ -34,11 +34,10 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.*;
-import net.minecraft.core.dispenser.BlockSource;
+import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.OptionalDispenseItemBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.tags.ItemTags;
@@ -46,7 +45,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.animal.Squid;
-import net.minecraft.world.entity.animal.armadillo.Armadillo;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.level.ItemLike;
@@ -56,9 +55,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -100,27 +97,125 @@ public class ESCommonSetupHandler {
 	);
 
 	public static final Map<TagKey<Item>, List<TagKey<Item>>> ITEM_TAG_EXCLUSIONS = Map.of(
-		ItemTags.TRIMMABLE_ARMOR, List.of(ESTags.Items.UNTRIMMABLE_ARMOR),
-		ItemTags.FIRE_ASPECT_ENCHANTABLE, List.of(ESTags.Items.THERMAL_SPRINGSTONE_WEAPONS, ESTags.Items.GLACITE_WEAPONS)
+		ItemTags.TRIMMABLE_ARMOR, List.of(ESTags.Items.UNTRIMMABLE_ARMOR)
+		//ItemTags.FIRE_ASPECT_ENCHANTABLE, List.of(ESTags.Items.THERMAL_SPRINGSTONE_WEAPONS, ESTags.Items.GLACITE_WEAPONS)
 	);
 
 	public static void commonSetup() {
-		DispenserBlock.registerProjectileBehavior(ESItems.THIOQUARTZ_ARROW.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.AETHERSENT_ARROW.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.AETHERSTRIKE_ROCKET.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.GLACITE_ARROW.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.MALARITE_ARROW.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.MALARITE_SPEAR.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.PUNGENCY_FRUIT_SPEAR.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.AMARAMBER_ARROW.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.VORACIOUS_ARROW.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.AIR_SAC_ARROW.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.FROZEN_TUBE.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.SONAR_BOMB.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.ASHEN_SNOWBALL.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.FROZEN_BOMB.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.STARFIRE.get());
-		DispenserBlock.registerProjectileBehavior(ESItems.GLEECH_EGG.get());
+
+		DispenserBlock.registerBehavior(ESItems.THIOQUARTZ_ARROW.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new ThioquartzArrow(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.AETHERSENT_ARROW.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new AethersentArrow(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.AETHERSTRIKE_ROCKET.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new AetherstrikeRocketEntity(level, pos.x(), pos.y(), pos.z(), stack.copyWithCount(1));
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.GLACITE_ARROW.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new GlaciteArrow(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.MALARITE_ARROW.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new MalariteArrow(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.MALARITE_SPEAR.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new ThrownMalariteSpear(level,null, pos.x(), pos.y(), pos.z(), stack.copyWithCount(1));
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.PUNGENCY_FRUIT_SPEAR.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new ThrownPungencyFruitSpear(level, null, pos.x(), pos.y(), pos.z(), stack.copyWithCount(1));
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.AMARAMBER_ARROW.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new AmaramberArrow(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.VORACIOUS_ARROW.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new VoraciousArrow(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.AIR_SAC_ARROW.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new AirSacArrow(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.FROZEN_TUBE.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new FrozenTube(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.SONAR_BOMB.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new SonarBomb(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.ASHEN_SNOWBALL.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new AshenSnowball(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.FROZEN_BOMB.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new FrozenBomb(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.STARFIRE.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new ThrownStarfire(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+		DispenserBlock.registerBehavior(ESItems.GLEECH_EGG.get(), new AbstractProjectileDispenseBehavior() {
+				@Override
+				protected Projectile getProjectile(Level level, Position pos, ItemStack stack) {
+					return new GleechEgg(level, pos.x(), pos.y(), pos.z());
+				}
+			}
+		);
+
 		DispenserBlock.registerBehavior(ESItems.LUNAR_BOAT.get(), new ESBoatDispenseItemBehavior(ESBoat.Type.LUNAR));
 		DispenserBlock.registerBehavior(ESItems.LUNAR_CHEST_BOAT.get(), new ESBoatDispenseItemBehavior(ESBoat.Type.LUNAR, true));
 		DispenserBlock.registerBehavior(ESItems.NORTHLAND_BOAT.get(), new ESBoatDispenseItemBehavior(ESBoat.Type.NORTHLAND));
@@ -139,6 +234,7 @@ public class ESCommonSetupHandler {
 		DispenserBlock.registerBehavior(ESItems.ROOKFISH_BUCKET.get(), new BucketDispenseItemBehavior());
 		DispenserBlock.registerBehavior(ESItems.LUMINOFISH_BUCKET.get(), new BucketDispenseItemBehavior());
 		DispenserBlock.registerBehavior(ESItems.LUMINARIS_BUCKET.get(), new BucketDispenseItemBehavior());
+		/*
 		DispenserBlock.registerBehavior(ESItems.DEEPSILVER_BRUSH.get(), new OptionalDispenseItemBehavior() {
 			@Override
 			protected ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
@@ -158,74 +254,113 @@ public class ESCommonSetupHandler {
 				return itemStack;
 			}
 		});
-		DispenserBlock.registerBehavior(ESItems.SALTPETER_MATCHBOX.get(), new OptionalDispenseItemBehavior() {
-			@Override
-			protected ItemStack execute(BlockSource blockSource, ItemStack item) {
-				ServerLevel serverLevel = blockSource.level();
-				this.setSuccess(true);
-				Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
-				BlockPos blockPos = blockSource.pos().relative(direction);
-				BlockState blockState = serverLevel.getBlockState(blockPos);
-				if (BaseFireBlock.canBePlacedAt(serverLevel, blockPos, direction)) {
-					serverLevel.setBlockAndUpdate(blockPos, BaseFireBlock.getState(serverLevel, blockPos));
-					serverLevel.gameEvent(null, GameEvent.BLOCK_PLACE, blockPos);
-				} else if (!CampfireBlock.canLight(blockState) && !CandleBlock.canLight(blockState) && !CandleCakeBlock.canLight(blockState)) {
-					if (blockState.getBlock() instanceof TntBlock) {
-						TntBlock.explode(serverLevel, blockPos);
-						serverLevel.removeBlock(blockPos, false);
-					} else {
-						this.setSuccess(false);
-					}
-				} else {
-					serverLevel.setBlockAndUpdate(blockPos, blockState.setValue(BlockStateProperties.LIT, true));
-					serverLevel.gameEvent(null, GameEvent.BLOCK_CHANGE, blockPos);
-				}
-
-				if (this.isSuccess()) {
-					item.hurtAndBreak(1, serverLevel, null, (i) -> {
-					});
-				}
-
-				return item;
-			}
-		});
-		DispenserBlock.registerBehavior(ESItems.TANGLED_SKULL.get(), new DefaultDispenseItemBehavior() {
-			@Override
-			protected ItemStack execute(BlockSource blockSource, ItemStack item) {
-				if (!ArmorItem.dispenseArmor(blockSource, item)) {
-					Level level = blockSource.level();
-					Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
-					Position position = DispenserBlock.getDispensePosition(blockSource, 0.7, new Vec3(0.0, 0.1, 0.0));
-					TangledSkull skull = new TangledSkull(ESEntities.TANGLED_SKULL.get(), level);
-					skull.setPos(new Vec3(position.x(), position.y(), position.z()));
-					skull.setShot(true);
-					Vec3 movement = new Vec3(direction.getStepX(), direction.getStepY(), direction.getStepZ());
-					skull.setShotMovement(movement.normalize());
-					level.addFreshEntity(skull);
-				}
-				item.shrink(1);
-				return item;
-			}
-		});
-		DispenserBlock.registerBehavior(ESBlocks.CARVED_LUNARIS_CACTUS_FRUIT.get(), new OptionalDispenseItemBehavior() {
-			@Override
-			protected ItemStack execute(BlockSource blockSource, ItemStack item) {
-				Level level = blockSource.level();
-				BlockPos blockpos = blockSource.pos().relative(blockSource.state().getValue(DispenserBlock.FACING));
-				CarvedLunarisCactusFruitBlock fruitBlock = ESBlocks.CARVED_LUNARIS_CACTUS_FRUIT.get();
-				if (level.isEmptyBlock(blockpos) && fruitBlock.canSpawnGolem(level, blockpos)) {
-					if (!level.isClientSide) {
-						level.setBlock(blockpos, fruitBlock.defaultBlockState(), 3);
-						level.gameEvent(null, GameEvent.BLOCK_PLACE, blockpos);
-					}
-					item.shrink(1);
+		 */
+		DispenserBlock.registerBehavior(ESItems.SALTPETER_MATCHBOX.get(),
+			new OptionalDispenseItemBehavior() {
+				@Override
+				protected ItemStack execute(BlockSource source, ItemStack stack) {
+					ServerLevel level = source.getLevel();
 					this.setSuccess(true);
-				} else {
-					this.setSuccess(ArmorItem.dispenseArmor(blockSource, item));
+
+					Direction dir = source.getBlockState().getValue(DispenserBlock.FACING);
+					BlockPos pos = source.getPos().relative(dir);
+					BlockState state = level.getBlockState(pos);
+
+					if (BaseFireBlock.canBePlacedAt(level, pos, dir)) {
+						level.setBlockAndUpdate(pos, BaseFireBlock.getState(level, pos));
+						level.gameEvent(null, GameEvent.BLOCK_PLACE, pos);
+					}
+					else if (!CampfireBlock.canLight(state) &&
+						!CandleBlock.canLight(state) &&
+						!CandleCakeBlock.canLight(state)) {
+
+						if (state.getBlock() instanceof TntBlock) {
+							TntBlock.explode(level, pos);
+							level.removeBlock(pos, false);
+						} else {
+							this.setSuccess(false);
+						}
+					}
+					else {
+						level.setBlockAndUpdate(pos, state.setValue(BlockStateProperties.LIT, true));
+						level.gameEvent(null, GameEvent.BLOCK_CHANGE, pos);
+					}
+
+					if (this.isSuccess()) {
+						stack.hurt(1, level.random, null);
+					}
+
+					return stack;
 				}
-				return item;
 			}
-		});
+		);
+
+		DispenserBlock.registerBehavior(ESItems.TANGLED_SKULL.get(),
+			new DefaultDispenseItemBehavior() {
+				@Override
+				protected ItemStack execute(BlockSource source, ItemStack stack) {
+
+					if (!ArmorItem.dispenseArmor(source, stack)) {
+
+						Level level = source.getLevel();
+						Direction dir = source.getBlockState().getValue(DispenserBlock.FACING);
+
+						Position basePos = DispenserBlock.getDispensePosition(source);
+
+						Vec3 pos = new Vec3(
+							basePos.x() + 0.0,
+							basePos.y() + 0.1,
+							basePos.z() + 0.0
+						);
+
+						TangledSkull skull = new TangledSkull(ESEntities.TANGLED_SKULL.get(), level);
+						skull.setPos(pos);
+						skull.setShot(true);
+
+						Vec3 movement = new Vec3(dir.getStepX(), dir.getStepY(), dir.getStepZ());
+						skull.setShotMovement(movement.normalize());
+
+						level.addFreshEntity(skull);
+					}
+
+					stack.shrink(1);
+					return stack;
+				}
+			}
+		);
+
+		DispenserBlock.registerBehavior(ESBlocks.CARVED_LUNARIS_CACTUS_FRUIT.get(),
+			new OptionalDispenseItemBehavior() {
+				@Override
+				protected ItemStack execute(BlockSource source, ItemStack stack) {
+
+					Level level = source.getLevel();
+					BlockPos pos = source.getPos().relative(
+						source.getBlockState().getValue(DispenserBlock.FACING)
+					);
+
+					CarvedLunarisCactusFruitBlock fruit = ESBlocks.CARVED_LUNARIS_CACTUS_FRUIT.get();
+
+					if (level.isEmptyBlock(pos) && fruit.canSpawnGolem(level, pos)) {
+
+						if (!level.isClientSide) {
+							level.setBlock(pos, fruit.defaultBlockState(), 3);
+							level.gameEvent(null, GameEvent.BLOCK_PLACE, pos);
+						}
+
+						stack.shrink(1);
+						this.setSuccess(true);
+					}
+					else {
+						this.setSuccess(ArmorItem.dispenseArmor(source, stack));
+					}
+
+					return stack;
+				}
+			}
+		);
+
+		/*
 		if (ESPlatform.INSTANCE.getLoader() == ESPlatform.Loader.FABRIC) {
 			DefaultDispenseItemBehavior eggBehavior = new DefaultDispenseItemBehavior() {
 				@Override
@@ -251,6 +386,8 @@ public class ESCommonSetupHandler {
 				}
 			}
 		}
+
+		 */
 
 		AlloyFurnaceBlock.registerCoolingItem(Items.SNOW, new AlloyFurnaceCoolingItem(800, 3));
 		AlloyFurnaceBlock.registerCoolingItem(Items.SNOWBALL, new AlloyFurnaceCoolingItem(800, 3));
@@ -347,36 +484,37 @@ public class ESCommonSetupHandler {
 	}
 
 	public interface SpawnPlacementRegisterStrategy {
-		<T extends Mob> void register(EntityType<T> entityType, @Nullable SpawnPlacementType placementType, @Nullable Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> predicate);
+		<T extends Mob> void register(EntityType<T> entityType, SpawnPlacements.Type placementType, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> predicate);
 	}
 
+
 	public static void registerSpawnPlacements(SpawnPlacementRegisterStrategy strategy) {
-		strategy.register(ESEntities.BOARWARF.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Boarwarf::checkBoarwarfSpawnRules);
-		strategy.register(ESEntities.ASTRAL_GOLEM.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, AstralGolem::checkAstralGolemSpawnRules);
-		strategy.register(ESEntities.GLEECH.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Gleech::checkGleechSpawnRules);
-		strategy.register(ESEntities.LONESTAR_SKELETON.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, LonestarSkeleton::checkLonestarSkeletonSpawnRules);
-		strategy.register(ESEntities.NIGHTFALL_SPIDER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, NightfallSpider::checkNightfallSpiderSpawnRules);
-		strategy.register(ESEntities.SEEKER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Seeker::checkSeekerSpawnRules);
-		strategy.register(ESEntities.THIRST_WALKER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ThirstWalker::checkThirstWalkerSpawnRules);
-		strategy.register(ESEntities.CRETEOR.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Creteor::checkCreteorSpawnRules);
-		strategy.register(ESEntities.STRANGHOUL.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Stranghoul::checkStranghoulSpawnRules);
-		strategy.register(ESEntities.ENT.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Ent::checkEntSpawnRules);
-		strategy.register(ESEntities.RATLIN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Ratlin::checkRatlinSpawnRules);
-		strategy.register(ESEntities.ZOMBIFIED_RATLIN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ZombifiedRatlin::checkZombifiedRatlinSpawnRules);
-		strategy.register(ESEntities.SHADOW_SNAIL.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ShadowSnail::checkShadowSnailSpawnRules);
-		strategy.register(ESEntities.YETI.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Yeti::checkYetiSpawnRules);
-		strategy.register(ESEntities.AURORA_DEER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, AuroraDeer::checkAuroraDeerSpawnRules);
-		strategy.register(ESEntities.CRYSTALLIZED_MOTH.get(), SpawnPlacementTypes.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, CrystallizedMoth::checkMothSpawnRules);
-		strategy.register(ESEntities.SHIMMER_LACEWING.get(), SpawnPlacementTypes.NO_RESTRICTIONS, Heightmap.Types.WORLD_SURFACE, ShimmerLacewing::checkLacewingSpawnRules);
-		strategy.register(ESEntities.STARFIRE_BIRD.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, StarfireBird::checkStarfireBirdSpawnRules);
-		strategy.register(ESEntities.GRIMSTONE_GOLEM.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
-		strategy.register(ESEntities.AETHERSENT_GOLEM.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
-		strategy.register(ESEntities.ROOKFISH.get(), SpawnPlacementTypes.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Rookfish::checkRookfishSpawnRules);
-		strategy.register(ESEntities.LUMINOFISH.get(), SpawnPlacementTypes.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Luminofish::checkLuminoFishSpawnRules);
-		strategy.register(ESEntities.LUMINARIS.get(), SpawnPlacementTypes.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Luminaris::checkLuminarisSpawnRules);
-		strategy.register(ESEntities.TWILIGHT_GAZE.get(), SpawnPlacementTypes.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, TwilightGaze::checkTwilightGazeSpawnRules);
-		strategy.register(ESEntities.FREEZE.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Freeze::checkFreezeSpawnRules);
-		strategy.register(ESEntities.TANGLED.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Tangled::checkTangledSpawnRules);
+		strategy.register(ESEntities.BOARWARF.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Boarwarf::checkBoarwarfSpawnRules);
+		strategy.register(ESEntities.ASTRAL_GOLEM.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, AstralGolem::checkAstralGolemSpawnRules);
+		strategy.register(ESEntities.GLEECH.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Gleech::checkGleechSpawnRules);
+		strategy.register(ESEntities.LONESTAR_SKELETON.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, LonestarSkeleton::checkLonestarSkeletonSpawnRules);
+		strategy.register(ESEntities.NIGHTFALL_SPIDER.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, NightfallSpider::checkNightfallSpiderSpawnRules);
+		strategy.register(ESEntities.SEEKER.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Seeker::checkSeekerSpawnRules);
+		strategy.register(ESEntities.THIRST_WALKER.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ThirstWalker::checkThirstWalkerSpawnRules);
+		strategy.register(ESEntities.CRETEOR.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Creteor::checkCreteorSpawnRules);
+		strategy.register(ESEntities.STRANGHOUL.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Stranghoul::checkStranghoulSpawnRules);
+		strategy.register(ESEntities.ENT.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Ent::checkEntSpawnRules);
+		strategy.register(ESEntities.RATLIN.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Ratlin::checkRatlinSpawnRules);
+		strategy.register(ESEntities.ZOMBIFIED_RATLIN.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ZombifiedRatlin::checkZombifiedRatlinSpawnRules);
+		strategy.register(ESEntities.SHADOW_SNAIL.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, ShadowSnail::checkShadowSnailSpawnRules);
+		strategy.register(ESEntities.YETI.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Yeti::checkYetiSpawnRules);
+		strategy.register(ESEntities.AURORA_DEER.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, AuroraDeer::checkAuroraDeerSpawnRules);
+		strategy.register(ESEntities.CRYSTALLIZED_MOTH.get(), SpawnPlacements.Type.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, CrystallizedMoth::checkMothSpawnRules);
+		strategy.register(ESEntities.SHIMMER_LACEWING.get(), SpawnPlacements.Type.NO_RESTRICTIONS, Heightmap.Types.WORLD_SURFACE, ShimmerLacewing::checkLacewingSpawnRules);
+		strategy.register(ESEntities.STARFIRE_BIRD.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, StarfireBird::checkStarfireBirdSpawnRules);
+		strategy.register(ESEntities.GRIMSTONE_GOLEM.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
+		strategy.register(ESEntities.AETHERSENT_GOLEM.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
+		strategy.register(ESEntities.ROOKFISH.get(), SpawnPlacements.Type.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Rookfish::checkRookfishSpawnRules);
+		strategy.register(ESEntities.LUMINOFISH.get(), SpawnPlacements.Type.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Luminofish::checkLuminoFishSpawnRules);
+		strategy.register(ESEntities.LUMINARIS.get(), SpawnPlacements.Type.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Luminaris::checkLuminarisSpawnRules);
+		strategy.register(ESEntities.TWILIGHT_GAZE.get(), SpawnPlacements.Type.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, TwilightGaze::checkTwilightGazeSpawnRules);
+		strategy.register(ESEntities.FREEZE.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Freeze::checkFreezeSpawnRules);
+		strategy.register(ESEntities.TANGLED.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Tangled::checkTangledSpawnRules);
 	}
 
 	public interface FuelRegisterStrategy {
@@ -412,11 +550,11 @@ public class ESCommonSetupHandler {
 	}
 
 	public static void registerChunkGenerator() {
-		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, EternalStarlight.ID + ":es_gen", ESChunkGenerator.CODEC);
+		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, EternalStarlight.ID + ":es_gen", ESChunkGenerator.CODEC.codec());
 	}
 
 	public static void registerBiomeSource() {
-		Registry.register(BuiltInRegistries.BIOME_SOURCE, EternalStarlight.ID + ":es_biomes", ESBiomeSource.CODEC);
+		Registry.register(BuiltInRegistries.BIOME_SOURCE, EternalStarlight.ID + ":es_biomes", ESBiomeSource.CODEC.codec());
 	}
 
 	public static void addReloadListeners(Consumer<PreparableReloadListener> strategy) {
