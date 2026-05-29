@@ -121,6 +121,10 @@ public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optio
 			return tag;
 		}
 
+		public Crest value() {
+			return crest.value();
+		}
+
 		public static Instance loadNBT(CompoundTag tag) {
 			ResourceLocation key = new ResourceLocation(tag.getString("Crest"));
 			int level = tag.getInt("Level");

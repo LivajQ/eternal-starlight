@@ -75,20 +75,20 @@ public class ESClientHandler {
 	public static final Set<Mob> BOSSES = Collections.newSetFromMap(new WeakHashMap<>());
 	public static final List<WorldVisualEffect> VISUAL_EFFECTS = new ArrayList<>();
 	public static final List<ScreenShake> SCREEN_SHAKES = new ArrayList<>();
-	private static final ResourceLocation[] BAR_BACKGROUND_SPRITES = new ResourceLocation[]{ResourceLocation.withDefaultNamespace("boss_bar/pink_background"), ResourceLocation.withDefaultNamespace("boss_bar/blue_background"), ResourceLocation.withDefaultNamespace("boss_bar/red_background"), ResourceLocation.withDefaultNamespace("boss_bar/green_background"), ResourceLocation.withDefaultNamespace("boss_bar/yellow_background"), ResourceLocation.withDefaultNamespace("boss_bar/purple_background"), ResourceLocation.withDefaultNamespace("boss_bar/white_background")};
-	private static final ResourceLocation[] BAR_PROGRESS_SPRITES = new ResourceLocation[]{ResourceLocation.withDefaultNamespace("boss_bar/pink_progress"), ResourceLocation.withDefaultNamespace("boss_bar/blue_progress"), ResourceLocation.withDefaultNamespace("boss_bar/red_progress"), ResourceLocation.withDefaultNamespace("boss_bar/green_progress"), ResourceLocation.withDefaultNamespace("boss_bar/yellow_progress"), ResourceLocation.withDefaultNamespace("boss_bar/purple_progress"), ResourceLocation.withDefaultNamespace("boss_bar/white_progress")};
-	private static final ResourceLocation[] OVERLAY_BACKGROUND_SPRITES = new ResourceLocation[]{ResourceLocation.withDefaultNamespace("boss_bar/notched_6_background"), ResourceLocation.withDefaultNamespace("boss_bar/notched_10_background"), ResourceLocation.withDefaultNamespace("boss_bar/notched_12_background"), ResourceLocation.withDefaultNamespace("boss_bar/notched_20_background")};
-	private static final ResourceLocation[] OVERLAY_PROGRESS_SPRITES = new ResourceLocation[]{ResourceLocation.withDefaultNamespace("boss_bar/notched_6_progress"), ResourceLocation.withDefaultNamespace("boss_bar/notched_10_progress"), ResourceLocation.withDefaultNamespace("boss_bar/notched_12_progress"), ResourceLocation.withDefaultNamespace("boss_bar/notched_20_progress")};
+	private static final ResourceLocation[] BAR_BACKGROUND_SPRITES = new ResourceLocation[]{new ResourceLocation("minecraft", "boss_bar/pink_background"), new ResourceLocation("minecraft", "boss_bar/blue_background"), new ResourceLocation("minecraft", "boss_bar/red_background"), new ResourceLocation("minecraft", "boss_bar/green_background"), new ResourceLocation("minecraft", "boss_bar/yellow_background"), new ResourceLocation("minecraft", "boss_bar/purple_background"), new ResourceLocation("minecraft", "boss_bar/white_background")};
+	private static final ResourceLocation[] BAR_PROGRESS_SPRITES = new ResourceLocation[]{new ResourceLocation("minecraft", "boss_bar/pink_progress"), new ResourceLocation("minecraft", "boss_bar/blue_progress"), new ResourceLocation("minecraft", "boss_bar/red_progress"), new ResourceLocation("minecraft", "boss_bar/green_progress"), new ResourceLocation("minecraft", "boss_bar/yellow_progress"), new ResourceLocation("minecraft", "boss_bar/purple_progress"), new ResourceLocation("minecraft", "boss_bar/white_progress")};
+	private static final ResourceLocation[] OVERLAY_BACKGROUND_SPRITES = new ResourceLocation[]{new ResourceLocation("minecraft", "boss_bar/notched_6_background"), new ResourceLocation("minecraft", "boss_bar/notched_10_background"), new ResourceLocation("minecraft", "boss_bar/notched_12_background"), new ResourceLocation("minecraft", "boss_bar/notched_20_background")};
+	private static final ResourceLocation[] OVERLAY_PROGRESS_SPRITES = new ResourceLocation[]{new ResourceLocation("minecraft", "boss_bar/notched_6_progress"), new ResourceLocation("minecraft", "boss_bar/notched_10_progress"), new ResourceLocation("minecraft", "boss_bar/notched_12_progress"), new ResourceLocation("minecraft", "boss_bar/notched_20_progress")};
 	private static final ResourceLocation ETHER_EROSION_OVERLAY = EternalStarlight.id("textures/misc/ether_erosion.png");
 	private static final ResourceLocation ETHER_ARMOR_EMPTY = EternalStarlight.id("textures/gui/hud/ether_armor_empty.png");
 	private static final ResourceLocation ETHER_ARMOR_HALF = EternalStarlight.id("textures/gui/hud/ether_armor_half.png");
 	private static final ResourceLocation ETHER_ARMOR_FULL = EternalStarlight.id("textures/gui/hud/ether_armor_full.png");
 	private static final ResourceLocation ORB_OF_PROPHECY_USE = EternalStarlight.id("textures/misc/orb_of_prophecy_use.png");
-	private static final ResourceLocation CROSSHAIR_ATTACK_INDICATOR_FULL_SPRITE = ResourceLocation.withDefaultNamespace("hud/crosshair_attack_indicator_full");
-	private static final ResourceLocation CROSSHAIR_ATTACK_INDICATOR_BACKGROUND_SPRITE = ResourceLocation.withDefaultNamespace("hud/crosshair_attack_indicator_background");
-	private static final ResourceLocation CROSSHAIR_ATTACK_INDICATOR_PROGRESS_SPRITE = ResourceLocation.withDefaultNamespace("hud/crosshair_attack_indicator_progress");
-	private static final ResourceLocation HOTBAR_ATTACK_INDICATOR_BACKGROUND_SPRITE = ResourceLocation.withDefaultNamespace("hud/hotbar_attack_indicator_background");
-	private static final ResourceLocation HOTBAR_ATTACK_INDICATOR_PROGRESS_SPRITE = ResourceLocation.withDefaultNamespace("hud/hotbar_attack_indicator_progress");
+	private static final ResourceLocation CROSSHAIR_ATTACK_INDICATOR_FULL_SPRITE = new ResourceLocation("minecraft", "hud/crosshair_attack_indicator_full");
+	private static final ResourceLocation CROSSHAIR_ATTACK_INDICATOR_BACKGROUND_SPRITE = new ResourceLocation("minecraft", "hud/crosshair_attack_indicator_background");
+	private static final ResourceLocation CROSSHAIR_ATTACK_INDICATOR_PROGRESS_SPRITE = new ResourceLocation("minecraft", "hud/crosshair_attack_indicator_progress");
+	private static final ResourceLocation HOTBAR_ATTACK_INDICATOR_BACKGROUND_SPRITE = new ResourceLocation("minecraft", "hud/hotbar_attack_indicator_background");
+	private static final ResourceLocation HOTBAR_ATTACK_INDICATOR_PROGRESS_SPRITE = new ResourceLocation("minecraft", "hud/hotbar_attack_indicator_progress");
 	private static final ResourceLocation LUNARIS_CACTUS_BLUR_LOCATION = EternalStarlight.id("textures/misc/lunaris_cactus_blur.png");
 	public static final ResourceLocation WIP_LOCATION = EternalStarlight.id("textures/gui/wip.png");
 	private static final Map<ResourceKey<Crest>, GuiCrest> GUI_CRESTS = new HashMap<>();
@@ -109,8 +109,8 @@ public class ESClientHandler {
 	public static boolean tearyEffect;
 	public static int oldSeedsLauncherAnimTicks;
 	public static int seedsLauncherAnimTicks;
-	public static final MultiBufferSource.BufferSource DELAYED_BUFFER_SOURCE = new DelayedMultiBufferSource(new ByteBufferBuilder(RenderType.TRANSIENT_BUFFER_SIZE));
-	public static final MultiBufferSource.BufferSource AFTER_LEVEL_BUFFER_SOURCE = new DelayedMultiBufferSource(new ByteBufferBuilder(RenderType.TRANSIENT_BUFFER_SIZE));
+	public static final MultiBufferSource.BufferSource DELAYED_BUFFER_SOURCE = new DelayedMultiBufferSource(new BufferBuilder(RenderType.TRANSIENT_BUFFER_SIZE));
+	public static final MultiBufferSource.BufferSource AFTER_LEVEL_BUFFER_SOURCE = new DelayedMultiBufferSource(new BufferBuilder(RenderType.TRANSIENT_BUFFER_SIZE));
 	private static Matrix4f modelViewMatrix = new Matrix4f();
 	public static boolean isHalloween;
 
@@ -120,7 +120,7 @@ public class ESClientHandler {
 		}
 		LocalPlayer player = Minecraft.getInstance().player;
 		ClientWeatherState.tickRainLevel();
-		if (Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally()) {
+		if (Minecraft.getInstance().level != null) {
 			if (!Minecraft.getInstance().isPaused()) {
 				clientTickCount++;
 
@@ -195,14 +195,19 @@ public class ESClientHandler {
 
 		if (player != null) {
 			// portal animation
-			oldPortalTicks = portalTicks;
-			if (player.portalProcess != null && player.portalProcess.isSamePortal(ESBlocks.STARLIGHT_PORTAL.get()) && player.portalProcess.isInsidePortalThisTick()) {
+			boolean inStarlightPortal =
+				player.isInsidePortal &&
+					player.portalEntrancePos != null &&
+					player.level().getBlockState(player.portalEntrancePos).is(ESBlocks.STARLIGHT_PORTAL.get());
+
+			if (inStarlightPortal) {
 				portalTicks++;
-				player.portalProcess.setAsInsidePortalThisTick(false);
 			} else {
 				portalTicks -= 2;
 			}
+
 			portalTicks = Mth.clamp(portalTicks, 0, 80);
+
 
 			// entity progression
 			Entity entity = Minecraft.getInstance().crosshairPickEntity;
@@ -250,8 +255,8 @@ public class ESClientHandler {
 			for (Map.Entry<ResourceKey<Crest>, GuiCrest> entry : GUI_CRESTS.entrySet()) {
 				entry.getValue().shouldShow = false;
 			}
-			if (component != null && component.isBound()) {
-				Registry<Crest> registry = player.registryAccess().registryOrThrow(ESRegistries.CREST);
+			if (component != null && component.crest().isBound()) {
+				Registry<Crest> registry = player.level().registryAccess().registryOrThrow(ESRegistries.CREST);
 				Optional<ResourceKey<Crest>> key = registry.getResourceKey(component.value());
 				if (key.isPresent()) {
 					if (!GUI_CRESTS.containsKey(key.get())) {
@@ -302,10 +307,10 @@ public class ESClientHandler {
 
 			// teary
 			oldTearyEffect = tearyEffect;
-			tearyEffect = player.hasEffect(ESMobEffects.TEARY.asHolder());
+			tearyEffect = player.hasEffect(ESMobEffects.TEARY.get());
 
 			// dream catcher
-			if (player.hasEffect(ESMobEffects.DREAM_CATCHER.asHolder())) {
+			if (player.hasEffect(ESMobEffects.DREAM_CATCHER.get())) {
 				for (DreamCatcherText text : DREAM_CATCHER_TEXTS) {
 					text.updatePosition();
 				}
@@ -422,25 +427,31 @@ public class ESClientHandler {
 
 	private static void renderSkyShader(ShaderInstance shader, float intensity) {
 		Tesselator tesselator = Tesselator.getInstance();
-		BufferBuilder buffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+		BufferBuilder buffer = tesselator.getBuilder();
 
 		final float scale = 2048F * (Minecraft.getInstance().gameRenderer.getRenderDistance() / 32F);
 		Vec3 pos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
 		float height = (float) (pos.y() + 128);
 		float cloud = Minecraft.getInstance().level.effects().getCloudHeight() + 64;
 		float y = (float) (Math.max(height, cloud) - pos.y());
-		buffer.addVertex(-scale, y, scale).setColor(1F, 1F, 1F, 1F);
-		buffer.addVertex(-scale, y, -scale).setColor(1F, 1F, 1F, 1F);
-		buffer.addVertex(scale, y, -scale).setColor(1F, 1F, 1F, 1F);
-		buffer.addVertex(scale, y, scale).setColor(1F, 1F, 1F, 1F);
+
+		buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+
+		buffer.vertex(-scale, y,  scale).color(1F, 1F, 1F, 1F).endVertex();
+		buffer.vertex(-scale, y, -scale).color(1F, 1F, 1F, 1F).endVertex();
+		buffer.vertex( scale, y, -scale).color(1F, 1F, 1F, 1F).endVertex();
+		buffer.vertex( scale, y,  scale).color(1F, 1F, 1F, 1F).endVertex();
 
 		RenderSystem.enableBlend();
 		RenderSystem.enableDepthTest();
 		RenderSystem.setShaderColor(1F, 1F, 1F, intensity);
+
 		ShaderInstance last = RenderSystem.getShader();
 		RenderSystem.setShader(() -> shader);
 		shader.apply();
-		BufferUploader.drawWithShader(buffer.buildOrThrow());
+
+		BufferUploader.drawWithShader(buffer.end());
+
 		shader.clear();
 		RenderSystem.setShader(() -> last);
 		RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
@@ -455,18 +466,34 @@ public class ESClientHandler {
 	public static OptionalDouble onComputeFovModifier(float original) {
 		float modified = original;
 		LocalPlayer player = Minecraft.getInstance().player;
+
 		if (player != null && player.isUsingItem()) {
 			ItemStack itemStack = player.getUseItem();
-			if (BuiltInRegistries.ITEM.getKey(itemStack.getItem()).getNamespace().equals(EternalStarlight.ID) && itemStack.getItem() instanceof BowItem) {
+			if (BuiltInRegistries.ITEM.getKey(itemStack.getItem()).getNamespace().equals(EternalStarlight.ID)
+				&& itemStack.getItem() instanceof BowItem) {
+
 				float f = player.getTicksUsingItem() / 20.0F;
 				f = f > 1.0F ? 1.0F : f * f;
-				modified = (float) Mth.lerp(Minecraft.getInstance().options.fovEffectScale().get(), 1.0F, (modified * (1.0F - f * 0.15F)));
+
+				modified = (float) Mth.lerp(
+					Minecraft.getInstance().options.fovEffectScale().get(),
+					1.0F,
+					modified * (1.0F - f * 0.15F)
+				);
 			}
 		}
-		float portal = Mth.lerp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally()), oldPortalTicks, portalTicks) / 80f;
+
+		float partial = Minecraft.getInstance().getFrameTime();
+		float portal = Mth.lerp(partial, oldPortalTicks, portalTicks) / 80f;
+
 		if (portal > 0) {
-			modified = (float) Mth.lerp(Minecraft.getInstance().options.fovEffectScale().get(), 1.0F, (modified * (1.0F - portal)));
+			modified = (float) Mth.lerp(
+				Minecraft.getInstance().options.fovEffectScale().get(),
+				1.0F,
+				modified * (1.0F - portal)
+			);
 		}
+
 		return modified == original ? OptionalDouble.empty() : OptionalDouble.of(modified);
 	}
 
@@ -494,7 +521,7 @@ public class ESClientHandler {
 			RenderSystem.setShaderFogEnd(RenderSystem.getShaderFogEnd() - Mth.clamp(fogEndDecrement, 0, RenderSystem.getShaderFogEnd() - 50));
 		}
 
-		AttributeInstance fogVision = player.getAttribute(ESAttributes.FOG_VISION.asHolder());
+		AttributeInstance fogVision = player.getAttribute(ESAttributes.FOG_VISION.get());
 		if (fogVision != null && fogMode == FogRenderer.FogMode.FOG_TERRAIN) {
 			RenderSystem.setShaderFogStart(RenderSystem.getShaderFogStart() + (float) fogVision.getValue());
 			RenderSystem.setShaderFogEnd(RenderSystem.getShaderFogEnd() + (float) fogVision.getValue());
@@ -513,14 +540,16 @@ public class ESClientHandler {
 				break;
 			}
 		}
-		switch (boss) {
-			case TheGatekeeper ignored -> barLocation = ResourceLocation.fromNamespaceAndPath(EternalStarlight.ID, "textures/gui/bars/the_gatekeeper.png");
-			case StarlightGolem ignored -> barLocation = ResourceLocation.fromNamespaceAndPath(EternalStarlight.ID, "textures/gui/bars/starlight_golem.png");
-			case LunarMonstrosity lunarMonstrosity -> barLocation = ResourceLocation.fromNamespaceAndPath(EternalStarlight.ID, "textures/gui/bars/lunar_monstrosity" + (lunarMonstrosity.getPhase() > 0 ? "_soul.png" : ".png"));
-			case null, default -> {
-				return false;
-			}
+		if (boss instanceof TheGatekeeper) {
+			barLocation = new ResourceLocation(EternalStarlight.ID, "textures/gui/bars/the_gatekeeper.png");
+		} else if (boss instanceof StarlightGolem) {
+			barLocation = new ResourceLocation(EternalStarlight.ID, "textures/gui/bars/starlight_golem.png");
+		} else if (boss instanceof LunarMonstrosity lunarMonstrosity) {
+			barLocation = new ResourceLocation(EternalStarlight.ID, "textures/gui/bars/lunar_monstrosity" + (lunarMonstrosity.getPhase() > 0 ? "_soul.png" : ".png"));
+		} else {
+			return false;
 		}
+
 		drawBar(guiGraphics, x, y, bossEvent, barLocation);
 		Component component = bossEvent.getName();
 		int textWidth = Minecraft.getInstance().font.width(component);
@@ -532,25 +561,35 @@ public class ESClientHandler {
 
 	public static void drawBar(GuiGraphics guiGraphics, int x, int y, BossEvent event, ResourceLocation barLocation) {
 		drawBar(guiGraphics, x, y, event, 182, BAR_BACKGROUND_SPRITES, OVERLAY_BACKGROUND_SPRITES);
-		int k = Mth.lerpDiscrete(event.getProgress(), 0, 182);
+
+		int k = Mth.floor(event.getProgress() * 182.0F);
 		if (k > 0) {
 			drawBar(guiGraphics, x, y, event, k, BAR_PROGRESS_SPRITES, OVERLAY_PROGRESS_SPRITES);
 		}
+
 		guiGraphics.blit(barLocation, x - 1, y - 5, 0.0F, 0.0F, 184, 16, 184, 16);
 	}
 
 	private static void drawBar(GuiGraphics guiGraphics, int x, int y, BossEvent bossEvent, int progress, ResourceLocation[] bars, ResourceLocation[] overlays) {
-		guiGraphics.blitSprite(bars[bossEvent.getColor().ordinal()], 182, 5, 0, 0, x, y, progress, 5);
+		guiGraphics.blit(bars[bossEvent.getColor().ordinal()], x, y, 0, 0, progress, 5);
 		if (bossEvent.getOverlay() != BossEvent.BossBarOverlay.PROGRESS) {
 			RenderSystem.enableBlend();
-			guiGraphics.blitSprite(overlays[bossEvent.getOverlay().ordinal() - 1], 182, 5, 0, 0, x, y, progress, 5);
+			guiGraphics.blit(overlays[bossEvent.getOverlay().ordinal() - 1], x, y, 0, 0, progress, 5);
 			RenderSystem.disableBlend();
 		}
 	}
 
 	public static int getEtherTint(BlockAndTintGetter getter, BlockPos pos) {
-		double progress = getter != null && pos != null ? (ESClientSetupHandler.COLOR_NOISE.getValue(pos.getX() / 15.0, pos.getY() / 15.0, pos.getZ() / 15.0) + 1) / 2 : (Math.sin((ESClientHandler.clientTickCount + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally())) / 30.0) + 1) / 2;
-		return FastColor.ARGB32.color((int) Mth.lerp(progress, 190, 255), (int) Mth.lerp(progress, 240, 255), (int) Mth.lerp(progress, 230, 255));
+		double progress;
+
+		if (getter != null && pos != null) {
+			progress = (ESClientSetupHandler.COLOR_NOISE.getValue(pos.getX() / 15.0, pos.getY() / 15.0, pos.getZ() / 15.0) + 1) / 2;
+		} else {
+			float partial = Minecraft.getInstance().getFrameTime();
+			progress = (Math.sin((ESClientHandler.clientTickCount + partial) / 30.0) + 1) / 2;
+		}
+
+		return FastColor.ARGB32.color(255, (int) Mth.lerp(progress, 190, 255), (int) Mth.lerp(progress, 240, 255), (int) Mth.lerp(progress, 230, 255));
 	}
 
 	// copied from Gui
@@ -568,7 +607,8 @@ public class ESClientHandler {
 
 	// copied from Gui#renderPortalOverlay
 	public static void renderPortalOverlay(GuiGraphics guiGraphics) {
-		float alpha = Mth.lerp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally()), oldPortalTicks, portalTicks) / 120f;
+		float partial = Minecraft.getInstance().getFrameTime();
+		float alpha = Mth.lerp(partial, oldPortalTicks, portalTicks) / 120f;
 
 		if (alpha <= 0) {
 			return;
@@ -618,11 +658,11 @@ public class ESClientHandler {
 					// +16 -> +24 we want it to be under the normal crosshair
 					int y = guiGraphics.guiHeight() / 2 - 7 + 24;
 					if (full) {
-						guiGraphics.blitSprite(CROSSHAIR_ATTACK_INDICATOR_FULL_SPRITE, x, y, 16, 16);
+						guiGraphics.blit(CROSSHAIR_ATTACK_INDICATOR_FULL_SPRITE, x, y, 0, 0, 16, 16);
 					} else if (attackStrengthScale < 1.0F) {
 						int progress = (int) (attackStrengthScale * 17.0F);
-						guiGraphics.blitSprite(CROSSHAIR_ATTACK_INDICATOR_BACKGROUND_SPRITE, x, y, 16, 4);
-						guiGraphics.blitSprite(CROSSHAIR_ATTACK_INDICATOR_PROGRESS_SPRITE, 16, 4, 0, 0, x, y, progress, 4);
+						guiGraphics.blit(CROSSHAIR_ATTACK_INDICATOR_BACKGROUND_SPRITE, x, y, 0, 0, 16, 4);
+						guiGraphics.blit(CROSSHAIR_ATTACK_INDICATOR_PROGRESS_SPRITE, x, y, 0, 0, progress, 4);
 					}
 					RenderSystem.defaultBlendFunc();
 				}
@@ -638,9 +678,8 @@ public class ESClientHandler {
 						}
 						int y = guiGraphics.guiHeight() - 20;
 						int progress = (int) (attackStrengthScale * 19.0F);
-						guiGraphics.blitSprite(HOTBAR_ATTACK_INDICATOR_BACKGROUND_SPRITE, x, y, 18, 18);
-						guiGraphics.blitSprite(HOTBAR_ATTACK_INDICATOR_PROGRESS_SPRITE, 18, 18, 0, 18 - progress, x, y + 18 - progress, 18, progress);
-					}
+						guiGraphics.blit(HOTBAR_ATTACK_INDICATOR_BACKGROUND_SPRITE, x, y, 0, 0, 18, 18);
+						guiGraphics.blit(HOTBAR_ATTACK_INDICATOR_PROGRESS_SPRITE, x, y + (18 - progress), 0, 18 - progress, 18, progress);					}
 				}
 			}
 		}
@@ -670,8 +709,8 @@ public class ESClientHandler {
 					int k = screenWidth / 2 - 8;
 
 					int l = (int) (f * 17.0F);
-					guiGraphics.blitSprite(CROSSHAIR_ATTACK_INDICATOR_BACKGROUND_SPRITE, k, j, 16, 4);
-					guiGraphics.blitSprite(CROSSHAIR_ATTACK_INDICATOR_PROGRESS_SPRITE, 16, 4, 0, 0, k, j, l, 4);
+					guiGraphics.blit(CROSSHAIR_ATTACK_INDICATOR_BACKGROUND_SPRITE, k, j, 0, 0, 16, 4);
+					guiGraphics.blit(CROSSHAIR_ATTACK_INDICATOR_PROGRESS_SPRITE, 16, 4, 0, 0, k, j, l, 4);
 				}
 			}
 		}
@@ -742,8 +781,8 @@ public class ESClientHandler {
 
 	public static void renderCurrentCrest(GuiGraphics guiGraphics) {
 		if (Minecraft.getInstance().player != null) {
-			Registry<Crest> registry = Minecraft.getInstance().player.registryAccess().registryOrThrow(ESRegistries.CREST);
-			float partialTicks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally());
+			Registry<Crest> registry = Minecraft.getInstance().player.level().registryAccess().registryOrThrow(ESRegistries.CREST);
+			float partialTicks = Minecraft.getInstance().getFrameTime();
 			for (Map.Entry<ResourceKey<Crest>, GuiCrest> entry : GUI_CRESTS.entrySet()) {
 				GuiCrest guiCrest = entry.getValue();
 				Crest crest = registry.get(entry.getKey());
@@ -765,7 +804,7 @@ public class ESClientHandler {
 
 	public static void renderDreamCatcher(GuiGraphics guiGraphics) {
 		LocalPlayer player = Minecraft.getInstance().player;
-		if (player != null && player.hasEffect(ESMobEffects.DREAM_CATCHER.asHolder())) {
+		if (player != null && player.hasEffect(ESMobEffects.DREAM_CATCHER.get())) {
 			for (DreamCatcherText text : DREAM_CATCHER_TEXTS) {
 				guiGraphics.drawCenteredString(Minecraft.getInstance().font, text.getText(), text.getX(), text.getY(), 0x5187c4);
 			}

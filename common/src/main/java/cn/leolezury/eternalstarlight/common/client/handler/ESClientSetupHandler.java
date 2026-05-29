@@ -66,11 +66,12 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.util.FastColor;
@@ -80,11 +81,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CrossbowItem;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.ChargedProjectiles;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SkullBlock;
@@ -352,7 +349,7 @@ public class ESClientSetupHandler {
 		ESBlocks.CRINOA,
 		ESBlocks.NOCTURNAL_MILLET_PANICLE,
 		ESBlocks.NOCTURNAL_MILLET_STALK,
-		ESBlocks.DEEPSILVER_GRATE,
+		//ESBlocks.DEEPSILVER_GRATE,
 		ESBlocks.PUNGENCY_FRUIT_VINES,
 		ESBlocks.STARFIRE_BIRD_NEST,
 		ESBlocks.OAK_STARFIRE_BIRD_AVIARY,
@@ -380,9 +377,9 @@ public class ESClientSetupHandler {
 		ESBlocks.STARLIGHT_GOLEM_SPAWNER,
 		ESBlocks.PERMAFROST_SPAWNER,
 		ESBlocks.LUNAR_MONSTROSITY_SPAWNER,
-		ESBlocks.GOLEM_STEEL_GRATE,
-		ESBlocks.WAXED_GOLEM_STEEL_GRATE,
-		ESBlocks.OXIDIZED_GOLEM_STEEL_GRATE,
+		//ESBlocks.GOLEM_STEEL_GRATE,
+		//ESBlocks.WAXED_GOLEM_STEEL_GRATE,
+		//ESBlocks.OXIDIZED_GOLEM_STEEL_GRATE,
 		ESBlocks.MECHANICAL_SPAWNER,
 		ESBlocks.SHADEGRIEVE,
 		ESBlocks.BLOOMING_SHADEGRIEVE,
@@ -411,15 +408,20 @@ public class ESClientSetupHandler {
 	public static final Map<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> ITEMS_WITH_SPECIAL_MODEL = new HashMap<>();
 
 	public static ModelResourceLocation getSpecialModel(ModelResourceLocation item, ItemDisplayContext context) {
-		return ITEMS_WITH_SPECIAL_MODEL.containsKey(item) && ITEMS_WITH_SPECIAL_MODEL.get(item).containsKey(context) ? new ModelResourceLocation(ITEMS_WITH_SPECIAL_MODEL.get(item).get(context).id().withPrefix("item/"), ESPlatform.INSTANCE.getLoader() == ESPlatform.Loader.FABRIC ? "fabric_resource" : "standalone") : item;
+		ModelResourceLocation target = ITEMS_WITH_SPECIAL_MODEL.get(item).get(context);
+		ResourceLocation rl = new ResourceLocation(target.getNamespace(), "item/" + target.getPath());
+		return new ModelResourceLocation(rl, ESPlatform.INSTANCE.getLoader() == ESPlatform.Loader.FABRIC ? "fabric_resource" : "inventory");
 	}
 
 	private static void registerSimpleSpecialModel(String id) {
-		ITEMS_WITH_SPECIAL_MODEL.put(ModelResourceLocation.inventory(EternalStarlight.id(id)), Map.of(
-			ItemDisplayContext.HEAD, ModelResourceLocation.inventory(EternalStarlight.id(id + "_inventory")),
-			ItemDisplayContext.GUI, ModelResourceLocation.inventory(EternalStarlight.id(id + "_inventory")),
-			ItemDisplayContext.GROUND, ModelResourceLocation.inventory(EternalStarlight.id(id + "_inventory")),
-			ItemDisplayContext.FIXED, ModelResourceLocation.inventory(EternalStarlight.id(id + "_inventory"))
+		ModelResourceLocation base = new ModelResourceLocation(EternalStarlight.id(id), "inventory");
+		ModelResourceLocation inv  = new ModelResourceLocation(EternalStarlight.id(id + "_inventory"), "inventory");
+
+		ITEMS_WITH_SPECIAL_MODEL.put(base, Map.of(
+			ItemDisplayContext.HEAD,   inv,
+			ItemDisplayContext.GUI,    inv,
+			ItemDisplayContext.GROUND, inv,
+			ItemDisplayContext.FIXED,  inv
 		));
 	}
 
@@ -475,7 +477,7 @@ public class ESClientSetupHandler {
 			if (entity == null) {
 				return 0.0F;
 			} else {
-				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
+				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 20.0F;
 			}
 		});
 		ItemProperties.register(ESItems.STARFALL_LONGBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
@@ -490,14 +492,24 @@ public class ESClientSetupHandler {
 			if (entity == null) {
 				return 0.0F;
 			} else {
-				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack, entity);
+				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack);
 			}
 		});
 		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
 		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), new ResourceLocation("minecraft", "charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
 		ItemProperties.register(ESItems.UNREALIUM_CROSSBOW.get(), new ResourceLocation("minecraft", "firework"), (stack, level, entity, i) -> {
-			ChargedProjectiles chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
-			return chargedProjectiles != null && chargedProjectiles.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
+			if (!stack.hasTag()) return 0.0F;
+			CompoundTag tag = stack.getTag();
+			if (!tag.getBoolean("Charged")) return 0.0F;
+			ListTag list = tag.getList("ChargedProjectiles", Tag.TAG_COMPOUND);
+			for (int j = 0; j < list.size(); j++) {
+				ItemStack proj = ItemStack.of(list.getCompound(j));
+				if (proj.is(Items.FIREWORK_ROCKET)) {
+					return 1.0F;
+				}
+			}
+
+			return 0.0F;
 		});
 
 		ItemProperties.register(ESItems.MALARITE_SPEAR.get(), new ResourceLocation("minecraft", "throwing"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
@@ -508,21 +520,31 @@ public class ESClientSetupHandler {
 			if (entity == null) {
 				return 0.0F;
 			} else {
-				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack, entity);
+				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack);
 			}
 		});
 		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
 		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), new ResourceLocation("minecraft", "charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
 		ItemProperties.register(ESItems.STARFIRE_CROSSBOW.get(), new ResourceLocation("minecraft", "firework"), (stack, level, entity, i) -> {
-			ChargedProjectiles chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
-			return chargedProjectiles != null && chargedProjectiles.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
+			if (!stack.hasTag()) return 0.0F;
+			CompoundTag tag = stack.getTag();
+			if (!tag.getBoolean("Charged")) return 0.0F;
+			ListTag list = tag.getList("ChargedProjectiles", Tag.TAG_COMPOUND);
+			for (int j = 0; j < list.size(); j++) {
+				ItemStack proj = ItemStack.of(list.getCompound(j));
+				if (proj.is(Items.FIREWORK_ROCKET)) {
+					return 1.0F;
+				}
+			}
+
+			return 0.0F;
 		});
 
 		ItemProperties.register(ESItems.FLOWGLAZE_BOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
-				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
+				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 20.0F;
 			}
 		});
 		ItemProperties.register(ESItems.FLOWGLAZE_BOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
@@ -556,7 +578,7 @@ public class ESClientSetupHandler {
 			if (entity == null) {
 				return 0.0F;
 			} else {
-				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
+				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 20.0F;
 			}
 		});
 		ItemProperties.register(ESItems.GLISTERING_BOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
@@ -575,14 +597,24 @@ public class ESClientSetupHandler {
 			if (entity == null) {
 				return 0.0F;
 			} else {
-				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack, entity);
+				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack);
 			}
 		});
 		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
 		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), new ResourceLocation("minecraft", "charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
 		ItemProperties.register(ESItems.MECHANICAL_CROSSBOW.get(), new ResourceLocation("minecraft", "firework"), (stack, level, entity, i) -> {
-			ChargedProjectiles chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
-			return chargedProjectiles != null && chargedProjectiles.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
+			if (!stack.hasTag()) return 0.0F;
+			CompoundTag tag = stack.getTag();
+			if (!tag.getBoolean("Charged")) return 0.0F;
+			ListTag list = tag.getList("ChargedProjectiles", Tag.TAG_COMPOUND);
+			for (int j = 0; j < list.size(); j++) {
+				ItemStack proj = ItemStack.of(list.getCompound(j));
+				if (proj.is(Items.FIREWORK_ROCKET)) {
+					return 1.0F;
+				}
+			}
+
+			return 0.0F;
 		});
 
 		ItemProperties.register(ESItems.CRYSTAL_GREATSWORD.get(), new ResourceLocation("minecraft", "blocking"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
@@ -591,35 +623,55 @@ public class ESClientSetupHandler {
 			if (entity == null) {
 				return 0.0F;
 			} else {
-				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack, entity);
+				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack);
 			}
 		});
 		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
 		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), new ResourceLocation("minecraft", "charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
 		ItemProperties.register(ESItems.CRYSTAL_CROSSBOW.get(), new ResourceLocation("minecraft", "firework"), (stack, level, entity, i) -> {
-			ChargedProjectiles chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
-			return chargedProjectiles != null && chargedProjectiles.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
+			if (!stack.hasTag()) return 0.0F;
+			CompoundTag tag = stack.getTag();
+			if (!tag.getBoolean("Charged")) return 0.0F;
+			ListTag list = tag.getList("ChargedProjectiles", Tag.TAG_COMPOUND);
+			for (int j = 0; j < list.size(); j++) {
+				ItemStack proj = ItemStack.of(list.getCompound(i));
+				if (proj.is(Items.FIREWORK_ROCKET)) {
+					return 1.0F;
+				}
+			}
+
+			return 0.0F;
 		});
 
 		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
-				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack, entity);
+				return CrossbowItem.isCharged(stack) ? 0.0F : (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / (float) CrossbowItem.getChargeDuration(stack);
 			}
 		});
 		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
 		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), new ResourceLocation("minecraft", "charged"), (stack, level, entity, i) -> CrossbowItem.isCharged(stack) ? 1.0F : 0.0F);
 		ItemProperties.register(ESItems.WILTED_CROSSBOW.get(), new ResourceLocation("minecraft", "firework"), (stack, level, entity, i) -> {
-			ChargedProjectiles chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
-			return chargedProjectiles != null && chargedProjectiles.contains(Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
+			if (!stack.hasTag()) return 0.0F;
+			CompoundTag tag = stack.getTag();
+			if (!tag.getBoolean("Charged")) return 0.0F;
+			ListTag list = tag.getList("ChargedProjectiles", Tag.TAG_COMPOUND);
+			for (int j = 0; j < list.size(); j++) {
+				ItemStack proj = ItemStack.of(list.getCompound(i));
+				if (proj.is(Items.FIREWORK_ROCKET)) {
+					return 1.0F;
+				}
+			}
+
+			return 0.0F;
 		});
 
 		ItemProperties.register(ESItems.MOONRING_BOW.get(), new ResourceLocation("minecraft", "pull"), (stack, level, entity, i) -> {
 			if (entity == null) {
 				return 0.0F;
 			} else {
-				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
+				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 20.0F;
 			}
 		});
 		ItemProperties.register(ESItems.MOONRING_BOW.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
@@ -648,10 +700,12 @@ public class ESClientSetupHandler {
 			if (entity == null) {
 				return 0.0F;
 			} else {
-				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
+				return entity.getUseItem() != stack ? 0.0F : (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / 20.0F;
 			}
 		});
 		ItemProperties.register(ESItems.BOW_OF_BLOOD.get(), new ResourceLocation("minecraft", "pulling"), (stack, level, entity, i) -> entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
+
+		registerMenuScreens(MenuScreens::register);
 	}
 
 	public static void registerBlockColors(BlockColorRegisterStrategy strategy) {
@@ -706,8 +760,10 @@ public class ESClientSetupHandler {
 			return FastColor.ARGB32.lerp(progress, 0xffffffff, 0xff00dfff);
 		}, ESBlocks.ACCUMULATOR.get());
 		strategy.register((state, getter, pos, i) -> {
-			double progress = getter != null && pos != null ? (COLOR_NOISE.getValue(pos.getX() / 10.0, pos.getY() / 10.0, pos.getZ() / 10.0) + 1) / 2 : (Math.sin((ESClientHandler.clientTickCount + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally())) / 30.0) + 1) / 2;
-			return FastColor.ARGB32.color((int) Mth.lerp(progress, 218, 255), (int) Mth.lerp(progress, 90, 255), (int) Mth.lerp(progress, 255, 116));
+			double progress = getter != null && pos != null
+				? (COLOR_NOISE.getValue(pos.getX() / 10.0, pos.getY() / 10.0, pos.getZ() / 10.0) + 1) / 2
+				: (Math.sin((ESClientHandler.clientTickCount + Minecraft.getInstance().getFrameTime()) / 30.0) + 1) / 2;
+			return FastColor.ARGB32.color(255, (int) Mth.lerp(progress, 218, 255), (int) Mth.lerp(progress, 90, 255), (int) Mth.lerp(progress, 255, 116));
 		}, ESBlocks.DUSK_GLASS.get());
 	}
 
@@ -774,38 +830,41 @@ public class ESClientSetupHandler {
 		strategy.register(EternalStarlight.id("aurora"), DefaultVertexFormat.POSITION_COLOR, ESShaders::setAurora);
 	}
 
-	public static void modifyBakingResult(Map<ModelResourceLocation, BakedModel> models) {
+	public static void modifyBakingResult(Map<ResourceLocation, BakedModel> models) {
 		if (!modifiedBakedModels) {
-			for (ModelResourceLocation id : models.keySet()) {
-				String path = id.id().getPath();
-				if (id.id().getNamespace().equals(EternalStarlight.ID) && (path.startsWith("thermal_springstone_") || (path.startsWith("starfire_") && !path.startsWith("starfire_bird") && !path.startsWith("starfire_upgrade")))) {
+			for (ResourceLocation id : models.keySet()) {
+				String path = id.getPath();
+				if (id.getNamespace().equals(EternalStarlight.ID)
+					&& (path.startsWith("thermal_springstone_")
+					|| (path.startsWith("starfire_") && !path.startsWith("starfire_bird") && !path.startsWith("starfire_upgrade")))) {
 					models.put(id, ESClientPlatform.INSTANCE.getGlowingBakedModel(models.get(id)));
 				}
 			}
+
 			modifiedBakedModels = true;
 		}
 	}
 
 	public static void registerExtraBakedModels(Consumer<ModelResourceLocation> registration) {
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("thermal_springstone_scythe_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("thermal_springstone_hammer_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("glacite_scythe_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("malarite_spear_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("pungency_fruit_spear_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("seeds_launcher_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("starfire_scythe_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("starfire_hammer_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("flowglaze_scythe_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("glistering_greatsword_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("glistering_morning_star_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("golem_steel_greatsword_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("crystal_greatsword_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("moonring_greatsword_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("petal_scythe_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("crescent_spear_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("bonemore_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("doomeden_rapier_inventory")));
-		registration.accept(ModelResourceLocation.inventory(EternalStarlight.id("orb_of_prophecy_inventory")));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("thermal_springstone_scythe_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("thermal_springstone_hammer_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("glacite_scythe_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("malarite_spear_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("pungency_fruit_spear_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("seeds_launcher_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("starfire_scythe_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("starfire_hammer_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("flowglaze_scythe_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("glistering_greatsword_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("glistering_morning_star_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("golem_steel_greatsword_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("crystal_greatsword_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("moonring_greatsword_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("petal_scythe_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("crescent_spear_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("bonemore_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("doomeden_rapier_inventory"), "inventory"));
+		registration.accept(new ModelResourceLocation(EternalStarlight.id("orb_of_prophecy_inventory"), "inventory"));
 	}
 
 	public static void registerParticleProviders(ParticleProviderRegisterStrategy strategy) {
@@ -841,12 +900,15 @@ public class ESClientSetupHandler {
 		strategy.register(ESParticles.ASHEN_SNOW.get(), AshenSnowParticle.Provider::new);
 		strategy.register(ESParticles.ORBITAL_ASHEN_SNOW.get(), OrbitalAshenSnowParticle.Provider::new);
 		strategy.register(ESParticles.EXPLOSION_SHOCK.get(), ExplosionShockParticle.Provider::new);
-		strategy.register(ESParticles.COLORED_INK.get(), spriteSet -> new ParticleProvider<>() {
+		strategy.register(ESParticles.COLORED_INK.get(), spriteSet -> new ParticleProvider<SimpleParticleType>() {
 			@Override
-			public @NotNull Particle createParticle(ColorParticleOption option, ClientLevel level, double x, double y, double z, double dx, double dy, double dz) {
-				return new SquidInkParticle(level, x, y, z, dx, dy, dz, FastColor.ARGB32.colorFromFloat(option.getAlpha(), 1 - option.getRed(), 1 - option.getGreen(), 1 - option.getBlue()), spriteSet);
+			public @NotNull Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double dx, double dy, double dz) {
+				int color = FastColor.ARGB32.color(255, 0, 0, 0);
+
+				return new SquidInkParticle(level, x, y, z, dx, dy, dz, color, spriteSet);
 			}
 		});
+
 		strategy.register(ESParticles.AMARAMBER_WAX_ON.get(), spriteSet -> (type, level, x, y, z, dx, dy, dz) -> {
 			GlowParticle particle = new GlowParticle(level, x, y, z, 0.0F, 0.0F, 0.0F, spriteSet);
 			particle.setParticleSpeed(dx * 0.01 / (double) 2.0F, dy * 0.01, dz * 0.01 / (double) 2.0F);
