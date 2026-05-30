@@ -25,7 +25,7 @@ public abstract class ProjectileMixin {
 		if (getOwner() instanceof LivingEntity livingEntity && ((Projectile) (Object) this) instanceof ThrownPotion) {
 			double factor = 1;
 			if (livingEntity.getAttributes().hasAttribute(ESAttributes.THROWN_POTION_DISTANCE.asHolder())) {
-				AttributeInstance distance = livingEntity.getAttribute(ESAttributes.THROWN_POTION_DISTANCE.asHolder());
+				AttributeInstance distance = livingEntity.getAttribute(ESAttributes.THROWN_POTION_DISTANCE.get());
 				if (distance != null) {
 					factor = distance.getValue();
 				}

@@ -23,7 +23,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -83,7 +82,8 @@ public abstract class ItemInHandRendererMixin {
 	@Inject(method = "applyItemArmTransform", at = @At("RETURN"))
 	private void applyItemArmTransform(PoseStack stack, HumanoidArm arm, float equipProgress, CallbackInfo ci) {
 		if (ESClientHandler.oldSeedsLauncherAnimTicks != 0 || ESClientHandler.seedsLauncherAnimTicks != 0) {
-			float anim = Mth.lerp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally()), ESClientHandler.oldSeedsLauncherAnimTicks, ESClientHandler.seedsLauncherAnimTicks);
+			float partial = Minecraft.getInstance().getFrameTime();
+			float anim = Mth.lerp(partial, ESClientHandler.oldSeedsLauncherAnimTicks, ESClientHandler.seedsLauncherAnimTicks);
 			stack.translate(0, 0, Mth.sin((anim / 5) * Mth.PI) * 0.05);
 		}
 	}
@@ -92,7 +92,7 @@ public abstract class ItemInHandRendererMixin {
 	private boolean mainHandMatch(ItemStack stack1, ItemStack stack2, Operation<Boolean> original) {
 		if (stack1.getItem() instanceof SeedsLauncherItem && stack2.getItem() instanceof SeedsLauncherItem) {
 			ItemStack copied = stack1.copy();
-			copied.set(DataComponents.DAMAGE, stack2.get(DataComponents.DAMAGE));
+			copied.setDamageValue(stack2.getDamageValue());
 			return original.call(copied, stack2);
 		}
 		return original.call(stack1, stack2);
@@ -102,7 +102,7 @@ public abstract class ItemInHandRendererMixin {
 	private boolean offhandMatch(ItemStack stack1, ItemStack stack2, Operation<Boolean> original) {
 		if (stack1.getItem() instanceof SeedsLauncherItem && stack2.getItem() instanceof SeedsLauncherItem) {
 			ItemStack copied = stack1.copy();
-			copied.set(DataComponents.DAMAGE, stack2.get(DataComponents.DAMAGE));
+			copied.setDamageValue(stack2.getDamageValue());
 			return original.call(copied, stack2);
 		}
 		return original.call(stack1, stack2);
@@ -203,7 +203,7 @@ public abstract class ItemInHandRendererMixin {
 		playerModel.crouching = false;
 		playerModel.swimAmount = 0.0F;
 		playerModel.setupAnim(abstractClientPlayer, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
-		ResourceLocation resourceLocation = abstractClientPlayer.getSkin().texture();
+		ResourceLocation resourceLocation = abstractClientPlayer.getSkinTextureLocation();
 		modelPart.render(poseStack, buffer.getBuffer(RenderType.entitySolid(resourceLocation)), light, OverlayTexture.NO_OVERLAY);
 		modelPart2.render(poseStack, buffer.getBuffer(RenderType.entityTranslucent(resourceLocation)), light, OverlayTexture.NO_OVERLAY);
 		poseStack.pushPose();

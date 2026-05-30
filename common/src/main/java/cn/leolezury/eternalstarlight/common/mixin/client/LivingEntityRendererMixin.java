@@ -12,7 +12,8 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.client.resources.DefaultPlayerSkin;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -30,9 +31,11 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 
 	@Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isSpectator()Z"))
 	private void renderOverlay(T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
-		if (entity instanceof AbstractClientPlayer && entity.level().getEntity(ESDataAttachments.HUSK_OWNER_ID.getData(entity)) instanceof Player) {
-			VertexConsumer consumer = buffer.getBuffer(RenderType.entityCutout(entity instanceof AbstractClientPlayer player && player.getSkin().model() == PlayerSkin.Model.SLIM ? EternalStarlight.id("textures/entity/tangled_husk_slim.png") : EternalStarlight.id("textures/entity/tangled_husk.png")));
-			getModel().renderToBuffer(poseStack, consumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F));
+		if (entity instanceof AbstractClientPlayer player && entity.level().getEntity(ESDataAttachments.HUSK_OWNER_ID.getData(entity)) instanceof Player) {
+			boolean slim = DefaultPlayerSkin.getSkinModelName(player.getUUID()).equals("slim");
+			ResourceLocation tex = slim ? EternalStarlight.id("textures/entity/tangled_husk_slim.png") : EternalStarlight.id("textures/entity/tangled_husk.png");
+			VertexConsumer consumer = buffer.getBuffer(RenderType.entityCutout(tex));
+			getModel().renderToBuffer(poseStack, consumer, packedLight, LivingEntityRenderer.getOverlayCoords(entity, 0.0F), 1.0F, 1.0F, 1.0F, 1.0F);
 		}
 	}
 

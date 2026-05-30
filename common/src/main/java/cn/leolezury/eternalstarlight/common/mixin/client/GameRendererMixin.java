@@ -29,7 +29,7 @@ public abstract class GameRendererMixin {
 			if (entity instanceof SoulitSpectator) {
 				loadEffect(EternalStarlight.id("shaders/post/soulit_spectator.json"));
 			} else if (ESClientHandler.tearyEffect) {
-				loadEffect(ResourceLocation.withDefaultNamespace("shaders/post/blur.json"));
+				loadEffect(new ResourceLocation("minecraft", "shaders/post/blur.json"));
 			}
 		}
 	}

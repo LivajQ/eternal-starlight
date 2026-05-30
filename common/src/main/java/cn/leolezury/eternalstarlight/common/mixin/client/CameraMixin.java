@@ -21,12 +21,12 @@ public abstract class CameraMixin {
 	public abstract void move(float f, float g, float h);
 
 	@Shadow
-	public abstract float getMaxZoom(float f);
+	public abstract double getMaxZoom(double f);
 
 	@Inject(method = "setup", at = @At("RETURN"))
 	private void setup(BlockGetter blockGetter, Entity entity, boolean bl, boolean bl2, float f, CallbackInfo ci) {
 		if (isDetached() && Minecraft.getInstance().player instanceof SpellCaster && ESDataAttachments.SPELL_CAST_DATA.getData(Minecraft.getInstance().player).hasSpell()) {
-			move(-getMaxZoom(2 * Minecraft.getInstance().player.getScale()), 1, 0);
+			move((float) -getMaxZoom(2 * Minecraft.getInstance().player.getScale()), 1, 0);
 		}
 	}
 }

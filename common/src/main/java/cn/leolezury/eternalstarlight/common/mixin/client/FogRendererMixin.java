@@ -14,7 +14,16 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class FogRendererMixin {
 	@WrapOperation(method = "setupColor", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getWaterVision()F"))
 	private static float setupColor(LocalPlayer instance, Operation<Float> original) {
-		float modifier = Mth.lerp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().level != null && Minecraft.getInstance().level.tickRateManager().runsNormally()), ESClientHandler.oldAbyssalFogModifier, ESClientHandler.abyssalFogModifier);
-		return Mth.lerp(modifier, 0, original.call(instance));
+
+		float partialTicks = Minecraft.getInstance().getFrameTime();
+
+		float modifier = Mth.lerp(
+			partialTicks,
+			ESClientHandler.oldAbyssalFogModifier,
+			ESClientHandler.abyssalFogModifier
+		);
+
+		return Mth.lerp(modifier, 0f, original.call(instance));
 	}
+
 }

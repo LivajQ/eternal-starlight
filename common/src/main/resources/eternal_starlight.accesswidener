@@ -145,7 +145,8 @@ accessible field net/minecraft/client/particle/ParticleEngine spriteSets Ljava/u
 
 # astral golem
 
-# fabirc mixin
+# mixin
+accessible class net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection
 
 # datagen
 

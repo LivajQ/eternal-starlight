@@ -49,11 +49,11 @@ public abstract class EntityRenderDispatcherMixin {
 	private <E extends Entity> void render(E entity, double xOffset, double yOffset, double zOffset, float delta, float yRot, PoseStack poseStack, MultiBufferSource multiBufferSource, int light, CallbackInfo ci) {
 		if (entity instanceof LivingEntity living && !living.isDeadOrDying()) {
 			AttributeInstance instance = living.getAttribute(Attributes.ARMOR);
-			if (instance != null && instance.hasModifier(CrystalInfectionEffect.ARMOR_MODIFIER_ID)) {
-				AttributeModifier modifier = instance.getModifier(CrystalInfectionEffect.ARMOR_MODIFIER_ID);
+			if (instance != null && instance.getModifier(CrystalInfectionEffect.ARMOR_MODIFIER_UUID) != null) {
+				AttributeModifier modifier = instance.getModifier(CrystalInfectionEffect.ARMOR_MODIFIER_UUID);
 				long seed = (long) (Math.pow(living.getId(), 3) * 54321L);
 				RandomSource random = RandomSource.create(seed);
-				int crystalCount = (int) (living.getBbHeight() / 0.5F) + (modifier == null ? 0 : (int) Math.abs(modifier.amount() * 2.5));
+				int crystalCount = (int) (living.getBbHeight() / 0.5F) + (modifier == null ? 0 : (int) Math.abs(modifier.getAmount() * 2.5));
 
 				for (int i = 0; i < crystalCount; i++) {
 					poseStack.pushPose();
@@ -83,7 +83,7 @@ public abstract class EntityRenderDispatcherMixin {
 	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;displayFireAnimation()Z", shift = At.Shift.AFTER))
 	private <E extends Entity> void renderFlame(E entity, double d, double e, double f, float g, float h, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
 		if (ESDataAttachments.ABYSSAL_FIRE_TICKS.getData(entity) > 0) {
-			renderAbyssalFlame(poseStack, multiBufferSource, entity, Mth.rotationAroundAxis(Mth.Y_AXIS, cameraOrientation, new Quaternionf()));
+			renderAbyssalFlame(poseStack, multiBufferSource, entity, cameraOrientation);
 		}
 	}
 

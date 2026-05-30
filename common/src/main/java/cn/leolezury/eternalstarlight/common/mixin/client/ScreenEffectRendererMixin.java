@@ -39,31 +39,41 @@ public abstract class ScreenEffectRendererMixin {
 		RenderSystem.depthFunc(519);
 		RenderSystem.depthMask(false);
 		RenderSystem.enableBlend();
-		TextureAtlasSprite textureAtlasSprite = ABYSSAL_FIRE_1.sprite();
-		RenderSystem.setShaderTexture(0, textureAtlasSprite.atlasLocation());
-		float f = textureAtlasSprite.getU0();
-		float g = textureAtlasSprite.getU1();
-		float h = (f + g) / 2.0F;
-		float i = textureAtlasSprite.getV0();
-		float j = textureAtlasSprite.getV1();
-		float k = (i + j) / 2.0F;
-		float l = textureAtlasSprite.uvShrinkRatio();
-		float m = Mth.lerp(l, f, h);
-		float n = Mth.lerp(l, g, h);
-		float o = Mth.lerp(l, i, k);
-		float p = Mth.lerp(l, j, k);
 
-		for (int r = 0; r < 2; ++r) {
+		TextureAtlasSprite sprite = ABYSSAL_FIRE_1.sprite();
+		RenderSystem.setShaderTexture(0, sprite.atlasLocation());
+
+		float u0 = sprite.getU0();
+		float u1 = sprite.getU1();
+		float v0 = sprite.getV0();
+		float v1 = sprite.getV1();
+
+		float midU = (u0 + u1) * 0.5f;
+		float midV = (v0 + v1) * 0.5f;
+		float shrink = sprite.uvShrinkRatio();
+
+		float uMin = Mth.lerp(shrink, u0, midU);
+		float uMax = Mth.lerp(shrink, u1, midU);
+		float vMin = Mth.lerp(shrink, v0, midV);
+		float vMax = Mth.lerp(shrink, v1, midV);
+
+		for (int r = 0; r < 2; r++) {
 			poseStack.pushPose();
-			poseStack.translate((float) (-(r * 2 - 1)) * 0.24F, -0.3F, 0.0F);
-			poseStack.mulPose(Axis.YP.rotationDegrees((float) (r * 2 - 1) * 10.0F));
-			Matrix4f matrix4f = poseStack.last().pose();
-			BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-			bufferBuilder.addVertex(matrix4f, -0.5F, -0.5F, -0.5F).setColor(1.0F, 1.0F, 1.0F, 0.9F).setUv(n, p);
-			bufferBuilder.addVertex(matrix4f, 0.5F, -0.5F, -0.5F).setColor(1.0F, 1.0F, 1.0F, 0.9F).setUv(m, p);
-			bufferBuilder.addVertex(matrix4f, 0.5F, 0.5F, -0.5F).setColor(1.0F, 1.0F, 1.0F, 0.9F).setUv(m, o);
-			bufferBuilder.addVertex(matrix4f, -0.5F, 0.5F, -0.5F).setColor(1.0F, 1.0F, 1.0F, 0.9F).setUv(n, o);
-			BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+			poseStack.translate((-(r * 2 - 1)) * 0.24F, -0.3F, 0.0F);
+			poseStack.mulPose(Axis.YP.rotationDegrees((r * 2 - 1) * 10.0F));
+
+			Matrix4f mat = poseStack.last().pose();
+
+			BufferBuilder buf = Tesselator.getInstance().getBuilder();
+			buf.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+
+			buf.vertex(mat, -0.5F, -0.5F, -0.5F).uv(uMax, vMax).color(1f, 1f, 1f, 0.9f).endVertex();
+			buf.vertex(mat,  0.5F, -0.5F, -0.5F).uv(uMin, vMax).color(1f, 1f, 1f, 0.9f).endVertex();
+			buf.vertex(mat,  0.5F,  0.5F, -0.5F).uv(uMin, vMin).color(1f, 1f, 1f, 0.9f).endVertex();
+			buf.vertex(mat, -0.5F,  0.5F, -0.5F).uv(uMax, vMin).color(1f, 1f, 1f, 0.9f).endVertex();
+
+			BufferUploader.drawWithShader(buf.end());
+
 			poseStack.popPose();
 		}
 

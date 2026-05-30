@@ -12,9 +12,7 @@ import cn.leolezury.eternalstarlight.common.util.ESTags;
 import cn.leolezury.eternalstarlight.common.vfx.ScreenShakeVfx;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -32,7 +30,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
@@ -69,14 +66,17 @@ public abstract class LivingEntityMixin {
 	public abstract Collection<MobEffectInstance> getActiveEffects();
 
 	@Shadow
-	public abstract boolean hasEffect(Holder<MobEffect> holder);
+	public abstract boolean hasEffect(MobEffect holder);
 
 	@Shadow
-	public abstract boolean removeEffect(Holder<MobEffect> holder);
+	public abstract boolean removeEffect(MobEffect holder);
 
 	@Shadow
 	@Nullable
 	protected ItemStack autoSpinAttackItemStack;
+
+	@Shadow
+	protected int attackStrengthTicker;
 
 	@Shadow
 	@NotNull
@@ -112,12 +112,12 @@ public abstract class LivingEntityMixin {
 	@Inject(method = "createLivingAttributes", at = @At("RETURN"))
 	private static void createLivingAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
 		cir.getReturnValue()
-			.add(ESAttributes.THROWN_POTION_DISTANCE.asHolder())
-			.add(ESAttributes.ETHER_RESISTANCE.asHolder())
-			.add(ESAttributes.FIRE_RESISTANCE.asHolder())
-			.add(ESAttributes.METEOR_COUNTERATTACK_CHANCE.asHolder())
-			.add(ESAttributes.HEAL_MULTIPLIER.asHolder())
-			.add(ESAttributes.ENEMY_FOLLOW_RANGE_MULTIPLIER.asHolder());
+			.add(ESAttributes.THROWN_POTION_DISTANCE.get())
+			.add(ESAttributes.ETHER_RESISTANCE.get())
+			.add(ESAttributes.FIRE_RESISTANCE.get())
+			.add(ESAttributes.METEOR_COUNTERATTACK_CHANCE.get())
+			.add(ESAttributes.HEAL_MULTIPLIER.get())
+			.add(ESAttributes.ENEMY_FOLLOW_RANGE_MULTIPLIER.get());
 	}
 
 	@Inject(method = "checkAutoSpinAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V", shift = At.Shift.AFTER))
@@ -140,7 +140,7 @@ public abstract class LivingEntityMixin {
 			if (!entity.level().isClientSide) {
 				for (LivingEntity living : entity.level().getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, entity, entity.getBoundingBox().inflate(3))) {
 					if (ESEntityUtil.shouldHarm(entity, living) && entity instanceof Player player) {
-						player.attackStrengthTicker = Mth.ceil(player.getCurrentItemAttackStrengthDelay());
+						attackStrengthTicker = Mth.ceil(player.getCurrentItemAttackStrengthDelay());
 						player.attack(living);
 						if (entity.level() instanceof ServerLevel serverLevel) {
 							Vec3 targetPos = living.position().add((entity.getRandom().nextDouble() - 0.5) * living.getBbWidth(), entity.getRandom().nextDouble() * living.getBbHeight(), (entity.getRandom().nextDouble() - 0.5) * living.getBbWidth());
@@ -169,13 +169,13 @@ public abstract class LivingEntityMixin {
 	@Inject(method = "eat(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/food/FoodProperties;)Lnet/minecraft/world/item/ItemStack;", at = @At("HEAD"))
 	private void eat(Level level, ItemStack itemStack, FoodProperties foodProperties, CallbackInfoReturnable<ItemStack> cir) {
 		if (itemStack.is(ESItems.LUNARIS_CACTUS_GEL.get())) {
-			List<Holder<MobEffect>> effectsToRemove = new ArrayList<>();
+			List<MobEffect> effectsToRemove = new ArrayList<>();
 			for (MobEffectInstance effectInstance : getActiveEffects()) {
-				if (!effectInstance.getEffect().value().isBeneficial()) {
+				if (!effectInstance.getEffect().isBeneficial()) {
 					effectsToRemove.add(effectInstance.getEffect());
 				}
 			}
-			for (Holder<MobEffect> effect : effectsToRemove) {
+			for (MobEffect effect : effectsToRemove) {
 				if (hasEffect(effect)) {
 					removeEffect(effect);
 				}
@@ -224,7 +224,7 @@ public abstract class LivingEntityMixin {
 	@Inject(method = "onClimbable", at = @At("RETURN"), cancellable = true)
 	private void onClimbable(CallbackInfoReturnable<Boolean> cir) {
 		LivingEntity livingEntity = ((LivingEntity) (Object) this);
-		if (hasEffect(ESMobEffects.STICKY.asHolder())) {
+		if (hasEffect(ESMobEffects.STICKY.get())) {
 			boolean climbable = false;
 			AABB box = livingEntity.getBoundingBox();
 			BlockPos fromPos = BlockPos.containing(box.minX - 1.0E-3, box.minY + 1.0E-7, box.minZ - 1.0E-3);
@@ -250,7 +250,7 @@ public abstract class LivingEntityMixin {
 	@Inject(method = "tickEffects", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;updateGlowingStatus()V", shift = At.Shift.AFTER))
 	private void tickEffects(CallbackInfo ci) {
 		LivingEntity livingEntity = ((LivingEntity) (Object) this);
-		if (!hasEffect(ESMobEffects.NUMBNESS.asHolder())) {
+		if (!hasEffect(ESMobEffects.NUMBNESS.get())) {
 			float damage = ESDataAttachments.NUMBNESS_DAMAGE.getData(livingEntity);
 			if (damage != 0) {
 				livingEntity.hurt(ESDamageTypes.getDamageSource(livingEntity.level(), ESDamageTypes.NUMBNESS), damage);
@@ -259,6 +259,7 @@ public abstract class LivingEntityMixin {
 		}
 	}
 
+	/*
 	@WrapOperation(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;knockback(DDD)V"))
 	private void knockback(LivingEntity instance, double strength, double x, double z, Operation<Void> original, @Local(argsOnly = true) DamageSource source) {
 		if (source.getDirectEntity() instanceof AbstractArrow arrow) {
@@ -270,6 +271,7 @@ public abstract class LivingEntityMixin {
 		}
 		original.call(instance, strength, x, z);
 	}
+	 */
 
 	@Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;gameEvent(Lnet/minecraft/core/Holder;)V", shift = At.Shift.AFTER))
 	private void die(CallbackInfo ci) {

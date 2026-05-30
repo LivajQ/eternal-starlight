@@ -15,16 +15,19 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(FishingHook.class)
 public abstract class FishingHookMixin {
+
 	@WrapOperation(method = "retrieve", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/loot/LootTable;getRandomItems(Lnet/minecraft/world/level/storage/loot/LootParams;)Lit/unimi/dsi/fastutil/objects/ObjectArrayList;"))
 	public ObjectArrayList<ItemStack> getFishingLoot(LootTable instance, LootParams params, Operation<ObjectArrayList<ItemStack>> original) {
-		FishingHook hook = (FishingHook) (Object) this;
+		FishingHook hook = (FishingHook)(Object)this;
+
 		if (hook.level().dimension().location().equals(ESDimensions.STARLIGHT_KEY.location())) {
 			MinecraftServer server = hook.level().getServer();
 			if (server != null) {
-				LootTable lootTable = server.reloadableRegistries().getLootTable(ESLootTables.GAMEPLAY_FISHING);
-				return lootTable.getRandomItems(params);
+				LootTable table = server.getLootData().getLootTable(ESLootTables.GAMEPLAY_FISHING);
+				return table.getRandomItems(params);
 			}
 		}
+
 		return original.call(instance, params);
 	}
 }

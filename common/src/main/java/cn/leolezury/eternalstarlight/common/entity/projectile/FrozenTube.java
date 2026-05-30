@@ -97,12 +97,29 @@ public class FrozenTube extends ThrowableProjectile implements TrailOwner {
 	@Override
 	protected void onHitEntity(EntityHitResult hitResult) {
 		if (hitResult.getType() != HitResult.Type.MISS && getOwner() instanceof LivingEntity owner && ESEntityUtil.shouldHarm(owner, hitResult.getEntity())) {
-			hitResult.getEntity().hurt(ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.FREEZE, this, owner), (float) switch (getOwner()) {
-				case Player ignored -> 6;
-				case Freeze ignored -> ESConfig.INSTANCE.mobsConfig.freeze.attackDamage();
-				case Permafrost permafrost -> (permafrost.getAttribute(Attributes.ATTACK_DAMAGE) != null ? permafrost.getAttributeValue(Attributes.ATTACK_DAMAGE) : 12) * 0.4;
-				default -> 3;
-			});
+			float damage;
+			Entity shooter = getOwner();
+
+			if (shooter instanceof Player) {
+				damage = 6f;
+
+			} else if (shooter instanceof Freeze) {
+				damage = (float) ESConfig.INSTANCE.mobsConfig.freeze.attackDamage();
+
+			} else if (shooter instanceof Permafrost permafrost) {
+				double base = permafrost.getAttribute(Attributes.ATTACK_DAMAGE) != null
+					? permafrost.getAttributeValue(Attributes.ATTACK_DAMAGE)
+					: 12;
+				damage = (float)(base * 0.4);
+
+			} else {
+				damage = 3f;
+			}
+
+			hitResult.getEntity().hurt(
+				ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.FREEZE, this, owner),
+				damage
+			);
 		}
 	}
 

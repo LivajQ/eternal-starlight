@@ -6,7 +6,6 @@ import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -43,7 +42,7 @@ public abstract class ItemEntityMixin {
 	public void tick(CallbackInfo ci) {
 		ItemEntity itemEntity = ((ItemEntity) (Object) this);
 		// max age is 6000
-		if (age < 3000 && getItem().get(DataComponents.FOOD) != null && (itemEntity.level().getBlockState(itemEntity.blockPosition()).is(ESTags.Blocks.TOOTH_OF_HUNGER_BLOCKS) || itemEntity.level().getBlockState(itemEntity.blockPosition().below()).is(ESTags.Blocks.TOOTH_OF_HUNGER_BLOCKS))) {
+		if (age < 3000 && getItem().getItem().isEdible() && (itemEntity.level().getBlockState(itemEntity.blockPosition()).is(ESTags.Blocks.TOOTH_OF_HUNGER_BLOCKS) || itemEntity.level().getBlockState(itemEntity.blockPosition().below()).is(ESTags.Blocks.TOOTH_OF_HUNGER_BLOCKS))) {
 			age = 3000;
 		}
 	}

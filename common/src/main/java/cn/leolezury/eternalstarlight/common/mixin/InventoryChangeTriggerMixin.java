@@ -2,7 +2,6 @@ package cn.leolezury.eternalstarlight.common.mixin;
 
 import cn.leolezury.eternalstarlight.common.item.component.GuideBook;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
-import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
 import cn.leolezury.eternalstarlight.common.util.ESBookUtil;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;

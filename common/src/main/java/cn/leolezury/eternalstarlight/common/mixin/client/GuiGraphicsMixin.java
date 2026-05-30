@@ -3,7 +3,6 @@ package cn.leolezury.eternalstarlight.common.mixin.client;
 import cn.leolezury.eternalstarlight.common.client.handler.ESClientHandler;
 import cn.leolezury.eternalstarlight.common.item.component.Accessory;
 import cn.leolezury.eternalstarlight.common.registry.ESAccessories;
-import cn.leolezury.eternalstarlight.common.registry.ESDataComponents;
 import cn.leolezury.eternalstarlight.common.util.ESAccessoryUtil;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
 import com.mojang.blaze3d.vertex.PoseStack;

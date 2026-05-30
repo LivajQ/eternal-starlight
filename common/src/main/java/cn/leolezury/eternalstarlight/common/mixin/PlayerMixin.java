@@ -48,7 +48,7 @@ public abstract class PlayerMixin implements SpellCaster {
 	@Inject(method = "createAttributes", at = @At("RETURN"))
 	private static void createAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
 		cir.getReturnValue()
-			.add(ESAttributes.FOG_VISION.asHolder());
+			.add(ESAttributes.FOG_VISION.get());
 	}
 
 	@Inject(method = "hurtCurrentlyUsedShield", at = @At("HEAD"))
@@ -56,7 +56,7 @@ public abstract class PlayerMixin implements SpellCaster {
 		Player player = (Player) (Object) this;
 		ItemStack useItem = player.getUseItem();
 		if (useItem.is(ESTags.Items.GREATSWORDS)) {
-			useItem.hurtAndBreak(Math.max((int) (amount / 5f), 1), player, player.getUsedItemHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+			useItem.hurtAndBreak(Math.max((int)(amount / 5f), 1), player, (living) -> living.broadcastBreakEvent(player.getUsedItemHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND));
 			player.stopUsingItem();
 			player.getCooldowns().addCooldown(useItem.getItem(), 100);
 		}
