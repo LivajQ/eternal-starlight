@@ -60,12 +60,12 @@ public class AethersentMeteorRenderer extends EntityRenderer<AethersentMeteor> {
 			float currentTick = entity.tickCount + partialTicks;
 			if (entity.trailSnapshots.isEmpty() || currentTick - entity.lastTrailTick > 2) {
 				Map<String, ModelPartPose> snapshot = ESModelUtil.saveModelSnapshot(model.allPartNames, model::getAnyDescendantWithName);
-				entity.trailSnapshots.addFirst(Pair.of(currentPos, new ModelSnapshot(0, 0, currentTick, snapshot)));
+				entity.trailSnapshots.add(0, Pair.of(currentPos, new ModelSnapshot(0, 0, currentTick, snapshot)));
 				entity.lastTrailTick = currentTick;
 			}
 			entity.trailSnapshots.removeIf(p -> currentTick - p.getSecond().timestamp() > SNAPSHOT_LIFESPAN);
 			while (entity.trailSnapshots.size() > 32) {
-				entity.trailSnapshots.removeLast();
+				entity.trailSnapshots.remove(entity.trailSnapshots.size() - 1);
 			}
 			model.root.getAllParts().forEach(ModelPart::resetPose);
 			for (int i = 0; i < entity.trailSnapshots.size(); i++) {

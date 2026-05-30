@@ -132,7 +132,6 @@ accessible method net/minecraft/client/renderer/RenderType create (Ljava/lang/St
 # particle
 accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
 accessible method net/minecraft/client/particle/GlowParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDDLnet/minecraft/client/particle/SpriteSet;)V
-accessible method net/minecraft/client/particle/ParticleEngine$SpriteParticleRegistration <init> (Lnet/minecraft/client/particle/ParticleEngine;Lnet/minecraft/client/particle/SpriteSet;)V
 accessible method net/minecraft/client/particle/DripParticle$DripHangParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;Lnet/minecraft/core/particles/ParticleOptions;)V
 accessible method net/minecraft/client/particle/DripParticle$DripLandParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;)V
 accessible method net/minecraft/client/particle/DripParticle$FallAndLandParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;Lnet/minecraft/core/particles/ParticleOptions;)V
@@ -140,6 +139,8 @@ accessible method net/minecraft/client/particle/SquidInkParticle <init> (Lnet/mi
 
 accessible field net/minecraft/client/particle/Particle stoppedByCollision Z
 accessible field net/minecraft/client/particle/ParticleEngine spriteSets Ljava/util/Map;
+
+accessible class net/minecraft/client/particle/ParticleEngine$SpriteParticleRegistration
 
 # spellcasting camera
 

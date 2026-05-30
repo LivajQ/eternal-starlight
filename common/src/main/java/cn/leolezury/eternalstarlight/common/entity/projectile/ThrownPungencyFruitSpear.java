@@ -32,7 +32,7 @@ public class ThrownPungencyFruitSpear extends ThrownSpear {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.PUNGENCY_FRUIT_SPEAR.get().getDefaultInstance();
 	}
 }

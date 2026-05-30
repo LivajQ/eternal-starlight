@@ -89,7 +89,8 @@ public class ESForgePlatform implements ESPlatform {
 	@SuppressWarnings("unchecked")
 	private static <T> void registerIntoRoot(ResourceKey<? extends Registry<T>> key, Registry<T> registry) {
 		MappedRegistry<Registry<?>> root = (MappedRegistry<Registry<?>>) BuiltInRegistries.REGISTRY;
-		root.register((ResourceKey<Registry<?>>) key, registry, Lifecycle.stable());
+		ResourceKey<Registry<T>> cast = (ResourceKey<Registry<T>>) (ResourceKey<?>) key;
+		root.register((ResourceKey<Registry<?>>) (ResourceKey<?>) cast, registry, Lifecycle.stable());
 	}
 
 	static class ForgeVanillaRegistrationProvider<T> implements RegistrationProvider<T> {

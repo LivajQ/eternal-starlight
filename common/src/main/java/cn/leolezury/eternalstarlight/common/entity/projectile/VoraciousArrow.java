@@ -90,7 +90,7 @@ public class VoraciousArrow extends AbstractArrow {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.VORACIOUS_ARROW.get().getDefaultInstance();
 	}
 }

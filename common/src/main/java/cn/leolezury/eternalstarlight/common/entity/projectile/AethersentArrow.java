@@ -40,7 +40,7 @@ public class AethersentArrow extends AbstractArrow {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.AETHERSENT_ARROW.get().getDefaultInstance();
 	}
 

@@ -68,7 +68,7 @@ public class AlloyCategory extends AbstractRecipeCategory<AlloyRecipe> {
 		builder.addSlot(RecipeIngredientRole.RENDER_ONLY, 77, 41);
 
 		builder.addOutputSlot(115, 6)
-			.addItemStack(recipe.results().getFirst().getMaxResultItem());
+			.addItemStack(recipe.results().get(0).getMaxResultItem());
 		if (results.size() > 1) {
 			builder.addOutputSlot(106, 41)
 				.addItemStack(recipe.results().get(1).getMaxResultItem());

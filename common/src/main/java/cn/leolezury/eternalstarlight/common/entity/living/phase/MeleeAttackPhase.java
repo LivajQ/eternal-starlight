@@ -15,7 +15,7 @@ public class MeleeAttackPhase<T extends LivingEntity & MultiBehaviorUser> extend
 
 	@Override
 	public boolean canStart(T entity, boolean cooldownOver) {
-		return cooldownOver && !entries.isEmpty() && canReachTarget(entity, entries.getFirst().range());
+		return cooldownOver && !entries.isEmpty() && canReachTarget(entity, entries.get(0).range());
 	}
 
 	@Override

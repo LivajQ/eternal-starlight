@@ -138,9 +138,9 @@ public class AethersentGolem extends AbstractGolem {
 					meteors.forEach(meteor -> meteor.dropAndDiscard(true));
 					mobTargets.forEach(living -> living.hurt(damageSources().magic(), 8));
 					if (!meteors.isEmpty()) {
-						lookPos = meteors.getFirst().position();
+						lookPos = meteors.get(0).position();
 					} else {
-						lookPos = mobTargets.getFirst().position();
+						lookPos = mobTargets.get(0).position();
 					}
 					playSound(ESSoundEvents.AETHERSENT_GOLEM_SHOOT.get());
 					peaceTicks = 0;

@@ -28,11 +28,11 @@ public class TangledSkullRenderer<T extends TangledSkull> extends MobRenderer<T,
 				Mth.lerp(partialTicks, entity.yo, entity.getY()),
 				Mth.lerp(partialTicks, entity.zo, entity.getZ())
 			);
-			if (entity.trailPositions.isEmpty() || entity.trailPositions.getFirst().distanceTo(currentPos) > 0.1) {
-				entity.trailPositions.addFirst(currentPos);
+			if (entity.trailPositions.isEmpty() || entity.trailPositions.get(0).distanceTo(currentPos) > 0.1) {
+				entity.trailPositions.add(0, currentPos);
 			}
 			while (entity.trailPositions.size() > 5) {
-				entity.trailPositions.removeLast();
+				entity.trailPositions.remove(entity.trailPositions.size() - 1);
 			}
 			for (int i = 0; i < entity.trailPositions.size(); i++) {
 				getModel().alphaFactor = 1 - ((float) i / entity.trailPositions.size());

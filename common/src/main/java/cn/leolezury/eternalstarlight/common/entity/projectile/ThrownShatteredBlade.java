@@ -148,7 +148,7 @@ public class ThrownShatteredBlade extends AbstractArrow {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.SHATTERED_SWORD_BLADE.get().getDefaultInstance();
 	}
 

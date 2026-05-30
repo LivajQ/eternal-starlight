@@ -72,7 +72,7 @@ public class ThioquartzArrow extends AbstractArrow {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.THIOQUARTZ_ARROW.get().getDefaultInstance();
 	}
 }

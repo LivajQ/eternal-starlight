@@ -54,9 +54,9 @@ public class BookScreen extends Screen {
 		this.unlockedComponents.forEach(list -> list.removeIf(component -> !component.isEnabled(unlocked)));
 		this.unlockedComponents.removeIf(List::isEmpty);
 		if (!this.unlockedComponents.isEmpty()) {
-			this.currentComponents.addAll(this.unlockedComponents.getFirst());
+			this.currentComponents.addAll(this.unlockedComponents.get(0));
 			if (!this.currentComponents.isEmpty()) {
-				this.stamps.add(new Stamp(this.currentComponents.getFirst().config().id(), 0));
+				this.stamps.add(new Stamp(this.currentComponents.get(0).config().id(), 0));
 			}
 		}
 		this.context = new BookContext() {

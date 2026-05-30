@@ -41,7 +41,7 @@ public class DryingRackBlockEntity extends SimpleContainerBlockEntity {
 	private NonNullList<ItemStack> items = NonNullList.withSize(1, ItemStack.EMPTY);
 
 	public ItemStack getItem() {
-		return items.getFirst();
+		return items.get(0);
 	}
 
 	public void setItem(ItemStack item) {

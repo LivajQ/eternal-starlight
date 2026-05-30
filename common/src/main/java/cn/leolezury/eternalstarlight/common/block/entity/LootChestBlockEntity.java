@@ -167,7 +167,7 @@ public class LootChestBlockEntity extends BlockEntity {
 					blockEntity.setChanged();
 				}
 				if ((blockEntity.ejectionTicks + 5) % 10 == 0 && !blockEntity.itemsToEject.isEmpty()) {
-					boolean rare = blockEntity.itemsToEject.getFirst().getRarity() != Rarity.COMMON && !blockEntity.quickEjection;
+					boolean rare = blockEntity.itemsToEject.get(0).getRarity() != Rarity.COMMON && !blockEntity.quickEjection;
 					level.blockEvent(pos, state.getBlock(), 2, rare ? 1 : 0);
 				}
 				if (blockEntity.ejectionTicks % 10 == 0) {
@@ -188,7 +188,7 @@ public class LootChestBlockEntity extends BlockEntity {
 							}
 							blockEntity.itemsToEject.clear();
 						} else {
-							ItemStack stack = blockEntity.itemsToEject.removeFirst();
+							ItemStack stack = blockEntity.itemsToEject.remove(0);
 							ejectItem(level, pos, blockEntity, stack);
 						}
 						blockEntity.setChanged();

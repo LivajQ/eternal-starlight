@@ -49,11 +49,11 @@ public class ChainOfSoulsModel<T extends ChainOfSouls> extends EntityModel<T> {
 	}
 
 	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color) {
-		base.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-		side1.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-		side2.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-		side3.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-		side4.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+		base.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		side1.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		side2.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		side3.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+		side4.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
 	}
 }

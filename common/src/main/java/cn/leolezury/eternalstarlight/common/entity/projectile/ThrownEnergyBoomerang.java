@@ -50,7 +50,7 @@ public class ThrownEnergyBoomerang extends ThrownBoomerang {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.ENERGY_BOOMERANG.get().getDefaultInstance();
 	}
 }

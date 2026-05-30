@@ -98,12 +98,12 @@ public class TheGatekeeperRenderer<T extends TheGatekeeper> extends MobRenderer<
 			if (entity.trailSnapshots.isEmpty() || currentTick - entity.lastTrailTick > 3) {
 				if (entity.shouldAddTrailSnapshot()) {
 					Map<String, ModelPartPose> snapshot = ESModelUtil.saveModelSnapshot(getModel().allPartNames, getModel()::getAnyDescendantWithName);
-					entity.trailSnapshots.addFirst(Pair.of(new Vec3(currentX, currentY, currentZ), new ModelSnapshot(0, Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot), currentTick, snapshot)));
+					entity.trailSnapshots.add(0, Pair.of(new Vec3(currentX, currentY, currentZ), new ModelSnapshot(0, Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot), currentTick, snapshot)));
 					entity.lastTrailTick = currentTick;
 				}
 				entity.trailSnapshots.removeIf(p -> currentTick - p.getSecond().timestamp() > SNAPSHOT_LIFESPAN);
 				while (entity.trailSnapshots.size() > 32) {
-					entity.trailSnapshots.removeLast();
+					entity.trailSnapshots.remove(entity.trailSnapshots.size() - 1);
 				}
 			}
 			for (int i = 0; i < entity.trailSnapshots.size(); i++) {

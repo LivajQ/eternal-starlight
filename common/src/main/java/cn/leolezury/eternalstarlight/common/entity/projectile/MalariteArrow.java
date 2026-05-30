@@ -69,7 +69,7 @@ public class MalariteArrow extends AbstractArrow {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.MALARITE_ARROW.get().getDefaultInstance();
 	}
 }

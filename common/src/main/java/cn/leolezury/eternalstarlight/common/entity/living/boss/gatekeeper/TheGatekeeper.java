@@ -294,12 +294,15 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 
 	@Nullable
 	@Override
-	public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
-		spawnGroupData = super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData);
-		RandomSource randomSource = serverLevelAccessor.getRandom();
-		this.populateDefaultEquipmentSlots(randomSource, difficultyInstance);
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag dataTag) {
+		spawnGroupData = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+
+		RandomSource random = level.getRandom();
+		this.populateDefaultEquipmentSlots(random, difficulty);
+
 		return spawnGroupData;
 	}
+
 
 	@Override
 	protected void populateDefaultEquipmentSlots(RandomSource randomSource, DifficultyInstance difficultyInstance) {
@@ -703,7 +706,7 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 					recentPositions.add(blockPosition());
 				}
 				while (recentPositions.size() > 32) {
-					recentPositions.removeFirst();
+					recentPositions.remove(0);
 				}
 			} else {
 				setBehaviorState(0);

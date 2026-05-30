@@ -61,7 +61,7 @@ public class StranghoulDenStructure extends Structure {
 								Stranghoul stranghoul = new Stranghoul(ESEntities.STRANGHOUL.get(), level.getLevel());
 								stranghoul.setPos(Vec3.atBottomCenterOf(pos));
 								stranghoul.setPersistenceRequired();
-								stranghoul.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null);
+								stranghoul.finalizeSpawn(level, level.getCurrentDifficultyAt(pos), MobSpawnType.STRUCTURE, null, null);
 								level.addFreshEntity(stranghoul);
 								if (stranghoul.getMainHandItem().is(ItemTags.HOES)) {
 									farmer = true;

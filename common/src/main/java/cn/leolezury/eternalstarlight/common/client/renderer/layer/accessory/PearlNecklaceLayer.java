@@ -24,6 +24,7 @@ public class PearlNecklaceLayer extends ArmorLikeAccessoryLayer<LivingEntity, Hu
 
 	@Override
 	protected boolean shouldRender(LivingEntity entity) {
-		return ESAccessoryUtil.getActiveAccessoriesOnArmors(entity).contains(ESItems.PEARL_NECKLACE.get());
+		//return ESAccessoryUtil.getActiveAccessoriesOnArmors(entity).contains(ESItems.PEARL_NECKLACE.get());
+		return false;
 	}
 }

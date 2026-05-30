@@ -34,10 +34,10 @@ public class TentacleSpikeRenderer extends WhipRenderer<TentacleSpike> {
 		this.model.setupAnim(entity, 0, 0, bob, 0, 0);
 		RenderType renderType = this.model.renderType(getTextureLocation(entity));
 		VertexConsumer vertexConsumer = ItemRenderer.getFoilBufferDirect(buffer, renderType, false, entity.isFoil());
-		this.model.renderToBuffer(stack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
+		this.model.renderToBuffer(stack, vertexConsumer, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 		renderType = RenderType.eyes(GLOW_TEXTURE);
 		vertexConsumer = ItemRenderer.getFoilBufferDirect(buffer, renderType, false, entity.isFoil());
-		this.model.renderToBuffer(stack, vertexConsumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+		this.model.renderToBuffer(stack, vertexConsumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
 		stack.popPose();
 	}

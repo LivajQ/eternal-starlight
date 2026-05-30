@@ -67,7 +67,7 @@ public class AmaramberArrow extends AbstractArrow {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.AMARAMBER_ARROW.get().getDefaultInstance();
 	}
 }

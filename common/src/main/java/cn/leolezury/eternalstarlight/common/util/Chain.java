@@ -44,7 +44,7 @@ public record Chain(List<Segment> segments) {
 	}
 
 	public Optional<Vec3> getEndPos() {
-		return segments().isEmpty() ? Optional.empty() : Optional.of(segments().getFirst().getUpperPosition());
+		return segments().isEmpty() ? Optional.empty() : Optional.of(segments().get(0).getUpperPosition());
 	}
 
 	public void save(CompoundTag tag) {

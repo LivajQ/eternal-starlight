@@ -25,7 +25,7 @@ public class ThrownMalariteSpear extends ThrownSpear {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.MALARITE_SPEAR.get().getDefaultInstance();
 	}
 }

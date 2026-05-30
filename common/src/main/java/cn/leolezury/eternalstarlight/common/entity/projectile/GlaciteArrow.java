@@ -64,7 +64,7 @@ public class GlaciteArrow extends AbstractArrow {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.GLACITE_ARROW.get().getDefaultInstance();
 	}
 }

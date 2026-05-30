@@ -37,7 +37,7 @@ public record SmoothSegmentedValue(List<Segment> segments) {
 			}
 			accumulated = nextAccumulated;
 		}
-		return segments.getLast().to();
+		return segments.get(segments.size() - 1).to();
 	}
 
 	public record Segment(Easing easing, float from, float to, float size) {

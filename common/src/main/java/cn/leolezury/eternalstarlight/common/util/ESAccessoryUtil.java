@@ -77,7 +77,7 @@ public class ESAccessoryUtil {
 
 		if (slotItem.isEmpty()) {
 			if (!accessories.isEmpty()) {
-				ItemStack removed = accessories.getLast();
+				ItemStack removed = accessories.get(accessories.size() - 1);
 				removeAccessory(stack, removed);
 				ItemStack remain = slot.safeInsert(removed.copy());
 				applyAccessory(stack, remain);
@@ -105,7 +105,7 @@ public class ESAccessoryUtil {
 
 			if (other.isEmpty()) {
 				if (!accessories.isEmpty()) {
-					ItemStack removed = accessories.getLast();
+					ItemStack removed = accessories.get(accessories.size() - 1);
 					removeAccessory(stack, removed);
 					access.set(removed.copy());
 				}

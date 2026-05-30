@@ -3,6 +3,7 @@ package cn.leolezury.eternalstarlight.common.client.particle.effect;
 import cn.leolezury.eternalstarlight.common.particle.GeyserParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 public class GeyserPlumeParticle extends TextureSheetParticle {
@@ -58,7 +59,7 @@ public class GeyserPlumeParticle extends TextureSheetParticle {
 			this.done = true;
 		}
 
-		double yProgressLinear = Math.clamp((this.y - this.startY) / (this.maxY - this.startY), 0.0, 1.0);
+		double yProgressLinear = Mth.clamp((this.y - this.startY) / (this.maxY - this.startY), 0.0, 1.0);
 		double yProgressExponential = Math.pow(yProgressLinear, 3.0);
 		this.gravity = this.initialPropulsion * (float) yProgressExponential * 0.12F;
 		this.xd = yProgressLinear * this.horizontalSprayX;

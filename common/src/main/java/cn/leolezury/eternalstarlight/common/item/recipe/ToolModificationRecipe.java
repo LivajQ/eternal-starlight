@@ -1,9 +1,13 @@
 package cn.leolezury.eternalstarlight.common.item.recipe;
 
 import cn.leolezury.eternalstarlight.common.registry.ESRecipeSerializers;
+import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -72,5 +76,39 @@ public class ToolModificationRecipe extends CustomRecipe {
 	@Override
 	public RecipeSerializer<?> getSerializer() {
 		return ESRecipeSerializers.TOOL_MODIFICATION.get();
+	}
+
+	public static class Serializer implements RecipeSerializer<ToolModificationRecipe> {
+
+		@Override
+		public ToolModificationRecipe fromJson(ResourceLocation id, JsonObject json) {
+			CraftingBookCategory category = CraftingBookCategory.CODEC.byName(
+				GsonHelper.getAsString(json, "category", "misc")
+			);
+
+			Item tool = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(json, "tool")));
+			Item input = BuiltInRegistries.ITEM.get(new ResourceLocation(GsonHelper.getAsString(json, "input")));
+			ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "output"));
+
+			return new ToolModificationRecipe(id, category, tool, input, output);
+		}
+
+		@Override
+		public ToolModificationRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
+			CraftingBookCategory category = buf.readEnum(CraftingBookCategory.class);
+			Item tool = buf.readById(BuiltInRegistries.ITEM);
+			Item input = buf.readById(BuiltInRegistries.ITEM);
+			ItemStack output = buf.readItem();
+
+			return new ToolModificationRecipe(id, category, tool, input, output);
+		}
+
+		@Override
+		public void toNetwork(FriendlyByteBuf buf, ToolModificationRecipe recipe) {
+			buf.writeEnum(recipe.category());
+			buf.writeId(BuiltInRegistries.ITEM, recipe.tool);
+			buf.writeId(BuiltInRegistries.ITEM, recipe.input);
+			buf.writeItem(recipe.output);
+		}
 	}
 }

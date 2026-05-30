@@ -59,9 +59,9 @@ public class CradlewoodFeature extends Feature<CradlewoodFeature.Configuration> 
 			.sorted(Comparator.comparingInt(BlockPos::getY))
 			.toList();
 		if (!nearTop.isEmpty() && !points.isEmpty()) {
-			int topY = nearTop.getLast().getY();
+			int topY = nearTop.get(nearTop.size() - 1).getY();
 			for (int i = topY; i <= pos.getY(); i++) {
-				BlockPos extra = new BlockPos(points.getFirst()[0], i, points.getFirst()[2]);
+				BlockPos extra = new BlockPos(points.get(0)[0], i, points.get(0)[2]);
 				if (!trunkPositions.contains(extra)) {
 					trunkPositions.add(extra);
 				}
@@ -72,7 +72,7 @@ public class CradlewoodFeature extends Feature<CradlewoodFeature.Configuration> 
 			.sorted(Comparator.comparingInt(BlockPos::getY))
 			.toList();
 		if (!farTop.isEmpty()) {
-			BlockPos endPos = farTop.getLast();
+			BlockPos endPos = farTop.get(farTop.size() - 1);
 			trunkPositions.add(endPos.offset(1, 0, 1));
 			trunkPositions.add(endPos.offset(1, 0, -1));
 			trunkPositions.add(endPos.offset(-1, 0, 1));

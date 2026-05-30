@@ -230,7 +230,7 @@ public class StarfireBirdNestBlockEntity extends SimpleContainerBlockEntity {
 				baby.setBaby(true);
 				baby.moveTo(pos.getCenter());
 				if (level instanceof ServerLevel serverLevel) {
-					baby.finalizeSpawn(serverLevel, level.getCurrentDifficultyAt(pos), MobSpawnType.BREEDING, null);
+					baby.finalizeSpawn(serverLevel, level.getCurrentDifficultyAt(pos), MobSpawnType.BREEDING, null, null);
 				}
 				blockEntity.addBabyOccupant(baby);
 				change = true;

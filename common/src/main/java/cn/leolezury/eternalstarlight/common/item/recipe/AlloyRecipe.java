@@ -54,7 +54,7 @@ public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> i
 
 	@Override
 	public ItemStack getResultItem(RegistryAccess registryAccess) {
-		return results.getFirst().item();
+		return results.get(0).item();
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> i
 
 	@Override
 	public ItemStack assemble(Container container, RegistryAccess access) {
-		return this.results.getFirst().item().copy();
+		return this.results.get(0).item().copy();
 	}
 
 	@Override

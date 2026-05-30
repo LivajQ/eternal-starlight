@@ -165,7 +165,7 @@ public class ESClientHandler {
 						bosses.sort(Comparator.comparingDouble(b -> b.distanceToSqr(player)));
 						bosses = bosses.stream().filter(ESBoss::shouldPlayBossMusic).filter(b -> b.tickCount > 20 && player.hasLineOfSight(b)).toList();
 						if (!bosses.isEmpty()) {
-							ESBoss boss = bosses.getFirst();
+							ESBoss boss = bosses.get(0);
 							bossMusicInstance = new BossMusicSoundInstance(boss.getBossMusic(), boss);
 						}
 					} else {

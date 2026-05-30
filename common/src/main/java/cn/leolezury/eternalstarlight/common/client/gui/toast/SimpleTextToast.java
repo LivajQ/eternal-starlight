@@ -29,7 +29,7 @@ public class SimpleTextToast implements Toast {
 		List<FormattedCharSequence> list = toastComponent.getMinecraft().font.split(text, 125);
 		if (list.size() == 1) {
 			guiGraphics.drawString(toastComponent.getMinecraft().font, title, 30, 7, -1, false);
-			guiGraphics.drawString(toastComponent.getMinecraft().font, list.getFirst(), 30, 18, -1, false);
+			guiGraphics.drawString(toastComponent.getMinecraft().font, list.get(0), 30, 18, -1, false);
 		} else {
 			if (timeSinceLastVisible < 1500L) {
 				int color = Mth.floor(Mth.clamp((1500L - timeSinceLastVisible) / 300.0F, 0.0F, 1.0F) * 255.0F) << 24 | 67108864;

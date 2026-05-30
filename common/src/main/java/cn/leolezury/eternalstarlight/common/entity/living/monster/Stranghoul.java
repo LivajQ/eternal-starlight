@@ -588,7 +588,7 @@ public class Stranghoul extends Monster implements NeutralMob, OwnableEntity, Ra
 		@Nullable
 		private Stranghoul getFreePartner() {
 			List<Stranghoul> list = this.level.getNearbyEntities(Stranghoul.class, PARTNER_TARGETING, this.stranghoul, this.stranghoul.getBoundingBox().inflate(8.0F)).stream().filter(Stranghoul::canBreed).sorted(Comparator.comparingDouble(s -> s.distanceTo(stranghoul))).toList();
-			return list.isEmpty() ? null : list.getFirst();
+			return list.isEmpty() ? null : list.get(0);
 		}
 
 		@Override
@@ -612,7 +612,7 @@ public class Stranghoul extends Monster implements NeutralMob, OwnableEntity, Ra
 			if (Stranghoul.this.getRandom().nextInt(reducedTickDelay(80)) == 0 && !Stranghoul.this.getOffhandItem().is(ESTags.Items.STRANGHOUL_CURRENCIES)) {
 				List<ItemEntity> items = Stranghoul.this.level().getEntitiesOfClass(ItemEntity.class, Stranghoul.this.getBoundingBox().inflate(15)).stream().filter(i -> i.getItem().is(ESTags.Items.STRANGHOUL_CURRENCIES) && Stranghoul.this.hasLineOfSight(i)).sorted(Comparator.comparingDouble(i -> i.distanceTo(Stranghoul.this))).toList();
 				if (!items.isEmpty()) {
-					wantedItem = items.getFirst();
+					wantedItem = items.get(0);
 					return true;
 				}
 			}
@@ -1004,7 +1004,7 @@ public class Stranghoul extends Monster implements NeutralMob, OwnableEntity, Ra
 					List<Player> players = level().getNearbyPlayers(TargetingConditions.forNonCombat(), this, getBoundingBox().inflate(4));
 					players.sort(Comparator.comparingDouble(p -> p.distanceTo(this)));
 					if (!players.isEmpty()) {
-						pos = players.getFirst().position();
+						pos = players.get(0).position();
 					}
 					if (pos == null) {
 						pos = position();

@@ -57,7 +57,7 @@ public class AirSacArrow extends AbstractArrow {
 	}
 
 	@Override
-	protected ItemStack getPickupItem() {
+	public ItemStack getPickupItem() {
 		return ESItems.AIR_SAC_ARROW.get().getDefaultInstance();
 	}
 }
