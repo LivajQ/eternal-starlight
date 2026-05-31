@@ -6,6 +6,7 @@ import cn.leolezury.eternalstarlight.common.registry.ESRecipes;
 import com.google.gson.JsonObject;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -16,6 +17,9 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
+
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
 
 public record GeyserSmokingRecipe(Item input, int inputCount, ItemStack output) implements Recipe<Container> {
 
@@ -87,5 +91,38 @@ public record GeyserSmokingRecipe(Item input, int inputCount, ItemStack output) 
 			buf.writeInt(recipe.inputCount());
 			buf.writeItem(recipe.output());
 		}
+	}
+
+	private static JsonObject serializeItemStack(ItemStack stack) {
+		JsonObject json = new JsonObject();
+		json.addProperty("item", BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
+		if (stack.getCount() > 1) json.addProperty("count", stack.getCount());
+		return json;
+	}
+
+	public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+		consumer.accept(new FinishedRecipe() {
+			@Override
+			public void serializeRecipeData(JsonObject json) {
+				json.addProperty("input", BuiltInRegistries.ITEM.getKey(input).toString());
+				json.addProperty("input_count", inputCount);
+				json.add("output", serializeItemStack(output));
+			}
+
+			@Override
+			public RecipeSerializer<?> getType() {
+				return ESRecipeSerializers.GEYSER_SMOKING.get();
+			}
+
+			@Override
+			public ResourceLocation getId() { return id; }
+
+			@Nullable @Override
+			public JsonObject serializeAdvancement() { return null; }
+
+			@Nullable
+			@Override
+			public ResourceLocation getAdvancementId() { return null; }
+		});
 	}
 }

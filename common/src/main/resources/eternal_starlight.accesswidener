@@ -150,6 +150,9 @@ accessible class net/minecraft/client/particle/ParticleEngine$SpriteParticleRegi
 accessible class net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection
 
 # datagen
+accessible class net/minecraft/data/models/ItemModelGenerators$TrimModelData
+accessible field net/minecraft/data/models/ItemModelGenerators GENERATED_TRIM_MODELS Ljava/util/List;
+accessible method net/minecraft/data/models/ItemModelGenerators$TrimModelData itemModelIndex ()F
 
 # sprite source list mixin
 

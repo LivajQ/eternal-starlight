@@ -4,7 +4,9 @@ import cn.leolezury.eternalstarlight.common.item.component.Accessory;
 import cn.leolezury.eternalstarlight.common.registry.ESAccessories;
 import cn.leolezury.eternalstarlight.common.registry.ESRecipeSerializers;
 import cn.leolezury.eternalstarlight.common.util.ESAccessoryUtil;
+import com.google.gson.JsonObject;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
@@ -13,8 +15,10 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class AccessoryCombinationRecipe extends CustomRecipe {
 
@@ -108,5 +112,36 @@ public class AccessoryCombinationRecipe extends CustomRecipe {
 	@Override
 	public RecipeSerializer<?> getSerializer() {
 		return ESRecipeSerializers.ACCESSORY_COMBINATION.get();
+	}
+
+	public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+		consumer.accept(new FinishedRecipe() {
+			@Override
+			public void serializeRecipeData(JsonObject json) {
+				json.addProperty("category", category().getSerializedName());
+			}
+
+			@Override
+			public RecipeSerializer<?> getType() {
+				return ESRecipeSerializers.ACCESSORY_COMBINATION.get();
+			}
+
+			@Override
+			public ResourceLocation getId() {
+				return id;
+			}
+
+			@Nullable
+			@Override
+			public JsonObject serializeAdvancement() {
+				return null;
+			}
+
+			@Nullable
+			@Override
+			public ResourceLocation getAdvancementId() {
+				return null;
+			}
+		});
 	}
 }

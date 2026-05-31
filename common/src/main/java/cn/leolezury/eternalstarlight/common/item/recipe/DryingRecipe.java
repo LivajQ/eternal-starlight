@@ -5,6 +5,8 @@ import cn.leolezury.eternalstarlight.common.registry.ESRecipeSerializers;
 import cn.leolezury.eternalstarlight.common.registry.ESRecipes;
 import com.google.gson.JsonObject;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -12,6 +14,9 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
 
 public class DryingRecipe implements Recipe<Container> {
 	private final Ingredient input;
@@ -114,5 +119,39 @@ public class DryingRecipe implements Recipe<Container> {
 			buf.writeInt(recipe.durationTicks);
 			buf.writeBoolean(recipe.fireBelow);
 		}
+	}
+
+	private static JsonObject serializeItemStack(ItemStack stack) {
+		JsonObject json = new JsonObject();
+		json.addProperty("item", BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
+		if (stack.getCount() > 1) json.addProperty("count", stack.getCount());
+		return json;
+	}
+
+	public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+		consumer.accept(new FinishedRecipe() {
+			@Override
+			public void serializeRecipeData(JsonObject json) {
+				json.add("input", input.toJson());
+				json.add("output", serializeItemStack(output));
+				json.addProperty("duration_ticks", durationTicks);
+				json.addProperty("fire_below", fireBelow);
+			}
+
+			@Override
+			public RecipeSerializer<?> getType() {
+				return ESRecipeSerializers.DRYING.get();
+			}
+
+			@Override
+			public ResourceLocation getId() { return id; }
+
+			@Nullable @Override
+			public JsonObject serializeAdvancement() { return null; }
+
+			@Nullable
+			@Override
+			public ResourceLocation getAdvancementId() { return null; }
+		});
 	}
 }
