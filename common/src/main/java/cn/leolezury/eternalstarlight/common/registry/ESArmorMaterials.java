@@ -15,7 +15,7 @@ public class ESArmorMaterials {
 		35,
 		new int[]{3, 6, 7, 3},
 		35,
-		ESSoundEvents.ARMOR_EQUIP_AETHERSENT.get(),
+		ESSoundEvents.ARMOR_EQUIP_AETHERSENT,
 		() -> Ingredient.of(ESConventionalTags.Items.INGOTS_AETHERSENT),
 		0F,
 		0F
@@ -25,7 +25,7 @@ public class ESArmorMaterials {
 		15,
 		new int[]{2, 5, 6, 3},
 		15,
-		ESSoundEvents.ARMOR_EQUIP_THERMAL_SPRINGSTONE.get(),
+		ESSoundEvents.ARMOR_EQUIP_THERMAL_SPRINGSTONE,
 		() -> Ingredient.of(ESConventionalTags.Items.INGOTS_THERMAL_SPRINGSTONE),
 		0.5F,
 		0F
@@ -35,7 +35,7 @@ public class ESArmorMaterials {
 		9,
 		new int[]{3, 5, 6, 3},
 		9,
-		ESSoundEvents.ARMOR_EQUIP_GLACITE.get(),
+		ESSoundEvents.ARMOR_EQUIP_GLACITE,
 		() -> Ingredient.of(ESConventionalTags.Items.GEMS_GLACITE),
 		0.5F,
 		0F
@@ -45,7 +45,7 @@ public class ESArmorMaterials {
 		22,
 		new int[]{3, 6, 8, 3},
 		22,
-		ESSoundEvents.ARMOR_EQUIP_STARLIT_DIAMOND.get(),
+		ESSoundEvents.ARMOR_EQUIP_STARLIT_DIAMOND,
 		() -> Ingredient.of(ESConventionalTags.Items.GEMS_STARLIT_DIAMOND),
 		3F,
 		0.1F
@@ -55,7 +55,7 @@ public class ESArmorMaterials {
 		25,
 		new int[]{2, 5, 6, 2},
 		25,
-		ESSoundEvents.ARMOR_EQUIP_DEEPSILVER.get(),
+		ESSoundEvents.ARMOR_EQUIP_DEEPSILVER,
 		() -> Ingredient.of(ESConventionalTags.Items.INGOTS_DEEPSILVER),
 		0.5F,
 		0.2F
@@ -65,7 +65,7 @@ public class ESArmorMaterials {
 		25,
 		new int[]{3, 6, 8, 3},
 		25,
-		ESSoundEvents.ARMOR_EQUIP_UNREALIUM.get(),
+		ESSoundEvents.ARMOR_EQUIP_UNREALIUM,
 		() -> Ingredient.of(ESConventionalTags.Items.INGOTS_UNREALIUM),
 		0.5F,
 		0F
@@ -75,7 +75,7 @@ public class ESArmorMaterials {
 		9,
 		new int[]{2, 5, 5, 2},
 		9,
-		ESSoundEvents.ARMOR_EQUIP_AMARAMBER.get(),
+		ESSoundEvents.ARMOR_EQUIP_AMARAMBER,
 		() -> Ingredient.of(ESConventionalTags.Items.INGOTS_AMARAMBER),
 		0F,
 		0F
@@ -85,7 +85,7 @@ public class ESArmorMaterials {
 		15,
 		new int[]{2, 5, 6, 2},
 		15,
-		ESSoundEvents.ARMOR_EQUIP_ALCHEMIST.get(),
+		ESSoundEvents.ARMOR_EQUIP_ALCHEMIST,
 		() -> Ingredient.of(ESConventionalTags.Items.GEMS_THIOQUARTZ),
 		0F,
 		0F
@@ -95,7 +95,7 @@ public class ESArmorMaterials {
 		9,
 		new int[]{1, 4, 4, 1},
 		9,
-		SoundEvents.ARMOR_EQUIP_LEATHER,
+		() -> SoundEvents.ARMOR_EQUIP_LEATHER,
 		() -> Ingredient.of(ESItems.ROOKFISH_AIR_SAC.get()),
 		0F,
 		0F
@@ -108,7 +108,7 @@ public class ESArmorMaterials {
 		int durabilityMultiplier,
 		int[] slotProtections,
 		int enchantmentValue,
-		SoundEvent equipSound,
+		Supplier<SoundEvent> equipSoundSupplier,
 		Supplier<Ingredient> repairIngredient,
 		float toughness,
 		float knockbackResistance
@@ -133,7 +133,7 @@ public class ESArmorMaterials {
 
 		@Override
 		public SoundEvent getEquipSound() {
-			return equipSound;
+			return equipSoundSupplier.get();
 		}
 
 		@Override

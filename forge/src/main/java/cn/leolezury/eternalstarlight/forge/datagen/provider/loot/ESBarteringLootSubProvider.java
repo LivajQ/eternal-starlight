@@ -30,7 +30,7 @@ public class ESBarteringLootSubProvider implements LootTableSubProvider {
 			LootTable.lootTable()
 				.withPool(LootPool.lootPool()
 					.setRolls(UniformGenerator.between(2, 4))
-					.add(LootItem.lootTableItem(Items.BOOK).setWeight(5).apply(new EnchantRandomlyFunction.Builder().withEnchantment(Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.TEARING.location())))))
+					.add(LootItem.lootTableItem(Items.BOOK).setWeight(5).apply(new EnchantRandomlyFunction.Builder().withEnchantment(Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.TEARING.getId())))))
 					.add(LootItem.lootTableItem(Items.SPLASH_POTION).setWeight(8).apply(SetPotionFunction.setPotion(ESPotions.HUNGER.get())))
 					.add(LootItem.lootTableItem(Items.POTION).setWeight(10).apply(SetPotionFunction.setPotion(Potions.WATER)))
 					.add(LootItem.lootTableItem(Items.LEATHER).setWeight(30).apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F))))

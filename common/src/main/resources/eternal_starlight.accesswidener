@@ -148,6 +148,7 @@ accessible class net/minecraft/client/particle/ParticleEngine$SpriteParticleRegi
 
 # mixin
 accessible class net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection
+accessible method net/minecraft/world/level/block/CropBlock getGrowthSpeed (Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F
 
 # datagen
 accessible class net/minecraft/data/models/ItemModelGenerators$TrimModelData

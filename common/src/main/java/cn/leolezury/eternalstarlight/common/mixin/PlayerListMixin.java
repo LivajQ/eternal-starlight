@@ -57,4 +57,12 @@ public abstract class PlayerListMixin {
 		}
 		return original.call(instance);
 	}
+
+	@WrapOperation(method = "respawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))
+	private ServerLevel es$modifyRespawnDimension(MinecraftServer server, Operation<ServerLevel> original) {
+		if (ESConfig.INSTANCE.respawnInEternalStarlight) {
+			return server.getLevel(ESDimensions.STARLIGHT_KEY);
+		}
+		return original.call(server);
+	}
 }

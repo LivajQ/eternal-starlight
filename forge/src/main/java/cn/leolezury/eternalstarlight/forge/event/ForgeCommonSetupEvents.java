@@ -20,19 +20,19 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 public class ForgeCommonSetupEvents {
 
 	@SubscribeEvent
-	private static void onSetup(FMLCommonSetupEvent event) {
+	public static void onSetup(FMLCommonSetupEvent event) {
 		event.enqueueWork(() -> FluidInteractionRegistry.addInteraction(ESFluidTypes.ETHER.get(), new FluidInteractionRegistry.InteractionInformation((level, blockPos, relativePos, fluidState) -> level.getFluidState(relativePos).is(FluidTags.LAVA) && !level.getBlockState(relativePos).is(ESBlocks.ETHER.get()), ESBlocks.MOLTEN_STELLAGMITE.get().defaultBlockState())));
 		event.enqueueWork(() -> FluidInteractionRegistry.addInteraction(ESFluidTypes.ETHER.get(), new FluidInteractionRegistry.InteractionInformation((level, blockPos, relativePos, fluidState) -> !level.getFluidState(relativePos).isEmpty() && !level.getFluidState(relativePos).is(FluidTags.LAVA) && !level.getBlockState(relativePos).is(ESBlocks.ETHER.get()), ESBlocks.THIOQUARTZ_BLOCK.get().defaultBlockState())));
 		event.enqueueWork(ESCommonSetupHandler::commonSetup);
 	}
 
 	@SubscribeEvent
-	private static void onAttributeCreate(EntityAttributeCreationEvent event) {
+	public static void onAttributeCreate(EntityAttributeCreationEvent event) {
 		ESCommonSetupHandler.createAttributes(event::put);
 	}
 
 	@SubscribeEvent
-	private static void onSpawnPlacementRegister(SpawnPlacementRegisterEvent event) {
+	public static void onSpawnPlacementRegister(SpawnPlacementRegisterEvent event) {
 
 		ESCommonSetupHandler.SpawnPlacementRegisterStrategy strategy =
 			new ESCommonSetupHandler.SpawnPlacementRegisterStrategy() {

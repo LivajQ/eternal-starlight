@@ -30,22 +30,22 @@ import java.util.Map;
 public class ForgeClientSetupEvents {
 
 	@SubscribeEvent
-	private static void clientSetup(FMLClientSetupEvent event) {
+	public static void clientSetup(FMLClientSetupEvent event) {
 		event.enqueueWork(ESClientSetupHandler::clientSetup);
 	}
 
 	@SubscribeEvent
-	private static void onRegisterDimEffects(RegisterDimensionSpecialEffectsEvent event) {
+	public static void onRegisterDimEffects(RegisterDimensionSpecialEffectsEvent event) {
 		event.register(EternalStarlight.id("special_effect"), ESClientPlatform.INSTANCE.getDimEffect());
 	}
 
 	@SubscribeEvent
-	private static void onRegisterBlockColor(RegisterColorHandlersEvent.Block event) {
+	public static void onRegisterBlockColor(RegisterColorHandlersEvent.Block event) {
 		ESClientSetupHandler.registerBlockColors(event::register);
 	}
 
 	@SubscribeEvent
-	private static void onRegisterItemColor(RegisterColorHandlersEvent.Item event) {
+	public static void onRegisterItemColor(RegisterColorHandlersEvent.Item event) {
 		ESClientSetupHandler.registerItemColors(event::register);
 	}
 
@@ -177,14 +177,14 @@ public class ForgeClientSetupEvents {
 	 */
 
 	@SubscribeEvent
-	private static void onBakingCompleted(ModelEvent.ModifyBakingResult event) {
+	public static void onBakingCompleted(ModelEvent.ModifyBakingResult event) {
 		Map<ResourceLocation, BakedModel> models = event.getModels();
 		ESClientSetupHandler.modifiedBakedModels = false;
 		ESClientSetupHandler.modifyBakingResult(models);
 	}
 
 	@SubscribeEvent
-	private static void onRegisterExtraModels(ModelEvent.RegisterAdditional event) {
+	public static void onRegisterExtraModels(ModelEvent.RegisterAdditional event) {
 		ESClientSetupHandler.registerExtraBakedModels(l -> {
 			ModelResourceLocation forged = new ModelResourceLocation(
 				new ResourceLocation(l.getNamespace(), "item/" + l.getPath()),
@@ -197,23 +197,23 @@ public class ForgeClientSetupEvents {
 
 
 	@SubscribeEvent
-	private static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
+	public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
 		ESClientSetupHandler.registerParticleProviders(event::registerSpriteSet);
 	}
 
 	@SubscribeEvent
-	private static void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+	public static void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
 		ESClientSetupHandler.registerEntityRenderers(event::registerEntityRenderer);
 		ESClientSetupHandler.registerBlockEntityRenderers(event::registerBlockEntityRenderer);
 	}
 
 	@SubscribeEvent
-	private static void onRegisterSkullModels(EntityRenderersEvent.CreateSkullModels event) {
+	public static void onRegisterSkullModels(EntityRenderersEvent.CreateSkullModels event) {
 		ESClientSetupHandler.registerSkullModels(event::registerSkullModel, event.getEntityModelSet());
 	}
 
 	@SubscribeEvent
-	private static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
+	public static void onRegisterLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
 		ESClientSetupHandler.registerLayers(event::registerLayerDefinition);
 	}
 
@@ -225,7 +225,7 @@ public class ForgeClientSetupEvents {
 	 */
 
 	@SubscribeEvent
-	private static void onAddLayers(EntityRenderersEvent.AddLayers event) {
+	public static void onAddLayers(EntityRenderersEvent.AddLayers event) {
 		/* TODO check if this maybe works instead. for now off
 		for (EntityType<?> type : BuiltInRegistries.ENTITY_TYPE) {
 			if (type.getBaseClass() != null && LivingEntity.class.isAssignableFrom(type.getBaseClass())) {
@@ -245,7 +245,7 @@ public class ForgeClientSetupEvents {
 	}
 
 	@SubscribeEvent
-	private static void onRegisterShader(RegisterShadersEvent event) {
+	public static void onRegisterShader(RegisterShadersEvent event) {
 		ESClientSetupHandler.registerShaders((location, format, loaded) -> {
 			try {
 				event.registerShader(new ShaderInstance(event.getResourceProvider(), location, format), loaded);
@@ -256,7 +256,7 @@ public class ForgeClientSetupEvents {
 	}
 
 	@SubscribeEvent
-	private static void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
+	public static void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
 
 		event.registerAbove(
 			VanillaGuiOverlay.VIGNETTE.id(),
@@ -327,19 +327,19 @@ public class ForgeClientSetupEvents {
 	}
 
 	@SubscribeEvent
-	private static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+	public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
 		for (Map.Entry<ResourceLocation, KeyMapping> mapping : ESClientSetupHandler.KEY_MAPPINGS.entrySet()) {
 			event.register(mapping.getValue());
 		}
 	}
 
 	@SubscribeEvent
-	private static void onAddReloadListener(RegisterClientReloadListenersEvent event) {
+	public static void onAddReloadListener(RegisterClientReloadListenersEvent event) {
 		ESClientSetupHandler.addClientReloadListeners(event::registerReloadListener);
 	}
 
 	@SubscribeEvent
-	private static void onRegisterClientTooltipComponentFactories(RegisterClientTooltipComponentFactoriesEvent event) {
+	public static void onRegisterClientTooltipComponentFactories(RegisterClientTooltipComponentFactoriesEvent event) {
 		event.register(GalacticQuiverTooltipComponent.class, component -> new ClientGalacticQuiverTooltip(component.contents()));
 	}
 }

@@ -3,9 +3,11 @@ package cn.leolezury.eternalstarlight.forge.event;
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.handler.ESCommonHandler;
 import cn.leolezury.eternalstarlight.common.handler.ESCommonSetupHandler;
+import cn.leolezury.eternalstarlight.common.registry.ESAttributes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -16,6 +18,7 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.VanillaGameEvent;
+import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.AdvancementEvent;
@@ -34,33 +37,33 @@ import java.util.Map;
 public class ForgeCommonEvents {
 
 	@SubscribeEvent
-	private static void onServerTick(TickEvent.ServerTickEvent event) {
+	public static void onServerTick(TickEvent.ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.END) {
 			ESCommonHandler.onServerTick(event.getServer());
 		}
 	}
 
 	@SubscribeEvent
-	private static void onLevelTick(TickEvent.LevelTickEvent event) {
+	public static void onLevelTick(TickEvent.LevelTickEvent event) {
 		if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel serverLevel) {
 			ESCommonHandler.onLevelTick(serverLevel);
 		}
 	}
 
 	@SubscribeEvent
-	private static void onLevelLoad(LevelEvent.Load event) {
+	public static void onLevelLoad(LevelEvent.Load event) {
 		if (event.getLevel() instanceof ServerLevel serverLevel) {
 			ESCommonHandler.onLevelLoad(serverLevel);
 		}
 	}
 
 	@SubscribeEvent
-	private static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+	public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
 		ESCommonHandler.onPlayerJoin(event.getEntity());
 	}
 
 	@SubscribeEvent
-	private static void onIncomingDamage(LivingAttackEvent event) {
+	public static void onIncomingDamage(LivingAttackEvent event) {
 		if (event.isCanceled()) return;
 
 		boolean allow = ESCommonHandler.onAllowLivingHurt(
@@ -78,7 +81,7 @@ public class ForgeCommonEvents {
 	}
 
 	@SubscribeEvent
-	private static void onLivingHurt(LivingHurtEvent event) {
+	public static void onLivingHurt(LivingHurtEvent event) {
 
 		LivingEntity entity = event.getEntity();
 		DamageSource source = event.getSource();
@@ -93,17 +96,17 @@ public class ForgeCommonEvents {
 	}
 
 	@SubscribeEvent
-	private static void onLivingDamage(LivingDamageEvent event) {
+	public static void onLivingDamage(LivingDamageEvent event) {
 		ESCommonHandler.onPostLivingHurt(event.getEntity(), event.getSource(), event.getAmount());
 	}
 
 	@SubscribeEvent
-	private static void onLivingHeal(LivingHealEvent event) {
+	public static void onLivingHeal(LivingHealEvent event) {
 		event.setAmount(ESCommonHandler.onLivingHeal(event.getEntity(), event.getAmount()));
 	}
 
 	@SubscribeEvent
-	private static void onLivingDeath(LivingDeathEvent event) {
+	public static void onLivingDeath(LivingDeathEvent event) {
 		if (!event.isCanceled()) {
 			boolean allow = ESCommonHandler.onAllowLivingDeath(event.getEntity(), event.getSource());
 			if (!allow) {
@@ -116,12 +119,12 @@ public class ForgeCommonEvents {
 	}
 
 	@SubscribeEvent
-	private static void onLivingVisibility(LivingEvent.LivingVisibilityEvent event) {
+	public static void onLivingVisibility(LivingEvent.LivingVisibilityEvent event) {
 		event.modifyVisibility(ESCommonHandler.onLivingVisibility(event.getEntity(), event.getLookingEntity(), event.getVisibilityModifier()));
 	}
 
 	@SubscribeEvent
-	private static void onLivingChangeTarget(LivingChangeTargetEvent event) {
+	public static void onLivingChangeTarget(LivingChangeTargetEvent event) {
 		LivingEntity target = ESCommonHandler.onLivingChangeTarget(event.getEntity(), event.getNewTarget());
 		if (target != event.getNewTarget()) {
 			event.setNewTarget(target);
@@ -129,7 +132,7 @@ public class ForgeCommonEvents {
 	}
 
 	@SubscribeEvent
-	private static void onLivingBreathe(LivingBreatheEvent event) {
+	public static void onLivingBreathe(LivingBreatheEvent event) {
 		if (!event.canBreathe() && event.getConsumeAirAmount() > 0) {
 			int result = ESCommonHandler.onLivingDecreaseAirSupply(event.getEntity());
 			if (result > 0) {
@@ -143,12 +146,12 @@ public class ForgeCommonEvents {
 	}
 
 	@SubscribeEvent
-	private static void onLivingTick(LivingEvent.LivingTickEvent event) {
+	public static void onLivingTick(LivingEvent.LivingTickEvent event) {
 		ESCommonHandler.onEntityTick(event.getEntity());
 	}
 
 	@SubscribeEvent
-	private static void onCriticalHit(CriticalHitEvent event) {
+	public static void onCriticalHit(CriticalHitEvent event) {
 		boolean isCrit = event.getOldDamageModifier() > 1.0F;
 
 		if (isCrit) {
@@ -171,32 +174,32 @@ public class ForgeCommonEvents {
 	}
 
 	@SubscribeEvent
-	private static void onBlockBroken(BlockEvent.BreakEvent event) {
+	public static void onBlockBroken(BlockEvent.BreakEvent event) {
 		ESCommonHandler.onBlockBroken(event.getPlayer(), event.getPos(), event.getState());
 	}
 
 	@SubscribeEvent
-	private static void onBlockBreakSpeed(PlayerEvent.BreakSpeed event) {
+	public static void onBlockBreakSpeed(PlayerEvent.BreakSpeed event) {
 		event.setNewSpeed(ESCommonHandler.onBlockBreakSpeed(event.getEntity(), event.getState(), event.getNewSpeed()));
 	}
 
 	@SubscribeEvent
-	private static void onShieldBlock(ShieldBlockEvent event) {
+	public static void onShieldBlock(ShieldBlockEvent event) {
 		ESCommonHandler.onShieldBlock(event.getEntity(), event.getDamageSource());
 	}
 
 	@SubscribeEvent
-	private static void onProjectileImpact(ProjectileImpactEvent event) {
+	public static void onProjectileImpact(ProjectileImpactEvent event) {
 		ESCommonHandler.onProjectileImpact(event.getProjectile(), event.getRayTraceResult());
 	}
 
 	@SubscribeEvent
-	private static void onCompleteAdvancement(AdvancementEvent.AdvancementEarnEvent event) {
+	public static void onCompleteAdvancement(AdvancementEvent.AdvancementEarnEvent event) {
 		ESCommonHandler.onCompleteAdvancement(event.getEntity(), event.getAdvancement());
 	}
 
 	@SubscribeEvent
-	private static void onVanillaGameEvent(VanillaGameEvent event) {
+	public static void onVanillaGameEvent(VanillaGameEvent event) {
 		if (!event.isCanceled()) {
 			boolean allow = ESCommonHandler.onVanillaGameEvent(event.getLevel(), event.getVanillaEvent(), event.getEventPosition(), event.getContext());
 			if (!allow) {
@@ -206,12 +209,12 @@ public class ForgeCommonEvents {
 	}
 
 	@SubscribeEvent
-	private static void onAddReloadListener(AddReloadListenerEvent event) {
+	public static void onAddReloadListener(AddReloadListenerEvent event) {
 		ESCommonSetupHandler.addReloadListeners(event::addListener);
 	}
 
 	@SubscribeEvent
-	private static void onFuelBurnTime(FurnaceFuelBurnTimeEvent event) {
+	public static void onFuelBurnTime(FurnaceFuelBurnTimeEvent event) {
 		ESCommonSetupHandler.registerFuels(new ESCommonSetupHandler.FuelRegisterStrategy() {
 			@Override
 			public void register(ItemLike item, int time) {
@@ -247,12 +250,12 @@ public class ForgeCommonEvents {
 	 */
 
 	@SubscribeEvent
-	private static void onRegisterCommands(RegisterCommandsEvent event) {
+	public static void onRegisterCommands(RegisterCommandsEvent event) {
 		ESCommonSetupHandler.registerCommands(event.getDispatcher(), event.getBuildContext());
 	}
 
 	@SubscribeEvent
-	private static void onBlockToolModification(BlockEvent.BlockToolModificationEvent event) {
+	public static void onBlockToolModification(BlockEvent.BlockToolModificationEvent event) {
 		ToolAction action = event.getToolAction();
 
 		if (action == ToolActions.AXE_STRIP) {
@@ -278,4 +281,16 @@ public class ForgeCommonEvents {
 		}
 	}
 
+	@SubscribeEvent
+	public void onAttributeModification(EntityAttributeModificationEvent event) {
+		event.getTypes().forEach(entityType -> {
+			event.add(entityType, ESAttributes.THROWN_POTION_DISTANCE.get());
+			event.add(entityType, ESAttributes.ETHER_RESISTANCE.get());
+			event.add(entityType, ESAttributes.FIRE_RESISTANCE.get());
+			event.add(entityType, ESAttributes.METEOR_COUNTERATTACK_CHANCE.get());
+			event.add(entityType, ESAttributes.HEAL_MULTIPLIER.get());
+			event.add(entityType, ESAttributes.ENEMY_FOLLOW_RANGE_MULTIPLIER.get());
+		});
+		event.add(EntityType.PLAYER, ESAttributes.FOG_VISION.get());
+	}
 }

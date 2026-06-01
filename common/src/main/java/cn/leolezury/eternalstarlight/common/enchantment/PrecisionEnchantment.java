@@ -37,7 +37,7 @@ public class PrecisionEnchantment extends Enchantment {
 	}
 
 	public static float getCritChanceBonus(ItemStack stack) {
-		Enchantment ench = BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.PRECISION);
+		Enchantment ench = BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.PRECISION.getResourceKey());
 		int level = EnchantmentHelper.getItemEnchantmentLevel(ench, stack);
 
 		if (level <= 0) return 0F;

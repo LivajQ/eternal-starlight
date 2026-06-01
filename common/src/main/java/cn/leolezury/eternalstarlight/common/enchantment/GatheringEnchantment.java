@@ -37,7 +37,7 @@ public class GatheringEnchantment extends Enchantment {
 	}
 
 	public static float getPickupRadiusBonus(ItemStack stack) {
-		Enchantment ench = BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.GATHERING);
+		Enchantment ench = BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.GATHERING.getResourceKey());
 		int level = EnchantmentHelper.getItemEnchantmentLevel(ench, stack);
 		if (level <= 0) return 0F;
 

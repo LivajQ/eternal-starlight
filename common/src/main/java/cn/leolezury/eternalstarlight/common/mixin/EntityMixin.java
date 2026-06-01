@@ -67,6 +67,7 @@ public abstract class EntityMixin {
 		}
 	}
 
+	/*
 	@Inject(method = "getGravity", at = @At("RETURN"), cancellable = true)
 	private void getGravity(CallbackInfoReturnable<Double> cir) {
 		Entity entity = (Entity) (Object) this;
@@ -75,6 +76,8 @@ public abstract class EntityMixin {
 		}
 	}
 
+	 */
+
 	@Inject(method = "checkInsideBlocks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;entityInside(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/Entity;)V"))
 	private void checkInsideBlocks(CallbackInfo ci, @Local(ordinal = 0) BlockState state) {
 		if (state.getFluidState().is(ESTags.Fluids.ETHER)) {
@@ -82,6 +85,7 @@ public abstract class EntityMixin {
 		}
 	}
 
+	/*
 	@Inject(method = "onHitEntity", at = @At("HEAD"), cancellable = true)
 	private void onHitEntity(EntityHitResult hit, CallbackInfo ci) {
 		Entity entity = (Entity)(Object)this;
@@ -96,6 +100,7 @@ public abstract class EntityMixin {
 			ci.cancel();
 		}
 	}
+	 */
 
 	@Inject(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setPos(DDD)V", ordinal = 1))
 	private void move(MoverType moverType, Vec3 vec3, CallbackInfo ci, @Local(ordinal = 1) Vec3 movement) {

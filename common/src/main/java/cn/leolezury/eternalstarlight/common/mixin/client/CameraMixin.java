@@ -18,7 +18,7 @@ public abstract class CameraMixin {
 	public abstract boolean isDetached();
 
 	@Shadow
-	public abstract void move(float f, float g, float h);
+	protected abstract void move(double f, double g, double h);
 
 	@Shadow
 	public abstract double getMaxZoom(double f);

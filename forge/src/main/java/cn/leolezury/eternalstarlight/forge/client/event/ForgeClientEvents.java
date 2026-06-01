@@ -18,38 +18,38 @@ import net.minecraftforge.fml.common.Mod;
 public class ForgeClientEvents {
 
 	@SubscribeEvent
-	private static void onClientTick(TickEvent.ClientTickEvent event) {
+	public static void onClientTick(TickEvent.ClientTickEvent event) {
 		if (event.phase == TickEvent.Phase.END) {
 			ESClientHandler.onClientTick();
 		}
 	}
 
 	@SubscribeEvent
-	private static void onComputeCameraAngles(ViewportEvent.ComputeCameraAngles event) {
+	public static void onComputeCameraAngles(ViewportEvent.ComputeCameraAngles event) {
 		Vec3 angle = ESClientHandler.onComputeCameraAngles(new Vec3(event.getPitch(), event.getYaw(), event.getRoll()));
 		event.setPitch((float) angle.x);
 		event.setYaw((float) angle.y);
 	}
 
 	@SubscribeEvent
-	private static void onComputeFovModifier(ComputeFovModifierEvent event) {
+	public static void onComputeFovModifier(ComputeFovModifierEvent event) {
 		ESClientHandler.onComputeFovModifier(event.getFovModifier()).ifPresent(d -> event.setNewFovModifier((float) d));
 	}
 
 	@SubscribeEvent
-	private static void onRenderFog(ViewportEvent.RenderFog event) {
+	public static void onRenderFog(ViewportEvent.RenderFog event) {
 		ESClientHandler.onRenderFog(event.getCamera(), event.getMode());
 	}
 
 	@SubscribeEvent
-	private static void onRenderBossBar(CustomizeGuiOverlayEvent.BossEventProgress event) {
+	public static void onRenderBossBar(CustomizeGuiOverlayEvent.BossEventProgress event) {
 		if (ESClientHandler.renderBossBar(event.getGuiGraphics(), event.getBossEvent(), event.getX(), event.getY())) {
 			event.setCanceled(true);
 		}
 	}
 
 	@SubscribeEvent
-	private static void onRenderLevelStage(RenderLevelStageEvent event) {
+	public static void onRenderLevelStage(RenderLevelStageEvent event) {
 		float partial = event.getPartialTick();
 
 		if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {

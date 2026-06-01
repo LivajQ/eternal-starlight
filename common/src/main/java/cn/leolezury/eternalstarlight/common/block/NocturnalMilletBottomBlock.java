@@ -63,7 +63,7 @@ public class NocturnalMilletBottomBlock extends CropBlock {
 		}
 	}
 
-	protected static float getGrowthSpeed(Block block, BlockGetter level, BlockPos pos) {
+	public static float getGrowthSpeed(Block block, BlockGetter level, BlockPos pos) {
 		float speed = 1.0F;
 		BlockPos belowPos = pos.below();
 

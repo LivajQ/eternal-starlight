@@ -50,6 +50,7 @@ public abstract class ProjectileWeaponItemMixin {
 		}
 	}
 
+	/* TODO combine with the fix for AbstractArrowMixin
 	@Inject(method = "useAmmo", at = @At("RETURN"))
 	private static void useAmmo(ItemStack weapon, ItemStack ammo, LivingEntity shooter, boolean intangible, CallbackInfoReturnable<ItemStack> cir, @Local(ordinal = 0) int ammoUse) {
 		int use = ammoUse;
@@ -94,4 +95,5 @@ public abstract class ProjectileWeaponItemMixin {
 			}
 		}
 	}
+	 */
 }

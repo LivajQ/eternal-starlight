@@ -57,7 +57,7 @@ public class EternalStarlight {
 		ESDataAttachments.loadClass();
 		ESRegistries.loadClass();
 		ESFlammabilityRegistry.registerDefaults();
-		ESEnchantments.register();
+		ESEnchantments.loadClass();
 	}
 
 	public static ResourceLocation id(String string) {

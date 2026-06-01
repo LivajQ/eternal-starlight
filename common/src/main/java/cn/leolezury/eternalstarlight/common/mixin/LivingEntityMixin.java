@@ -72,15 +72,7 @@ public abstract class LivingEntityMixin {
 	public abstract boolean removeEffect(MobEffect holder);
 
 	@Shadow
-	@Nullable
-	protected ItemStack autoSpinAttackItemStack;
-
-	@Shadow
 	protected int attackStrengthTicker;
-
-	@Shadow
-	@NotNull
-	public abstract ItemStack getWeaponItem();
 
 	@Shadow
 	private Optional<BlockPos> lastClimbablePos;
@@ -102,13 +94,18 @@ public abstract class LivingEntityMixin {
 		}
 	}
 
-	@Inject(method = "getKnockback", at = @At("RETURN"), cancellable = true)
-	private void getKnockback(Entity target, DamageSource damageSource, CallbackInfoReturnable<Float> cir) {
-		if (getWeaponItem().is(ESTags.Items.HAMMERS)) {
-			cir.setReturnValue(cir.getReturnValue() + 1);
+	@Inject(method = "knockback", at = @At("HEAD"))
+	private void knockback(double strength, double x, double z, CallbackInfo ci) {
+		LivingEntity entity = (LivingEntity)(Object)this;
+
+		if (entity.getMainHandItem().is(ESTags.Items.HAMMERS)) {
+			double boosted = strength + 1.0;
+			entity.knockback(boosted, x, z);
+			ci.cancel();
 		}
 	}
 
+	/* too early
 	@Inject(method = "createLivingAttributes", at = @At("RETURN"))
 	private static void createLivingAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
 		cir.getReturnValue()
@@ -119,6 +116,7 @@ public abstract class LivingEntityMixin {
 			.add(ESAttributes.HEAL_MULTIPLIER.get())
 			.add(ESAttributes.ENEMY_FOLLOW_RANGE_MULTIPLIER.get());
 	}
+	 */
 
 	@Inject(method = "checkAutoSpinAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V", shift = At.Shift.AFTER))
 	private void checkAutoSpinAttack(CallbackInfo ci) {
@@ -136,7 +134,7 @@ public abstract class LivingEntityMixin {
 	@Unique
 	private void doCrescentSpearDamage() {
 		LivingEntity entity = (LivingEntity) (Object) this;
-		if (autoSpinAttackItemStack != null && autoSpinAttackItemStack.is(ESItems.CRESCENT_SPEAR.get())) {
+		if (ESDataAttachments.CRESCENT_SPEAR_DASH.getData(entity)) {
 			if (!entity.level().isClientSide) {
 				for (LivingEntity living : entity.level().getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, entity, entity.getBoundingBox().inflate(3))) {
 					if (ESEntityUtil.shouldHarm(entity, living) && entity instanceof Player player) {
@@ -166,8 +164,30 @@ public abstract class LivingEntityMixin {
 		}
 	}
 
-	@Inject(method = "eat(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/food/FoodProperties;)Lnet/minecraft/world/item/ItemStack;", at = @At("HEAD"))
-	private void eat(Level level, ItemStack itemStack, FoodProperties foodProperties, CallbackInfoReturnable<ItemStack> cir) {
+	@Inject(method = "getFluidFallingAdjustedMovement", at = @At("RETURN"), cancellable = true)
+	private void getFluidFallingAdjustedMovement(double d, boolean bl, Vec3 vec3, CallbackInfoReturnable<Vec3> cir) {
+		LivingEntity entity = (LivingEntity) (Object) this;
+		if (entity.getItemBySlot(EquipmentSlot.FEET).is(ESItems.AIR_SAC_BOOTS.get())) {
+			Vec3 result = cir.getReturnValue();
+			cir.setReturnValue(new Vec3(result.x, 0.0, result.z));
+		}
+	}
+
+	@Inject(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hurtCurrentlyUsedShield(F)V"), cancellable = true)
+	private void hurt(DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
+		LivingEntity entity = (LivingEntity) (Object) this;
+		if (entity.getUseItem().is(ESItems.FLOWGLAZE_SHIELD.get())) {
+			Entity projectile = damageSource.getDirectEntity();
+			if (projectile != null) {
+				Vec3 motion = projectile.getDeltaMovement().scale(-1);
+				projectile.setDeltaMovement(motion);
+				projectile.setYRot(projectile.getYRot() + 180f);
+			}
+		}
+	}
+
+	@Inject(method = "eat", at = @At("HEAD"))
+	private void eat(Level level, ItemStack itemStack, CallbackInfoReturnable<ItemStack> cir) {
 		if (itemStack.is(ESItems.LUNARIS_CACTUS_GEL.get())) {
 			List<MobEffect> effectsToRemove = new ArrayList<>();
 			for (MobEffectInstance effectInstance : getActiveEffects()) {
@@ -259,6 +279,15 @@ public abstract class LivingEntityMixin {
 		}
 	}
 
+	@Inject(method = "getMainHandItem", at = @At("RETURN"), cancellable = true)
+	private void overrideMainHandForOffhandAttack(CallbackInfoReturnable<ItemStack> cir) {
+		LivingEntity living = (LivingEntity)(Object)this;
+		if (living instanceof Player player &&
+			ESDataAttachments.OFFHAND_ATTACK.getData(player)) {
+			cir.setReturnValue(player.getOffhandItem());
+		}
+	}
+
 	/*
 	@WrapOperation(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;knockback(DDD)V"))
 	private void knockback(LivingEntity instance, double strength, double x, double z, Operation<Void> original, @Local(argsOnly = true) DamageSource source) {
@@ -273,11 +302,16 @@ public abstract class LivingEntityMixin {
 	}
 	 */
 
-	@Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;gameEvent(Lnet/minecraft/core/Holder;)V", shift = At.Shift.AFTER))
-	private void die(CallbackInfo ci) {
-		LivingEntity livingEntity = ((LivingEntity) (Object) this);
+	@Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;)V", shift = At.Shift.AFTER))
+	private void die(DamageSource damageSource, CallbackInfo ci) {
+		LivingEntity livingEntity = (LivingEntity)(Object)this;
 		if (livingEntity.getType().is(ESTags.EntityTypes.STRANGHOUL_PREYS) && getKillCredit() instanceof Stranghoul) {
-			List<Player> players = livingEntity.level().getNearbyPlayers(TargetingConditions.forNonCombat(), livingEntity, livingEntity.getBoundingBox().inflate(20));
+			List<Player> players = livingEntity.level().getNearbyPlayers(
+				TargetingConditions.forNonCombat(),
+				livingEntity,
+				livingEntity.getBoundingBox().inflate(20)
+			);
+
 			for (Player player : players) {
 				if (player instanceof ServerPlayer serverPlayer) {
 					ESCriteriaTriggers.WITNESS_STRANGHOUL_HUNT.trigger(serverPlayer);

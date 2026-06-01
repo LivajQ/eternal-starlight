@@ -39,16 +39,14 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 		}
 	}
 
-	@WrapOperation(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V"))
-	private void renderToBuffer(M instance, PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color, Operation<Void> original, @Local(ordinal = 0, argsOnly = true) T entity) {
-		if (entity instanceof AbstractClientPlayer && entity.level().getEntity(ESDataAttachments.HUSK_OWNER_ID.getData(entity)) instanceof Player) {
-			int alpha = FastColor.ARGB32.alpha(color);
-			int red = FastColor.ARGB32.red(color);
-			int green = FastColor.ARGB32.green(color);
-			int blue = FastColor.ARGB32.blue(color);
-			original.call(instance, poseStack, vertexConsumer, packedLight, packedOverlay, FastColor.ARGB32.color(alpha / 2, red / 2, green / 2, blue));
+	@WrapOperation(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V"))
+	private void renderToBuffer(M instance, PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha, Operation<Void> original, @Local(ordinal = 0, argsOnly = true) T entity) {
+		if (entity instanceof AbstractClientPlayer &&
+			entity.level().getEntity(ESDataAttachments.HUSK_OWNER_ID.getData(entity)) instanceof Player) {
+			original.call(instance, poseStack, vertexConsumer, packedLight, packedOverlay, red * 0.5f, green * 0.5f, blue * 0.5f, alpha);
 		} else {
-			original.call(instance, poseStack, vertexConsumer, packedLight, packedOverlay, color);
+			original.call(instance, poseStack, vertexConsumer, packedLight, packedOverlay,
+				red, green, blue, alpha);
 		}
 	}
 

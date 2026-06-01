@@ -1,0 +1,33 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mixins]]
+config = "eternal_starlight.mixins.json"
+[[mixins]]
+config = "eternal_starlight-common.mixins.json"
+
+[[mods]]
+modId = "eternal_starlight"
+version = "${version}"
+displayName = "Eternal Starlight"
+authors = "LeoLezury"
+description = '''
+A minecraft mod that adds the magical and mysterious starlight dimension
+'''
+logoFile = "icon.png"
+
+[[dependencies.eternal_starlight]]
+modId = "forge"
+mandatory = true
+versionRange = "[47.4.13,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.eternal_starlight]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"

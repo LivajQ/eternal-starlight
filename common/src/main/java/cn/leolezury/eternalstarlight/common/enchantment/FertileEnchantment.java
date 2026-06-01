@@ -36,7 +36,7 @@ public class FertileEnchantment extends Enchantment {
 	}
 
 	public static int getExtraProjectiles(ItemStack stack) {
-		Enchantment ench = BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.FERTILE);
+		Enchantment ench = BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.FERTILE.getResourceKey());
 		int level = EnchantmentHelper.getItemEnchantmentLevel(ench, stack);
 		return level * 2;
 	}

@@ -3,6 +3,8 @@ package cn.leolezury.eternalstarlight.common.data;
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.enchantment.*;
 
+import cn.leolezury.eternalstarlight.common.platform.registry.RegistrationProvider;
+import cn.leolezury.eternalstarlight.common.platform.registry.RegistryObject;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -13,41 +15,23 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 public final class ESEnchantments {
-	public static final ResourceKey<Enchantment> POISONING      = create("poisoning");
-	public static final ResourceKey<Enchantment> FEARLESS       = create("fearless");
-	public static final ResourceKey<Enchantment> SOUL_SNATCHER  = create("soul_snatcher");
-	public static final ResourceKey<Enchantment> TRACING        = create("tracing");
-	public static final ResourceKey<Enchantment> TEARING        = create("tearing");
-	public static final ResourceKey<Enchantment> OVERHEAT       = create("overheat");
-	public static final ResourceKey<Enchantment> GLACIAL_SOWING = create("glacial_sowing");
-	public static final ResourceKey<Enchantment> FERTILE        = create("fertile");
-	public static final ResourceKey<Enchantment> PRECISION      = create("precision");
-	public static final ResourceKey<Enchantment> HOMING         = create("homing");
-	public static final ResourceKey<Enchantment> GATHERING      = create("gathering");
-	public static final ResourceKey<Enchantment> SWIFT_LASH     = create("swift_lash");
-	public static final ResourceKey<Enchantment> ABYSSAL_TOUCH  = create("abyssal_touch");
+	public static final RegistrationProvider<Enchantment> ENCHANTMENTS = RegistrationProvider.get(Registries.ENCHANTMENT, EternalStarlight.ID);
 
-	private ESEnchantments() {}
+	public static final RegistryObject<Enchantment, Enchantment> POISONING = ENCHANTMENTS.register("poisoning", PoisoningEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> FEARLESS = ENCHANTMENTS.register("fearless", FearlessEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> SOUL_SNATCHER = ENCHANTMENTS.register("soul_snatcher", SoulSnatcherEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> TRACING = ENCHANTMENTS.register("tracing", TracingEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> TEARING = ENCHANTMENTS.register("tearing", TearingEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> OVERHEAT = ENCHANTMENTS.register("overheat", OverheatEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> GLACIAL_SOWING = ENCHANTMENTS.register("glacial_sowing", GlacialSowingEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> FERTILE = ENCHANTMENTS.register("fertile", FertileEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> PRECISION = ENCHANTMENTS.register("precision", PrecisionEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> HOMING = ENCHANTMENTS.register("homing", HomingEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> GATHERING = ENCHANTMENTS.register("gathering", GatheringEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> SWIFT_LASH = ENCHANTMENTS.register("swift_lash", SwiftLashEnchantment::new);
+	public static final RegistryObject<Enchantment, Enchantment> ABYSSAL_TOUCH = ENCHANTMENTS.register("abyssal_touch", AbyssalTouchEnchantment::new);
 
-	public static ResourceKey<Enchantment> create(String name) {
-		return ResourceKey.create(Registries.ENCHANTMENT, EternalStarlight.id(name));
-	}
-
-	public static void register() {
-		Registry.register(BuiltInRegistries.ENCHANTMENT, POISONING.location(),      new PoisoningEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, FEARLESS.location(),       new FearlessEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, SOUL_SNATCHER.location(),  new SoulSnatcherEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, TRACING.location(),        new TracingEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, TEARING.location(),        new TearingEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, OVERHEAT.location(),       new OverheatEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, GLACIAL_SOWING.location(), new GlacialSowingEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, FERTILE.location(),        new FertileEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, PRECISION.location(),      new PrecisionEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, HOMING.location(),         new HomingEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, GATHERING.location(),      new GatheringEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, SWIFT_LASH.location(),     new SwiftLashEnchantment());
-		Registry.register(BuiltInRegistries.ENCHANTMENT, ABYSSAL_TOUCH.location(),  new AbyssalTouchEnchantment());
-	}
+	public static void loadClass() {}
 
 	public static float modifyBoomerangCritChance(ItemStack tool, float base) {
 		float result = base;

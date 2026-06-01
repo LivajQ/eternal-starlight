@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.MissingMappingsEvent;
 
-@Mod.EventBusSubscriber(modid = EternalStarlight.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = EternalStarlight.ID)
 public class ESForgeRegistryRemapper {
 
 	@SubscribeEvent

@@ -1,26 +1,12 @@
 package cn.leolezury.eternalstarlight.common.mixin;
 
-import cn.leolezury.eternalstarlight.common.EternalStarlight;
-import cn.leolezury.eternalstarlight.common.item.misc.GalacticQuiverItem;
-import cn.leolezury.eternalstarlight.common.registry.ESItems;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.CrossbowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractArrow.class)
 public abstract class AbstractArrowMixin {
+
+	/* TODO arrows have no weapon metadata
 	@Shadow
 	@Nullable
 	private ItemStack firedFromWeapon;
@@ -55,4 +41,5 @@ public abstract class AbstractArrowMixin {
 		}
 		return original.call(instance, scale);
 	}
+	 */
 }

@@ -38,18 +38,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin implements SpellCaster {
-	@Shadow
-	@NotNull
-	public abstract ItemStack getWeaponItem();
 
 	@Unique
 	private boolean originalEnoughAttackStrength;
 
+	/* too early
 	@Inject(method = "createAttributes", at = @At("RETURN"))
 	private static void createAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
 		cir.getReturnValue()
 			.add(ESAttributes.FOG_VISION.get());
 	}
+	 */
 
 	@Inject(method = "hurtCurrentlyUsedShield", at = @At("HEAD"))
 	private void damageShield(float amount, CallbackInfo callBackInfo) {
@@ -71,23 +70,25 @@ public abstract class PlayerMixin implements SpellCaster {
 		}
 	}
 
-	@Inject(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;hurtEnemy(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/player/Player;)Z"))
+	@Inject(method = "attack", at = @At("TAIL"))
 	private void attackHurtEnemy(Entity entity, CallbackInfo ci) {
 		if (entity instanceof LivingEntity living) {
-			ESCommonHandler.handleFlowglazeWeaponAttack((Player) (Object) this, living);
+			ESCommonHandler.handleFlowglazeWeaponAttack((Player)(Object)this, living);
 		}
 	}
 
 	@Inject(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSprinting()Z", ordinal = 0))
 	private void attackCheckHammerStrength(Entity entity, CallbackInfo ci, @Local(ordinal = 0) LocalBooleanRef localRef) {
-		if (getWeaponItem().is(ESTags.Items.HAMMERS)) {
+		Player player = (Player)(Object)this;
+		if (player.getMainHandItem().is(ESTags.Items.HAMMERS)) {
 			localRef.set(true);
 		}
 	}
 
 	@Inject(method = "attack", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Player;walkDist:F", opcode = Opcodes.GETFIELD))
 	private void attackBeforeScytheSweepCheck(Entity entity, CallbackInfo ci, @Local(ordinal = 0) LocalBooleanRef localRef) {
-		if (getWeaponItem().is(ESTags.Items.SCYTHES)) {
+		Player player = (Player)(Object)this;
+		if (player.getMainHandItem().is(ESTags.Items.SCYTHES)) {
 			originalEnoughAttackStrength = localRef.get();
 			localRef.set(true);
 		}
@@ -95,7 +96,8 @@ public abstract class PlayerMixin implements SpellCaster {
 
 	@Inject(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;"))
 	private void attackAfterScytheSweepCheck(Entity entity, CallbackInfo ci, @Local(ordinal = 0) LocalBooleanRef localRef) {
-		if (getWeaponItem().is(ESTags.Items.SCYTHES)) {
+		Player player = (Player)(Object)this;
+		if (player.getMainHandItem().is(ESTags.Items.SCYTHES)) {
 			localRef.set(originalEnoughAttackStrength);
 		}
 	}
@@ -121,13 +123,15 @@ public abstract class PlayerMixin implements SpellCaster {
 		}
 	}
 
-	@Inject(method = "getWeaponItem", at = @At("RETURN"), cancellable = true)
-	private void getWeaponItem(CallbackInfoReturnable<ItemStack> cir) {
-		Player player = (Player) (Object) this;
+	/*
+	@Inject(method = "getMainHandItem", at = @At("RETURN"), cancellable = true)
+	private void overrideMainHandForOffhandAttack(CallbackInfoReturnable<ItemStack> cir) {
+		Player player = (Player)(Object)this;
 		if (ESDataAttachments.OFFHAND_ATTACK.getData(player)) {
 			cir.setReturnValue(player.getOffhandItem());
 		}
 	}
+	 */
 
 	@WrapOperation(method = "attack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;"))
 	private ItemStack useOffhandWeapon(Player instance, InteractionHand hand, Operation<ItemStack> original) {

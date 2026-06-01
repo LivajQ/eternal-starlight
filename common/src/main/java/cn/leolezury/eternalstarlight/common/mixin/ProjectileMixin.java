@@ -6,31 +6,40 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ThrownPotion;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Projectile.class)
 public abstract class ProjectileMixin {
-	@Shadow
-	@Nullable
+
+	@Shadow @Nullable
 	public abstract Entity getOwner();
 
-	@Inject(method = "getMovementToShoot", at = @At("RETURN"), cancellable = true)
-	private void getMovementToShoot(double x, double y, double z, float velocity, float inaccuracy, CallbackInfoReturnable<Vec3> cir) {
-		if (getOwner() instanceof LivingEntity livingEntity && ((Projectile) (Object) this) instanceof ThrownPotion) {
-			double factor = 1;
-			if (livingEntity.getAttributes().hasAttribute(ESAttributes.THROWN_POTION_DISTANCE.asHolder())) {
-				AttributeInstance distance = livingEntity.getAttribute(ESAttributes.THROWN_POTION_DISTANCE.get());
-				if (distance != null) {
-					factor = distance.getValue();
-				}
-			}
-			cir.setReturnValue(cir.getReturnValue().scale(factor));
+	@Inject(method = "shoot(DDDFF)V", at = @At("HEAD"), cancellable = true)
+	private void es$modifyPotionVelocity(double x, double y, double z, float velocity, float inaccuracy, CallbackInfo ci) {
+		Projectile self = (Projectile)(Object)this;
+
+		if (!(self instanceof ThrownPotion)) return;
+		if (!(getOwner() instanceof LivingEntity living)) return;
+
+		double factor = 1.0;
+
+		if (living.getAttributes().hasAttribute(ESAttributes.THROWN_POTION_DISTANCE.asHolder())) {
+			AttributeInstance inst = living.getAttribute(ESAttributes.THROWN_POTION_DISTANCE.get());
+			if (inst != null) factor = inst.getValue();
 		}
+
+		double nx = x * factor;
+		double ny = y * factor;
+		double nz = z * factor;
+
+		self.shoot(nx, ny, nz, velocity, inaccuracy);
+
+		ci.cancel();
 	}
 }
+

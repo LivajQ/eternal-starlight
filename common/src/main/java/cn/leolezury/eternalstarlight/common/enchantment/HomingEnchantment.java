@@ -37,7 +37,7 @@ public class HomingEnchantment extends Enchantment {
 	}
 
 	public static float getHomingBonus(ItemStack stack) {
-		Enchantment ench = BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.HOMING);
+		Enchantment ench = BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.HOMING.getResourceKey());
 		int level = EnchantmentHelper.getItemEnchantmentLevel(ench, stack);
 
 		if (level <= 0) return 0F;

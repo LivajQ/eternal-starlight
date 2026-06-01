@@ -6,6 +6,7 @@ import cn.leolezury.eternalstarlight.common.registry.ESAccessories;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.util.ESAccessoryUtil;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -29,7 +30,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
-import java.util.function.BiConsumer;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
@@ -55,38 +55,45 @@ public abstract class ItemStackMixin {
 		}
 	}
 
-	@Inject(method = "forEachModifier(Lnet/minecraft/world/entity/EquipmentSlot;Ljava/util/function/BiConsumer;)V", at = @At("RETURN"))
-	private void injectAccessoryModifiers(EquipmentSlot slot, BiConsumer<Attribute, AttributeModifier> action, CallbackInfo ci) {
+	@Inject(
+		method = "getAttributeModifiers(Lnet/minecraft/world/entity/EquipmentSlot;)Lcom/google/common/collect/Multimap;",
+		at = @At("RETURN"),
+		cancellable = true
+	)
+	private void injectAccessoryModifiers(EquipmentSlot slot, CallbackInfoReturnable<Multimap<Attribute, AttributeModifier>> cir) {
 
-		ItemStack stack = (ItemStack) (Object) this;
+		ItemStack stack = (ItemStack)(Object)this;
+
+		Multimap<Attribute, AttributeModifier> modifiers = cir.getReturnValue();
+		if (modifiers == null) return;
 
 		List<ItemStack> accessories = ESAccessoryUtil.getAccessoryStacks(stack);
 		if (accessories.isEmpty()) return;
 
-		for (ItemStack accStack : accessories) {
+		Multimap<Attribute, AttributeModifier> newMap = HashMultimap.create(modifiers);
 
+		for (ItemStack accStack : accessories) {
 			Accessory accessory = ESAccessories.get(accStack);
 			if (accessory == null) continue;
 
-			Multimap<Attribute, AttributeModifier> modifiers = accessory.attributeModifiers();
-			if (modifiers.isEmpty()) continue;
+			Multimap<Attribute, AttributeModifier> accMods = accessory.attributeModifiers();
+			if (accMods.isEmpty()) continue;
 
-			for (var entry : modifiers.entries()) {
-				Attribute attr = entry.getKey();
-				AttributeModifier mod = entry.getValue();
-				action.accept(attr, mod);
-			}
+			newMap.putAll(accMods);
 		}
+
+		cir.setReturnValue(newMap);
 	}
 
 	@Inject(
-		method = "getTooltipLines(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;",
+		method = "getTooltipLines(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/List;",
 		at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/world/item/Item;appendHoverText(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Ljava/util/List;Lnet/minecraft/world/item/TooltipFlag;)V"
 		)
 	)
-	private void getTooltipLines(ItemStack stack, Player player, TooltipFlag flag, CallbackInfoReturnable<List<Component>> cir, @Local(ordinal = 0) List<Component> list) {
+	private void es$injectTooltip(Player player, TooltipFlag flag, CallbackInfoReturnable<List<Component>> cir, @Local(ordinal = 0) List<Component> list) {
+		ItemStack stack = (ItemStack)(Object)this;
 		ESCommonHandler.onItemTooltip(player, flag, stack, list);
 	}
 

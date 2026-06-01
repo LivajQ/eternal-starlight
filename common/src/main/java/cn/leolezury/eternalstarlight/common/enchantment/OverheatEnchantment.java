@@ -53,7 +53,7 @@ public class OverheatEnchantment extends Enchantment {
 	}
 
 	public static void applyIgniteEffect(ItemStack launcher, Entity projectile, int level) {
-		Enchantment ench = BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.OVERHEAT);
+		Enchantment ench = BuiltInRegistries.ENCHANTMENT.get(ESEnchantments.OVERHEAT.getResourceKey());
 		int enchLevel = EnchantmentHelper.getItemEnchantmentLevel(ench, launcher);
 
 		if (enchLevel <= 0) return;
