@@ -34,7 +34,7 @@ public class ESParticles {
 			new ParticleType<>(false, ESExplosionParticleOptions.DESERIALIZER) {
 				@Override
 				public Codec<ESExplosionParticleOptions> codec() {
-					return ESExplosionParticleOptions.codec(ESParticles.EXPLOSION.get()).codec();
+					return ESExplosionParticleOptions.CODEC;
 				}
 			});
 
@@ -43,7 +43,7 @@ public class ESParticles {
 			new ParticleType<>(false, ESExplosionParticleOptions.DESERIALIZER) {
 				@Override
 				public Codec<ESExplosionParticleOptions> codec() {
-					return ESExplosionParticleOptions.codec(ESParticles.BLAST.get()).codec();
+					return ESExplosionParticleOptions.CODEC;
 				}
 			});
 

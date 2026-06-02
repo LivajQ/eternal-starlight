@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_haze_ice": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "eternal_starlight:haze_ice"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "eternal_starlight:haze_ice_brick_stairs_from_haze_ice_stonecutting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_haze_ice",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "eternal_starlight:haze_ice_brick_stairs_from_haze_ice_stonecutting"
+    ]
+  },
+  "sends_telemetry_event": false
+}

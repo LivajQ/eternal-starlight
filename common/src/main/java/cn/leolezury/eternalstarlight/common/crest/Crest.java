@@ -24,8 +24,9 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 import java.util.Optional;
 
-public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optional<Holder<AbstractSpell>> spell, Optional<List<MobEffectWithLevel>> effects, Optional<List<LevelBasedAttributeModifier>> attributeModifiers) {
-	public Crest(ManaType type, int maxLevel, ResourceLocation texture, Holder<AbstractSpell> spell, List<MobEffectWithLevel> effects, List<LevelBasedAttributeModifier> attributeModifiers) {
+public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optional<ResourceLocation> spell, Optional<List<MobEffectWithLevel>> effects,Optional<List<LevelBasedAttributeModifier>> attributeModifiers) {
+
+	public Crest(ManaType type, int maxLevel, ResourceLocation texture, ResourceLocation spell, List<MobEffectWithLevel> effects, List<LevelBasedAttributeModifier> attributeModifiers) {
 		this(type, maxLevel, texture, Optional.ofNullable(spell), Optional.of(effects), Optional.of(attributeModifiers));
 	}
 
@@ -33,13 +34,13 @@ public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optio
 		ManaType.CODEC.fieldOf("type").forGetter(Crest::type),
 		Codec.INT.fieldOf("max_level").forGetter(Crest::maxLevel),
 		ResourceLocation.CODEC.fieldOf("texture").forGetter(Crest::texture),
-		ESSpells.HOLDER_CODEC.optionalFieldOf("spell").forGetter(Crest::spell),
+		ResourceLocation.CODEC.optionalFieldOf("spell").forGetter(Crest::spell),
 		MobEffectWithLevel.CODEC.listOf().optionalFieldOf("mob_effects").forGetter(Crest::effects),
 		LevelBasedAttributeModifier.CODEC.listOf().optionalFieldOf("attribute_modifiers").forGetter(Crest::attributeModifiers)
 	).apply(instance, Crest::new));
 
 	public Optional<AbstractSpell> getSpell() {
-		return spell().map(Holder::value);
+		return spell().map(ESSpells.SPELLS::get);
 	}
 
 	public record MobEffectWithLevel(Holder<MobEffect> effect, int level, int levelAddition) {
@@ -52,8 +53,7 @@ public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optio
 
 	public record LevelBasedAttributeModifier(Holder<Attribute> attribute, ResourceLocation id, double amount, double amountAddition, AttributeModifier.Operation operation) {
 		public static final Codec<AttributeModifier.Operation> OPERATION_CODEC =
-			Codec.INT.xmap(AttributeModifier.Operation::fromValue,
-				AttributeModifier.Operation::toValue);
+			Codec.INT.xmap(AttributeModifier.Operation::fromValue, AttributeModifier.Operation::toValue);
 
 		public static final Codec<LevelBasedAttributeModifier> CODEC =
 			RecordCodecBuilder.create(instance -> instance.group(
@@ -65,9 +65,11 @@ public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optio
 			).apply(instance, LevelBasedAttributeModifier::new));
 
 		public AttributeModifier getModifier(int level) {
-			return new AttributeModifier(id().toString(),
+			return new AttributeModifier(
+				id().toString(),
 				amount() + (level - 1) * amountAddition(),
-				operation());
+				operation()
+			);
 		}
 	}
 
@@ -83,9 +85,7 @@ public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optio
 		public static Instance get(ItemStack stack) {
 			CompoundTag tag = stack.getTag();
 			if (tag == null || !tag.contains(TAG_CREST)) return null;
-
-			CompoundTag crestTag = tag.getCompound(TAG_CREST);
-			return loadNBT(crestTag);
+			return loadNBT(tag.getCompound(TAG_CREST));
 		}
 
 		public static void set(ItemStack stack, Instance instance) {
@@ -94,8 +94,8 @@ public record Crest(ManaType type, int maxLevel, ResourceLocation texture, Optio
 
 		public static Optional<Instance> of(RegistryAccess access, ResourceKey<Crest> key, int level) {
 			Registry<Crest> registry = access.registryOrThrow(ESRegistries.CREST);
-			Optional<Holder.Reference<Crest>> holder = registry.getHolder(key);
-			return holder.map(ref -> new Instance(ref, Math.min(level, ref.value().maxLevel())));
+			return registry.getHolder(key)
+				.map(ref -> new Instance(ref, Math.min(level, ref.value().maxLevel())));
 		}
 
 		public static Instance read(FriendlyByteBuf buf) {

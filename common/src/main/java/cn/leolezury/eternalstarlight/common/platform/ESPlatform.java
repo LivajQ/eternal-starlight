@@ -12,6 +12,7 @@ import cn.leolezury.eternalstarlight.common.item.combat.PetalScytheItem;
 import cn.leolezury.eternalstarlight.common.item.combat.ScytheItem;
 import cn.leolezury.eternalstarlight.common.network.ESPacket;
 import cn.leolezury.eternalstarlight.common.platform.registry.RegistrationProvider;
+import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import cn.leolezury.eternalstarlight.common.resource.gatekeeper.TheGatekeeperNameManager;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -26,6 +27,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
@@ -44,7 +46,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 
 import java.nio.file.Path;
@@ -92,6 +96,10 @@ public interface ESPlatform {
 	// items
 	default SpawnEggItem createSpawnEgg(Supplier<EntityType<? extends Mob>> defaultType, int backgroundColor, int highlightColor, Item.Properties properties) {
 		return new SpawnEggItem(defaultType.get(), backgroundColor, highlightColor, properties);
+	}
+
+	default Item createMobBucket(Supplier<? extends EntityType<? extends Mob>> type, Fluid fluid, SoundEvent sound, Item.Properties props) {
+		return new MobBucketItem(type.get(), fluid, sound, props);
 	}
 
 	default ScytheItem createScythe(Tier tier, boolean canTill, Item.Properties properties) {

@@ -31,7 +31,9 @@ public class ESPaintingItem extends HangingEntityItem {
 		Component.translatable("painting.random").withStyle(ChatFormatting.GRAY);
 
 	public ESPaintingItem(Properties properties) {
-		super(ESEntities.PAINTING.get(), properties);
+		// .get() crashes, but vanilla paintings here are hardcoded for vanilla types anyway
+		//super(ESEntities.PAINTING.get(), properties);
+		super(EntityType.PAINTING, properties);
 	}
 
 	@Override

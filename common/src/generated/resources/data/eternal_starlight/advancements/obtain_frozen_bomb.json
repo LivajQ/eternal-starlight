@@ -1,0 +1,38 @@
+{
+  "parent": "eternal_starlight:under_permafrost_forest",
+  "criteria": {
+    "has_item": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "eternal_starlight:frozen_bomb"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.eternal_starlight.obtain_frozen_bomb.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "eternal_starlight:frozen_bomb"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.eternal_starlight.obtain_frozen_bomb.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

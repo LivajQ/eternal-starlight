@@ -1,0 +1,36 @@
+{
+  "parent": "eternal_starlight:obtain_tooth_of_hunger",
+  "criteria": {
+    "has_item": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "eternal_starlight:tooth_of_hunger_blocks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.eternal_starlight.obtain_tooth_of_hunger_blocks.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "eternal_starlight:chiseled_tooth_of_hunger_tiles"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.eternal_starlight.obtain_tooth_of_hunger_blocks.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

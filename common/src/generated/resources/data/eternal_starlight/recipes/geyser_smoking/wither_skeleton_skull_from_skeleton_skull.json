@@ -1,0 +1,8 @@
+{
+  "type": "eternal_starlight:geyser_smoking",
+  "input": "minecraft:skeleton_skull",
+  "input_count": 1,
+  "output": {
+    "item": "minecraft:wither_skeleton_skull"
+  }
+}

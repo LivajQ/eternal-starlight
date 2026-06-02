@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": {
+      "tag": "c:gems/starcore"
+    },
+    "G": {
+      "tag": "c:gems/glacite"
+    },
+    "S": {
+      "item": "eternal_starlight:ashen_snowball"
+    }
+  },
+  "pattern": [
+    "SG ",
+    "GAG",
+    " G "
+  ],
+  "result": {
+    "count": 12,
+    "item": "eternal_starlight:frozen_bomb"
+  },
+  "show_notification": true
+}

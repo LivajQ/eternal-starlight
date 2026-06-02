@@ -78,7 +78,7 @@ public class LunarSpore extends ThrowableProjectile implements TrailOwner {
 				Vec3 vec3 = new Vec3(this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth());
 				for (int m = 0; m < serverLevel.players().size(); ++m) {
 					ServerPlayer serverPlayer = serverLevel.players().get(m);
-					serverLevel.sendParticles(serverPlayer, ESExplosionParticleOptions.LUNAR, true, vec3.x, vec3.y, vec3.z, 2, 0, 0, 0, 0);
+					serverLevel.sendParticles(serverPlayer, ESExplosionParticleOptions.lunar(), true, vec3.x, vec3.y, vec3.z, 2, 0, 0, 0, 0);
 					serverLevel.sendParticles(serverPlayer, ESSmokeParticleOptions.LUNAR_SHORT, true, vec3.x, vec3.y, vec3.z, 2, 0, 0, 0, 0);
 				}
 			}

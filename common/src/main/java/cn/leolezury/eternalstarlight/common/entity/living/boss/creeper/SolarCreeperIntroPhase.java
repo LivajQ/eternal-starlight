@@ -54,7 +54,7 @@ public class SolarCreeperIntroPhase extends BehaviorPhase<SolarCreeper> {
 						double dx = (random.nextDouble() * 3 + 2) * (random.nextBoolean() ? 1 : -1);
 						double dy = (random.nextDouble() * 3 + 2) * (random.nextBoolean() ? 1 : -1);
 						double dz = (random.nextDouble() * 3 + 2) * (random.nextBoolean() ? 1 : -1);
-						ESPlatform.INSTANCE.sendToTrackingClients(serverLevel, entity, new ParticlePacket(GatheringTrailParticleOptions.FLARE, entity.getX() - dx, entity.getY() + entity.getBbHeight() / 2 - dy, entity.getZ() - dz, dx, dy, dz));
+						ESPlatform.INSTANCE.sendToTrackingClients(serverLevel, entity, new ParticlePacket(GatheringTrailParticleOptions.flare(), entity.getX() - dx, entity.getY() + entity.getBbHeight() / 2 - dy, entity.getZ() - dz, dx, dy, dz));
 					}
 				}
 			}

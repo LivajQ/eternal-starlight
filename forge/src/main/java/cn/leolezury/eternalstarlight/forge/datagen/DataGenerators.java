@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.concurrent.CompletableFuture;
 
-@Mod.EventBusSubscriber(modid = EternalStarlight.ID)
+@Mod.EventBusSubscriber(modid = EternalStarlight.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class DataGenerators {
 	@SubscribeEvent
 	public static void onGatherData(GatherDataEvent event) {

@@ -2,6 +2,7 @@ package cn.leolezury.eternalstarlight.common.spell;
 
 import cn.leolezury.eternalstarlight.common.registry.ESSpells;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -25,7 +26,7 @@ public record SpellCastData(boolean hasSpell, AbstractSpell spell, int strength,
 
 	public void write(FriendlyByteBuf buf) {
 		buf.writeBoolean(hasSpell());
-		buf.writeVarInt(ESSpells.SPELLS.registry().getId(spell()));
+		buf.writeResourceLocation(ESSpells.SPELLS.getId(spell()));
 		buf.writeInt(strength());
 		buf.writeInt(castTicks());
 		buf.writeBoolean(offhand());
@@ -33,7 +34,8 @@ public record SpellCastData(boolean hasSpell, AbstractSpell spell, int strength,
 
 	public static SpellCastData read(FriendlyByteBuf buf) {
 		boolean hasSpell = buf.readBoolean();
-		AbstractSpell spell = ESSpells.SPELLS.registry().byId(buf.readVarInt());
+		ResourceLocation id = buf.readResourceLocation();
+		AbstractSpell spell = ESSpells.SPELLS.get(id);
 		int strength = buf.readInt();
 		int ticks = buf.readInt();
 		boolean offhand = buf.readBoolean();

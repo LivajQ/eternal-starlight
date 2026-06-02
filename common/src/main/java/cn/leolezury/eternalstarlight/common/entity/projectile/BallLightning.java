@@ -156,7 +156,7 @@ public class BallLightning extends ThrowableProjectile implements TrailOwner {
 	private void explodeAndDiscard() {
 		playSound(SoundEvents.GENERIC_EXPLODE);
 		if (level() instanceof ServerLevel serverLevel) {
-			serverLevel.sendParticles(ESExplosionParticleOptions.ENERGY, getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
+			serverLevel.sendParticles(ESExplosionParticleOptions.energy(), getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
 			for (int i = 0; i < 20; i++) {
 				Vec3 speed = new Vec3((this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F, (this.random.nextFloat() - this.random.nextFloat()) * 0.1F).normalize();
 				ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ExplosionShockParticleOptions.ENERGY, position().x + speed.x * 1.2, position().y + speed.y * 1.2, position().z + speed.z * 1.2, speed.x, speed.y, speed.z));

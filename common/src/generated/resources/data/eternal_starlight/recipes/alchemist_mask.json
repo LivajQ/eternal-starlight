@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "item": "minecraft:leather"
+    },
+    "S": {
+      "tag": "c:gems/thioquartz"
+    }
+  },
+  "pattern": [
+    "###",
+    "S S"
+  ],
+  "result": {
+    "item": "eternal_starlight:alchemist_mask"
+  },
+  "show_notification": true
+}

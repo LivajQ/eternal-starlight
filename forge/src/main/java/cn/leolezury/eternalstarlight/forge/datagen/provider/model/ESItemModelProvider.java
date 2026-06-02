@@ -1132,6 +1132,7 @@ public class ESItemModelProvider extends ItemModelProvider {
 			.parent(new ModelFile.UncheckedModelFile("item/template_spawn_egg"));
 	}*/
 
+	/*
 	private void armorWithTrim(ArmorItem armor) {
 		ItemModelBuilder armorBuilder = basicItem(armor);
 		for (ItemModelGenerators.TrimModelData trimModelData : ItemModelGenerators.GENERATED_TRIM_MODELS) {
@@ -1140,6 +1141,11 @@ public class ESItemModelProvider extends ItemModelProvider {
 				.texture("layer1", mcLoc("trims/items/" + armor.getType().getName() + "_trim_" + trimModelData.name()));
 			armorBuilder.override().predicate(ResourceLocation.withDefaultNamespace("trim_type"), trimModelData.itemModelIndex()).model(trimModel).end();
 		}
+	}
+	 */
+
+	private void armorWithTrim(ArmorItem armor) {
+		basicItem(armor);
 	}
 
 	private void greatsword(Item item) {

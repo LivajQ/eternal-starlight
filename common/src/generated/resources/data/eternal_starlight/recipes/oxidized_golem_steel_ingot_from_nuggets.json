@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "oxidized_golem_steel_ingot",
+  "key": {
+    "#": {
+      "item": "eternal_starlight:oxidized_golem_steel_nugget"
+    }
+  },
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "result": {
+    "item": "eternal_starlight:oxidized_golem_steel_ingot"
+  },
+  "show_notification": true
+}

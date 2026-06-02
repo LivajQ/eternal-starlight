@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "tag": "c:raw_materials/amaramber"
+    },
+    "L": {
+      "tag": "eternal_starlight:torreya_logs"
+    },
+    "S": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    " S ",
+    "SAS",
+    "LLL"
+  ],
+  "result": {
+    "item": "eternal_starlight:torreya_campfire"
+  },
+  "show_notification": true
+}

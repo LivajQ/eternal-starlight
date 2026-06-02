@@ -35,7 +35,7 @@ public abstract class AbstractWeather {
 	public abstract float modifyRainLevel(float original);
 
 	public String getDescriptionId() {
-		return Util.makeDescriptionId("weather", ESWeathers.WEATHERS.registry().getKey(this));
+		return Util.makeDescriptionId("weather", ESWeathers.WEATHERS.getId(this));
 	}
 
 	public Component getDescription() {

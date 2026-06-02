@@ -93,7 +93,7 @@ public class GatekeeperFireball extends Fireball implements TrailOwner {
 		super.onHit(hitResult);
 		if (level() instanceof ServerLevel serverLevel) {
 			this.level().explode(this, this.getX(), this.getY(), this.getZ(), 2, false, Level.ExplosionInteraction.NONE);
-			serverLevel.sendParticles(ESExplosionParticleOptions.LAVA, this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 10, 1.5, 1.5, 1.5, 0);
+			serverLevel.sendParticles(ESExplosionParticleOptions.lava(), this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 10, 1.5, 1.5, 1.5, 0);
 			this.discard();
 		}
 	}

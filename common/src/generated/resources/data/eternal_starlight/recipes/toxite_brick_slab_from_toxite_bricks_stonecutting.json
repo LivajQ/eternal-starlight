@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 2,
+  "ingredient": {
+    "item": "eternal_starlight:toxite_bricks"
+  },
+  "result": "eternal_starlight:toxite_brick_slab"
+}

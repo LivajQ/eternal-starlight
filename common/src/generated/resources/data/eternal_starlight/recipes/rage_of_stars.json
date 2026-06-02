@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "tag": "c:ingots/aethersent"
+    },
+    "H": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    "#",
+    "#",
+    "H"
+  ],
+  "result": {
+    "item": "eternal_starlight:rage_of_stars"
+  },
+  "show_notification": true
+}

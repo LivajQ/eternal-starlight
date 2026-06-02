@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "F": {
+      "tag": "eternal_starlight:arrow_feathers"
+    },
+    "S": {
+      "tag": "forge:rods/wooden"
+    },
+    "T": {
+      "tag": "c:gems/thioquartz"
+    }
+  },
+  "pattern": [
+    "T",
+    "S",
+    "F"
+  ],
+  "result": {
+    "count": 4,
+    "item": "eternal_starlight:thioquartz_arrow"
+  },
+  "show_notification": true
+}

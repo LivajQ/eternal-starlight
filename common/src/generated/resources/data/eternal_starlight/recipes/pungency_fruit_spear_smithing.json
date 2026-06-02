@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "item": "eternal_starlight:pungency_fruit"
+  },
+  "base": {
+    "item": "eternal_starlight:malarite_spear"
+  },
+  "result": {
+    "item": "eternal_starlight:pungency_fruit_spear"
+  },
+  "template": {
+    "item": "eternal_starlight:pungency_fruit_upgrade_smithing_template"
+  }
+}

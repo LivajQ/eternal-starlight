@@ -102,7 +102,7 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 	}
 
 	public AbstractBoarwarfProfession getProfession() {
-		return ESBoarwarfProfessions.PROFESSIONS.registry().get(getProfessionId());
+		return ESBoarwarfProfessions.PROFESSIONS.get(getProfessionId());
 	}
 
 	public void setProfessionId(ResourceLocation professionId) {
@@ -110,7 +110,7 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 	}
 
 	public void setProfession(AbstractBoarwarfProfession profession) {
-		ResourceLocation key = ESBoarwarfProfessions.PROFESSIONS.registry().getKey(profession);
+		ResourceLocation key = ESBoarwarfProfessions.PROFESSIONS.getId(profession);
 		if (key != null) {
 			setProfessionId(key);
 		}

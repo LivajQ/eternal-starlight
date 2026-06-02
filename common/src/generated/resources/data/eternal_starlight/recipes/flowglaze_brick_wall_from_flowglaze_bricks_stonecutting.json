@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 1,
+  "ingredient": {
+    "item": "eternal_starlight:flowglaze_bricks"
+  },
+  "result": "eternal_starlight:flowglaze_brick_wall"
+}

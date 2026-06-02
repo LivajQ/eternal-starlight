@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "tag": "c:gems/glacite"
+    },
+    "H": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    "#",
+    "H",
+    "H"
+  ],
+  "result": {
+    "item": "eternal_starlight:glacite_shovel"
+  },
+  "show_notification": true
+}

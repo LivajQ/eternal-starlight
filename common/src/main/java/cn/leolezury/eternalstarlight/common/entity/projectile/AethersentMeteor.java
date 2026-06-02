@@ -127,7 +127,7 @@ public class AethersentMeteor extends AbstractHurtingProjectile implements Trail
 					meteor.natural = false;
 					level.addFreshEntity(meteor);
 					if (level instanceof ServerLevel serverLevel) {
-						serverLevel.sendParticles(ESExplosionParticleOptions.AETHERSENT, meteor.getX(), meteor.getY(), meteor.getZ(), 2, 0.2D, 0.2D, 0.2D, 0.0D);
+						serverLevel.sendParticles(ESExplosionParticleOptions.aethersent(), meteor.getX(), meteor.getY(), meteor.getZ(), 2, 0.2D, 0.2D, 0.2D, 0.0D);
 					}
 				}
 			}
@@ -226,7 +226,7 @@ public class AethersentMeteor extends AbstractHurtingProjectile implements Trail
 							livingEntity.hurt(ESDamageTypes.getEntityDamageSource(level(), ESDamageTypes.METEOR, getOwner()), getSize() * 5 * (getOwner() instanceof LivingEntity ? 0.08f : 1f) * (getOwner() instanceof Player ? (float) ESConfig.INSTANCE.itemsConfig.playerAethersentMeteorDamageScale : 1));
 						}
 					}
-					serverLevel.sendParticles(getSize() >= 10 ? ParticleTypes.EXPLOSION_EMITTER : ESExplosionParticleOptions.AETHERSENT, getX(), getY() + 0.05 * getSize(), getZ(), 1, 0, 0, 0, 0);
+					serverLevel.sendParticles(getSize() >= 10 ? ParticleTypes.EXPLOSION_EMITTER : ESExplosionParticleOptions.aethersent(), getX(), getY() + 0.05 * getSize(), getZ(), 1, 0, 0, 0, 0);
 					dropAndDiscard(false);
 				}
 			}

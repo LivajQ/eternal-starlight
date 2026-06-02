@@ -11,8 +11,10 @@
         "leaves": true,
         "length": {
           "type": "minecraft:uniform",
-          "max_inclusive": 4,
-          "min_inclusive": 1
+          "value": {
+            "max_inclusive": 4,
+            "min_inclusive": 1
+          }
         },
         "plant_body": "eternal_starlight:hanging_fantagrass_plant",
         "plant_head": "eternal_starlight:hanging_fantagrass"
@@ -54,13 +56,17 @@
       "branch_layer_num": 1,
       "branch_length": {
         "type": "minecraft:uniform",
-        "max_inclusive": 4,
-        "min_inclusive": 3
+        "value": {
+          "max_inclusive": 4,
+          "min_inclusive": 3
+        }
       },
       "branch_num": {
         "type": "minecraft:uniform",
-        "max_inclusive": 4,
-        "min_inclusive": 3
+        "value": {
+          "max_inclusive": 4,
+          "min_inclusive": 3
+        }
       },
       "height_rand_a": 2,
       "height_rand_b": 4,

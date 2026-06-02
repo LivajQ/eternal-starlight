@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 1,
+  "ingredient": {
+    "item": "eternal_starlight:springstone"
+  },
+  "result": "eternal_starlight:polished_springstone_stairs"
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "N": {
+      "tag": "c:nuggets/amaramber"
+    },
+    "S": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    "N",
+    "S"
+  ],
+  "result": {
+    "count": 6,
+    "item": "minecraft:torch"
+  },
+  "show_notification": true
+}

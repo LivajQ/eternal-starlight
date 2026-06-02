@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "#": {
+      "item": "minecraft:redstone_torch"
+    },
+    "I": {
+      "item": "eternal_starlight:cinder_brick"
+    },
+    "X": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    "#X#",
+    "III"
+  ],
+  "result": {
+    "count": 3,
+    "item": "minecraft:repeater"
+  },
+  "show_notification": true
+}

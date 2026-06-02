@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 2,
+  "ingredient": {
+    "item": "eternal_starlight:cobbled_radianite"
+  },
+  "result": "eternal_starlight:polished_radianite_slab"
+}

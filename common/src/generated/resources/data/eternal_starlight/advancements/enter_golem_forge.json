@@ -1,0 +1,42 @@
+{
+  "parent": "eternal_starlight:obtain_seeking_eye",
+  "criteria": {
+    "in_structure": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "eternal_starlight:golem_forge"
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:location"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.eternal_starlight.enter_golem_forge.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "eternal_starlight:golem_steel_pillar"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.eternal_starlight.enter_golem_forge.title"
+    }
+  },
+  "requirements": [
+    [
+      "in_structure"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

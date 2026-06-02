@@ -153,7 +153,7 @@ public class TangledHusk extends LivingEntity implements TraceableEntity {
 			}
 			setSpawnedTicks(getSpawnedTicks() + 1);
 			if (getSpawnedTicks() > 100) {
-				serverLevel.sendParticles(ESExplosionParticleOptions.LUNAR, getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
+				serverLevel.sendParticles(ESExplosionParticleOptions.lunar(), getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
 				ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(RingExplosionParticleOptions.LUNAR, getX(), getY(), getZ(), 0, 0.2, 0));
 				ScreenShakeVfx.createInstance(level().dimension(), position(), 40, 50, 0.3f, 0.3f, 3, 5.5f).send(serverLevel);
 				playSound(SoundEvents.GENERIC_EXPLODE);

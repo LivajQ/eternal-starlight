@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_abysslate": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "eternal_starlight:abysslate"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "eternal_starlight:polished_abysslate_brick_slab_from_abysslate_stonecutting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_abysslate",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "eternal_starlight:polished_abysslate_brick_slab_from_abysslate_stonecutting"
+    ]
+  },
+  "sends_telemetry_event": false
+}

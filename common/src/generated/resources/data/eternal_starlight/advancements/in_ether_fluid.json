@@ -1,0 +1,44 @@
+{
+  "parent": "eternal_starlight:enter_starlight",
+  "criteria": {
+    "in_fluid": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "fluid": {
+                  "tag": "eternal_starlight:ether"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:location"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.eternal_starlight.in_ether_fluid.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "eternal_starlight:ether_bucket"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.eternal_starlight.in_ether_fluid.title"
+    }
+  },
+  "requirements": [
+    [
+      "in_fluid"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

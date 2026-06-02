@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": {
+      "tag": "c:nuggets/amaramber"
+    },
+    "F": {
+      "tag": "eternal_starlight:arrow_feathers"
+    },
+    "S": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    "A",
+    "S",
+    "F"
+  ],
+  "result": {
+    "count": 4,
+    "item": "eternal_starlight:amaramber_arrow"
+  },
+  "show_notification": true
+}

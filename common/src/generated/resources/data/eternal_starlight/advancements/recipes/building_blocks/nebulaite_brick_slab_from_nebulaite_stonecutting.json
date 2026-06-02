@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_nebulaite": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "eternal_starlight:nebulaite"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "eternal_starlight:nebulaite_brick_slab_from_nebulaite_stonecutting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_nebulaite",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "eternal_starlight:nebulaite_brick_slab_from_nebulaite_stonecutting"
+    ]
+  },
+  "sends_telemetry_event": false
+}

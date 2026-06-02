@@ -159,7 +159,7 @@ public class ChainOfSouls extends Projectile implements Grappling {
 									Vec3 randomPlayerPos = new Vec3(playerOwner.getRandomX(1), playerOwner.getRandomY(), playerOwner.getRandomZ(1));
 									Vec3 randomTargetPos = new Vec3(target.getRandomX(1), target.getRandomY(), target.getRandomZ(1));
 									ESPlatform.INSTANCE.sendToTrackingClients(serverLevel, this,
-										new ParticlePacket(GatheringTrailParticleOptions.SOUL_THIN,
+										new ParticlePacket(GatheringTrailParticleOptions.soulThin(),
 											randomTargetPos.x, randomTargetPos.y, randomTargetPos.z,
 											randomPlayerPos.x - randomTargetPos.x,
 											randomPlayerPos.y - randomTargetPos.y,

@@ -3,7 +3,9 @@ package cn.leolezury.eternalstarlight.common.platform.registry;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
+import java.util.Collection;
 import java.util.function.Supplier;
 
 public interface RegistrationProvider<T> {
@@ -18,4 +20,10 @@ public interface RegistrationProvider<T> {
 	Registry<T> registry();
 
 	<I extends T> RegistryObject<T, I> register(String id, Supplier<? extends I> supplier);
+
+	T get(ResourceLocation id);
+
+	ResourceLocation getId(T value);
+
+	Collection<T> values();
 }

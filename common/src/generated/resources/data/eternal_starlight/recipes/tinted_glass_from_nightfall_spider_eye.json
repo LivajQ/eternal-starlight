@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "E": {
+      "item": "eternal_starlight:nightfall_spider_eye"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    }
+  },
+  "pattern": [
+    " E ",
+    "EGE",
+    " E "
+  ],
+  "result": {
+    "count": 2,
+    "item": "minecraft:tinted_glass"
+  },
+  "show_notification": true
+}

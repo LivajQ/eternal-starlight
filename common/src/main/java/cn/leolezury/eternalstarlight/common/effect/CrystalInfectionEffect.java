@@ -19,7 +19,6 @@ public class CrystalInfectionEffect extends MobEffect {
 
 	public CrystalInfectionEffect(MobEffectCategory category, int color) {
 		super(category, color);
-		// pass UUID as string, as required by your addAttributeModifier
 		this.addAttributeModifier(
 			Attributes.ARMOR,
 			ARMOR_MODIFIER_UUID.toString(),

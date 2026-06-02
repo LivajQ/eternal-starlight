@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "item": "minecraft:leather"
+    },
+    "S": {
+      "tag": "c:gems/thioquartz"
+    }
+  },
+  "pattern": [
+    "S S",
+    "#S#",
+    "#S#"
+  ],
+  "result": {
+    "item": "eternal_starlight:alchemist_robe"
+  },
+  "show_notification": true
+}

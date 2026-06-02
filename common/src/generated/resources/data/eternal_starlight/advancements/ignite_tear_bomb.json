@@ -1,0 +1,30 @@
+{
+  "parent": "eternal_starlight:enter_starlight",
+  "criteria": {
+    "ignite": {
+      "conditions": {},
+      "trigger": "eternal_starlight:ignite_tear_bomb"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.eternal_starlight.ignite_tear_bomb.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "eternal_starlight:tear_bomb"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.eternal_starlight.ignite_tear_bomb.title"
+    }
+  },
+  "requirements": [
+    [
+      "ignite"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

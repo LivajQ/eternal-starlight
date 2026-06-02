@@ -9,7 +9,7 @@ import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ESFluidTypes {
-	public static final RegistrationProvider<FluidType> FLUID_TYPES = RegistrationProvider.get(ForgeRegistries.FLUID_TYPES.get().getRegistryKey(), EternalStarlight.ID);
+	public static final RegistrationProvider<FluidType> FLUID_TYPES = RegistrationProvider.get(ForgeRegistries.Keys.FLUID_TYPES, EternalStarlight.ID);
 	public static final RegistryObject<FluidType, FluidType> ETHER = FLUID_TYPES.register("ether", () -> new FluidType(
 		FluidType.Properties.create()
 			.canExtinguish(true)

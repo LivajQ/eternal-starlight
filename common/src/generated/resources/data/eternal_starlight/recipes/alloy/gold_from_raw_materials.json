@@ -1,0 +1,47 @@
+{
+  "type": "eternal_starlight:alloy",
+  "burn_time": 400,
+  "ingredients": [
+    {
+      "tag": "forge:raw_materials/gold"
+    },
+    {
+      "tag": "forge:raw_materials/gold"
+    },
+    {
+      "tag": "forge:raw_materials/gold"
+    },
+    {
+      "item": "eternal_starlight:starcore"
+    },
+    {
+      "item": "eternal_starlight:saltpeter_powder"
+    }
+  ],
+  "results": [
+    {
+      "amount_max": 4,
+      "amount_min": 4,
+      "item": {
+        "count": 1,
+        "item": "minecraft:gold_ingot"
+      }
+    },
+    {
+      "amount_max": 3,
+      "amount_min": 0,
+      "item": {
+        "count": 1,
+        "item": "eternal_starlight:dimslag"
+      }
+    },
+    {
+      "amount_max": 3,
+      "amount_min": 0,
+      "item": {
+        "count": 1,
+        "item": "eternal_starlight:dimslag"
+      }
+    }
+  ]
+}

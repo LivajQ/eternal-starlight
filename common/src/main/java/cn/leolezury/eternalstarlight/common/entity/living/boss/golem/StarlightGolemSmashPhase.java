@@ -98,7 +98,7 @@ public class StarlightGolemSmashPhase extends BehaviorPhase<StarlightGolem> {
 								if (entity.getRandom().nextInt(25) == 0 && ESPlatform.INSTANCE.postEntityDestroyBlockEvent(entity.level(), pos, entity)) {
 									entity.level().setBlockAndUpdate(pos, Blocks.MAGMA_BLOCK.defaultBlockState());
 									if (!entity.level().isClientSide) {
-										((ServerLevel) entity.level()).sendParticles(ESExplosionParticleOptions.LAVA, pos.getCenter().x, pos.getCenter().y + 0.6, pos.getCenter().z, 1, 0, 0, 0, 0);
+										((ServerLevel) entity.level()).sendParticles(ESExplosionParticleOptions.lava(), pos.getCenter().x, pos.getCenter().y + 0.6, pos.getCenter().z, 1, 0, 0, 0, 0);
 									}
 								}
 							}
@@ -124,7 +124,7 @@ public class StarlightGolemSmashPhase extends BehaviorPhase<StarlightGolem> {
 											}
 										}
 										if (!entity.level().isClientSide) {
-											((ServerLevel) entity.level()).sendParticles(ESExplosionParticleOptions.ENERGY, pos.getCenter().x, pos.getCenter().y, pos.getCenter().z, 1, 0, 0, 0, 0);
+											((ServerLevel) entity.level()).sendParticles(ESExplosionParticleOptions.energy(), pos.getCenter().x, pos.getCenter().y, pos.getCenter().z, 1, 0, 0, 0, 0);
 											if (entity.getRandom().nextInt(5) == 0) {
 												((ServerLevel) entity.level()).sendParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, pos.getCenter().x, pos.getCenter().y + 0.5, pos.getCenter().z, 1, 0, 0, 0, 0);
 											}

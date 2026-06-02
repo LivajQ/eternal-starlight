@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "eternal_starlight:crinoa"
+    },
+    {
+      "item": "eternal_starlight:crinoa"
+    },
+    {
+      "item": "eternal_starlight:lunar_berries"
+    }
+  ],
+  "result": {
+    "item": "eternal_starlight:crinoa_ball"
+  }
+}

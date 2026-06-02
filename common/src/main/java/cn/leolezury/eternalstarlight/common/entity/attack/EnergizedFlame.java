@@ -84,7 +84,7 @@ public class EnergizedFlame extends Entity implements TraceableEntity {
 			double dx = random.nextDouble() - 0.5;
 			double dy = random.nextDouble() - 0.5;
 			double dz = random.nextDouble() - 0.5;
-			level().addParticle(GatheringTrailParticleOptions.ENERGY, getX() - dx, getY() - dy, getZ() - dz, dz * 0.25, HEIGHT, dx * 0.25);
+			level().addParticle(GatheringTrailParticleOptions.energy(), getX() - dx, getY() - dy, getZ() - dz, dz * 0.25, HEIGHT, dx * 0.25);
 			if (tickCount % 20 == 0 && tickCount >= 20) {
 				level().addParticle(RingExplosionParticleOptions.ENERGY_SMALL, getX(), getY() + 0.12, getZ(), 0, 0, 0);
 			}

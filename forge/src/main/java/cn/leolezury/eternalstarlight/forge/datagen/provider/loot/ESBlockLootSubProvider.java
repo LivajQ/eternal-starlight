@@ -649,6 +649,7 @@ public class ESBlockLootSubProvider extends BlockLootSubProvider {
 
 		dropSelf(ESBlocks.RAW_AETHERSENT_BLOCK.get());
 		dropSelf(ESBlocks.AETHERSENT_BLOCK.get());
+		dropSelf(ESBlocks.ETHER.get());
 
 		dropSelf(ESBlocks.SPRINGSTONE.get());
 		add(ESBlocks.SPRINGSTONE_SLAB.get(), this::createSlabItemTable);

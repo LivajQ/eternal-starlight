@@ -68,7 +68,7 @@
           "entries": [
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:seeking_eye"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -89,7 +89,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:orb_of_prophecy"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -110,7 +110,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:crescent_pendant"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -131,7 +131,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:chiseled_golem_steel_block"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -157,7 +157,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:parasol_grass"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -180,7 +180,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:aetherstrike_rocket"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -201,7 +201,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:tooth_of_hunger"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -225,8 +225,11 @@
             },
             {
               "icon": {
-                "count": 1,
-                "id": "eternal_starlight:malarite_sword"
+                "Count": 1,
+                "id": "eternal_starlight:malarite_sword",
+                "tag": {
+                  "Damage": 0
+                }
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
               "icon_frame_height": 24,
@@ -249,7 +252,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:starlit_lily_pad"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -270,7 +273,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:abyssal_magma_block"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -318,7 +321,7 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:seeking_eye"
               },
               "x": 57,
@@ -529,7 +532,7 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:orb_of_prophecy"
               },
               "x": 57,
@@ -688,7 +691,7 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:butterfly_wings_amulet"
               },
               "x": 2,
@@ -709,61 +712,6 @@
                 },
                 {
                   "content": "book.eternal_starlight.accessories.butterfly_wings_amulet",
-                  "translation": true
-                }
-              ],
-              "width": 100,
-              "x": 25,
-              "y": 10
-            }
-          ],
-          "total_height": 30,
-          "unlock_conditions": [
-            [
-              "eternal_starlight:advancement_enter_starlight"
-            ]
-          ]
-        }
-      },
-      {
-        "type": "eternal_starlight:display",
-        "config": {
-          "crafting_recipe_displays": [],
-          "entity_displays": [],
-          "id": "eternal_starlight:pearl_necklace_display",
-          "image_displays": [
-            {
-              "height": 20,
-              "location": "eternal_starlight:textures/gui/screen/book/slot.png",
-              "width": 20,
-              "x": 0,
-              "y": 5
-            }
-          ],
-          "item_displays": [
-            {
-              "item": {
-                "count": 1,
-                "id": "eternal_starlight:pearl_necklace"
-              },
-              "x": 2,
-              "y": 7
-            }
-          ],
-          "item_tag_displays": [],
-          "text_displays": [
-            {
-              "centered": false,
-              "line_height": 12,
-              "min_distance_to_bottom": 8,
-              "scale": 1.0,
-              "text": [
-                {
-                  "content": "${color: #acfffc}",
-                  "translation": false
-                },
-                {
-                  "content": "book.eternal_starlight.accessories.pearl_necklace",
                   "translation": true
                 }
               ],
@@ -964,7 +912,7 @@
           "entries": [
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:frozen_tube"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -985,8 +933,11 @@
             },
             {
               "icon": {
-                "count": 1,
-                "id": "eternal_starlight:coldsnap"
+                "Count": 1,
+                "id": "eternal_starlight:coldsnap",
+                "tag": {
+                  "Damage": 0
+                }
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
               "icon_frame_height": 24,
@@ -1006,7 +957,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:energy_transmitter"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -1027,7 +978,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:accumulator"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -1439,7 +1390,7 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:energy_transmitter"
               },
               "x": 57,
@@ -1577,7 +1528,7 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:accumulator"
               },
               "x": 57,
@@ -1879,7 +1830,7 @@
           "entries": [
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:tangled_skull"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -2100,7 +2051,7 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:aetherstrike_rocket"
               },
               "x": 57,
@@ -2341,8 +2292,11 @@
           "entries": [
             {
               "icon": {
-                "count": 1,
-                "id": "eternal_starlight:dagger_of_hunger"
+                "Count": 1,
+                "id": "eternal_starlight:dagger_of_hunger",
+                "tag": {
+                  "Damage": 0
+                }
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
               "icon_frame_height": 24,
@@ -2362,7 +2316,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:crystalborn_catalyst"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -2410,8 +2364,11 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
-                "id": "eternal_starlight:dagger_of_hunger"
+                "Count": 1,
+                "id": "eternal_starlight:dagger_of_hunger",
+                "tag": {
+                  "Damage": 0
+                }
               },
               "x": 57,
               "y": 12
@@ -2536,7 +2493,7 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:crystalborn_catalyst"
               },
               "x": 57,
@@ -2839,7 +2796,7 @@
           "entries": [
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:pungency_fruit"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -2860,7 +2817,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:silver_pungency_fruit"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -2881,8 +2838,11 @@
             },
             {
               "icon": {
-                "count": 1,
-                "id": "eternal_starlight:seeds_launcher"
+                "Count": 1,
+                "id": "eternal_starlight:seeds_launcher",
+                "tag": {
+                  "Damage": 0
+                }
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
               "icon_frame_height": 24,
@@ -2902,7 +2862,7 @@
             },
             {
               "icon": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:drying_rack"
               },
               "icon_frame": "eternal_starlight:textures/gui/screen/book/chapter_frame.png",
@@ -2950,7 +2910,7 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:pungency_fruit"
               },
               "x": 57,
@@ -3036,7 +2996,7 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:silver_pungency_fruit"
               },
               "x": 57,
@@ -3073,8 +3033,8 @@
               "eternal_starlight:entity_seen_stranghoul"
             ],
             [
-              "eternal_starlight:advancement_enter_starlight",
               "eternal_starlight:item_silver_pungency_fruit",
+              "eternal_starlight:advancement_enter_starlight",
               "eternal_starlight:entity_seen_stranghoul"
             ]
           ]
@@ -3121,8 +3081,8 @@
               "eternal_starlight:entity_seen_stranghoul"
             ],
             [
-              "eternal_starlight:advancement_enter_starlight",
               "eternal_starlight:item_silver_pungency_fruit",
+              "eternal_starlight:advancement_enter_starlight",
               "eternal_starlight:entity_seen_stranghoul"
             ]
           ]
@@ -3152,8 +3112,8 @@
               "eternal_starlight:entity_seen_stranghoul"
             ],
             [
-              "eternal_starlight:advancement_enter_starlight",
               "eternal_starlight:item_silver_pungency_fruit",
+              "eternal_starlight:advancement_enter_starlight",
               "eternal_starlight:entity_seen_stranghoul"
             ]
           ],
@@ -3180,8 +3140,11 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
-                "id": "eternal_starlight:seeds_launcher"
+                "Count": 1,
+                "id": "eternal_starlight:seeds_launcher",
+                "tag": {
+                  "Damage": 0
+                }
               },
               "x": 57,
               "y": 12
@@ -3264,7 +3227,7 @@
           "item_displays": [
             {
               "item": {
-                "count": 1,
+                "Count": 1,
                 "id": "eternal_starlight:drying_rack"
               },
               "x": 57,

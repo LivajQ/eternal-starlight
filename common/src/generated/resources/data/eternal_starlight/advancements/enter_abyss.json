@@ -1,0 +1,42 @@
+{
+  "parent": "eternal_starlight:enter_starlight",
+  "criteria": {
+    "in_biome": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "biome": "eternal_starlight:the_abyss"
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:location"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.eternal_starlight.enter_abyss.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "eternal_starlight:abysslate"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.eternal_starlight.enter_abyss.title"
+    }
+  },
+  "requirements": [
+    [
+      "in_biome"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

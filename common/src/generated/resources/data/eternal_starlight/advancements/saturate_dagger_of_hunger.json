@@ -1,0 +1,31 @@
+{
+  "parent": "eternal_starlight:obtain_dagger_of_hunger",
+  "criteria": {
+    "saturate": {
+      "conditions": {},
+      "trigger": "eternal_starlight:saturate_dagger_of_hunger"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.eternal_starlight.saturate_dagger_of_hunger.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "eternal_starlight:dagger_of_hunger",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.eternal_starlight.saturate_dagger_of_hunger.title"
+    }
+  },
+  "requirements": [
+    [
+      "saturate"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

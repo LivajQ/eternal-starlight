@@ -1,0 +1,35 @@
+{
+  "parent": "eternal_starlight:kill_golem",
+  "criteria": {
+    "ignite": {
+      "conditions": {
+        "item": {
+          "tag": "eternal_starlight:lunar_monstrosity_igniters"
+        }
+      },
+      "trigger": "minecraft:player_interacted_with_entity"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.eternal_starlight.ignite_lunar_monstrosity.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "eternal_starlight:saltpeter_matchbox",
+      "nbt": "{Damage:0}"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.eternal_starlight.ignite_lunar_monstrosity.title"
+    }
+  },
+  "requirements": [
+    [
+      "ignite"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

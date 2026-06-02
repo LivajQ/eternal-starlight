@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "F": {
+      "tag": "eternal_starlight:arrow_feathers"
+    },
+    "G": {
+      "tag": "c:gems/glacite"
+    },
+    "S": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    "G",
+    "S",
+    "F"
+  ],
+  "result": {
+    "count": 4,
+    "item": "eternal_starlight:glacite_arrow"
+  },
+  "show_notification": true
+}

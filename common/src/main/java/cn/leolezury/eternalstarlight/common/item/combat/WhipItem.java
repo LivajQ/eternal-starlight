@@ -104,7 +104,7 @@ public abstract class WhipItem extends TieredItem implements SwingAttackWeapon {
 			double x = entity.getX() + (entity.level().getRandom().nextFloat() - 0.5) * entity.getBbWidth();
 			double y = entity.getY() + entity.level().getRandom().nextFloat() * entity.getBbHeight();
 			double z = entity.getZ() + (entity.level().getRandom().nextFloat() - 0.5) * entity.getBbWidth();
-			serverLevel.sendParticles(ESExplosionParticleOptions.BLAST, x, y, z, 1, 0.2, 0.2, 0.2, 0.0);
+			serverLevel.sendParticles(ESExplosionParticleOptions.blast(), x, y, z, 1, 0.2, 0.2, 0.2, 0.0);
 			for (int i = 0; i < 4; i++) {
 				Vec3 speed = new Vec3((entity.level().getRandom().nextFloat() - entity.level().getRandom().nextFloat()) * 0.1F, entity.level().getRandom().nextFloat() * 0.05F, (entity.level().getRandom().nextFloat() - entity.level().getRandom().nextFloat()) * 0.1F).normalize();
 				ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ExplosionShockParticleOptions.BLAST, x + speed.x * 0.6, y + speed.y * 0.6, z + speed.z * 0.6, speed.x, speed.y, speed.z));

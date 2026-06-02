@@ -1,0 +1,32 @@
+{
+  "parent": "eternal_starlight:enter_starlight",
+  "criteria": {
+    "witnessed": {
+      "conditions": {
+        "weather": "eternalstarlight:witness_weather"
+      },
+      "trigger": "eternalstarlight:witness_weather"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.eternal_starlight.witness_meteor_shower.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "eternal_starlight:raw_aethersent"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.eternal_starlight.witness_meteor_shower.title"
+    }
+  },
+  "requirements": [
+    [
+      "witnessed"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

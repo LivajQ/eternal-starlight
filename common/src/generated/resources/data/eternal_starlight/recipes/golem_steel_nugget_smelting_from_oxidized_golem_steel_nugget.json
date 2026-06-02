@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 30,
+  "experience": 1.0,
+  "ingredient": {
+    "item": "eternal_starlight:oxidized_golem_steel_nugget"
+  },
+  "result": "eternal_starlight:golem_steel_nugget"
+}

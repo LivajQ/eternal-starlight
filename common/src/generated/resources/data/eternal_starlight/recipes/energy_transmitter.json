@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "N": {
+      "item": "eternal_starlight:golem_steel_nugget"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "S": {
+      "item": "minecraft:stone"
+    }
+  },
+  "pattern": [
+    " N ",
+    "RNR",
+    "SSS"
+  ],
+  "result": {
+    "item": "eternal_starlight:energy_transmitter"
+  },
+  "show_notification": true
+}

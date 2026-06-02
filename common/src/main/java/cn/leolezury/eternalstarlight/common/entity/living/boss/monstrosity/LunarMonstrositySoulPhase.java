@@ -29,7 +29,7 @@ public class LunarMonstrositySoulPhase extends BehaviorPhase<LunarMonstrosity> {
 				double dx = (random.nextDouble() * 4 + 2) * (random.nextBoolean() ? 1 : -1);
 				double dy = (random.nextDouble() * 4 + 2) * (random.nextBoolean() ? 1 : -1);
 				double dz = (random.nextDouble() * 4 + 2) * (random.nextBoolean() ? 1 : -1);
-				ESPlatform.INSTANCE.sendToTrackingClients(serverLevel, entity, new ParticlePacket(GatheringTrailParticleOptions.SOUL, entity.getX() - dx, entity.getY() + entity.getBbHeight() / 2 - dy, entity.getZ() - dz, dx, dy, dz));
+				ESPlatform.INSTANCE.sendToTrackingClients(serverLevel, entity, new ParticlePacket(GatheringTrailParticleOptions.soul(), entity.getX() - dx, entity.getY() + entity.getBbHeight() / 2 - dy, entity.getZ() - dz, dx, dy, dz));
 			}
 		}
 		if (entity.getBehaviorTicks() == 70) {

@@ -30,7 +30,7 @@ public class MeteorParticle extends TextureSheetParticle {
 	@Override
 	public void tick() {
 		super.tick();
-		level.addParticle(ESExplosionParticleOptions.AETHERSENT, true, x, y, z, 0, 0, 0);
+		level.addParticle(ESExplosionParticleOptions.aethersent(), true, x, y, z, 0, 0, 0);
 		this.effect.update(new Vec3(xo, yo, zo));
 		if (onGround) {
 			effect.setLength(Math.max(effect.getLength() - 0.75f, 0));

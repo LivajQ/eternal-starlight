@@ -11,8 +11,7 @@ import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class ESRegistryProvider extends DatapackBuiltinEntriesProvider
-{
+public class ESRegistryProvider extends DatapackBuiltinEntriesProvider {
 	public static final RegistrySetBuilder BUILDER = new RegistrySetBuilder()
 		//.add(Registries.ENCHANTMENT, ESEnchantments::bootstrap)
 		.add(Registries.CONFIGURED_CARVER, ESConfiguredWorldCarvers::bootstrap)
@@ -30,7 +29,7 @@ public class ESRegistryProvider extends DatapackBuiltinEntriesProvider
 		.add(Registries.TRIM_MATERIAL, ESTrimMaterials::bootstrap)
 		.add(Registries.TRIM_PATTERN, ESTrimPatterns::bootstrap)
 		//.add(Registries.JUKEBOX_SONG, ESJukeboxSongs::bootstrap)
-		.add(Registries.PAINTING_VARIANT, ESPaintingVariants::bootstrap)
+		//.add(Registries.PAINTING_VARIANT, ESPaintingVariants::bootstrap)
 		// custom
 		.add(ESRegistries.BIOME_DATA, ESBiomeData::bootstrap)
 		.add(ESRegistries.BOARWARF_TYPE, ESBoarwarfTypes::bootstrap)

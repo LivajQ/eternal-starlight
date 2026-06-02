@@ -47,11 +47,11 @@ public class FrozenBomb extends ThrowableItemProjectile {
 				serverLevel.sendParticles(ESParticles.ORBITAL_ASHEN_SNOW.get(), this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + (random.nextFloat() - 0.5f) * getBbHeight() * 8, this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 5, 0.2, 1.5, 0.2, 0.0);
 				ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ExplosionShockParticleOptions.FROZEN, getX() + (random.nextFloat() - 0.5f) * getBbWidth() * 5, getY(), getZ() + (random.nextFloat() - 0.5f) * getBbWidth() * 5, 0, 1, 0));
 			}
-			serverLevel.sendParticles(ESExplosionParticleOptions.FROZEN, this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 10, 1.5, 1.5, 1.5, 0);
-			serverLevel.sendParticles(ESExplosionParticleOptions.FROZEN_BLAST, this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 3, 0.2, 0.2, 0.2, 0.0);
+			serverLevel.sendParticles(ESExplosionParticleOptions.frozen(), this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 10, 1.5, 1.5, 1.5, 0);
+			serverLevel.sendParticles(ESExplosionParticleOptions.frozenBlast(), this.getX() + (this.random.nextFloat() - 0.5) * getBbWidth(), this.getY() + random.nextFloat() * getBbHeight(), this.getZ() + (this.random.nextFloat() - 0.5) * getBbWidth(), 3, 0.2, 0.2, 0.2, 0.0);
 			level().explode(this, this.getX(), this.getY(), this.getZ(), 3.0F, Level.ExplosionInteraction.TNT);
 			level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.0F);
-			serverLevel.sendParticles(ESExplosionParticleOptions.FROZEN, this.getX(), this.getY(), this.getZ(), 20, 0.5, 0.5, 0.5, 0.1);
+			serverLevel.sendParticles(ESExplosionParticleOptions.frozen(), this.getX(), this.getY(), this.getZ(), 20, 0.5, 0.5, 0.5, 0.1);
 			for (LivingEntity entity : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(3))) {
 				if (ESEntityUtil.shouldHarm(getOwner(), entity)) {
 					if (entity.canFreeze()) {

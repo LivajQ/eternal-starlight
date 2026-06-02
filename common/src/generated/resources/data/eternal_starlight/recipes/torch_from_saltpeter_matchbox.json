@@ -1,0 +1,10 @@
+{
+  "type": "eternal_starlight:tool_modification",
+  "category": "misc",
+  "input": "minecraft:stick",
+  "output": {
+    "count": 4,
+    "item": "minecraft:torch"
+  },
+  "tool": "eternal_starlight:saltpeter_matchbox"
+}

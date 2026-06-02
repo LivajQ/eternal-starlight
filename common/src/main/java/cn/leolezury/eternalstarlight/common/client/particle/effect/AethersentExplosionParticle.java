@@ -41,7 +41,7 @@ public class AethersentExplosionParticle extends NoRenderParticle {
 		for (int angle = 0; angle <= 360; angle += 10) {
 			Vec3 basePos = ESMathUtil.rotationToPosition(new Vec3(x, y, z), radius, 0, angle);
 			Vec3 pos = basePos.offsetRandom(random, 2);
-			level.addParticle(ESExplosionParticleOptions.AETHERSENT, true, pos.x, pos.y, pos.z, 0, 0, 0);
+			level.addParticle(ESExplosionParticleOptions.aethersent(), true, pos.x, pos.y, pos.z, 0, 0, 0);
 			pos = basePos.offsetRandom(random, 2);
 			level.addParticle(ParticleTypes.SMOKE, true, pos.x, pos.y, pos.z, 0, 0, 0);
 			pos = basePos.offsetRandom(random, 2);

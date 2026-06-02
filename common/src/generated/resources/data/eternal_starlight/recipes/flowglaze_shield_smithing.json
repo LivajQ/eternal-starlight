@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": {
+    "item": "eternal_starlight:flowglaze"
+  },
+  "base": {
+    "item": "eternal_starlight:glacite_shield"
+  },
+  "result": {
+    "item": "eternal_starlight:flowglaze_shield"
+  },
+  "template": {
+    "item": "eternal_starlight:flowglaze_upgrade_smithing_template"
+  }
+}

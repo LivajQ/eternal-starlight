@@ -1,0 +1,11 @@
+{
+  "type": "eternal_starlight:drying",
+  "duration_ticks": 150,
+  "fire_below": true,
+  "input": {
+    "item": "minecraft:clay_ball"
+  },
+  "output": {
+    "item": "minecraft:brick"
+  }
+}

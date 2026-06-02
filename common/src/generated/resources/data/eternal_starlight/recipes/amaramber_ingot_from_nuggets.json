@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "amaramber_ingot",
+  "key": {
+    "#": {
+      "item": "eternal_starlight:amaramber_nugget"
+    }
+  },
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "result": {
+    "item": "eternal_starlight:amaramber_ingot"
+  },
+  "show_notification": true
+}

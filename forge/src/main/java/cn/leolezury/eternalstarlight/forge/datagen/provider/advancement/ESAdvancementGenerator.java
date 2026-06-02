@@ -95,6 +95,7 @@ public class ESAdvancementGenerator implements AdvancementSubProvider {
 
 		Advancement redVelvetumossFlower = addItemObtain(consumer, enterAbyss, "obtain_red_velvetumoss_flower", ESItems.RED_VELVETUMOSS_FLOWER.get());
 
+		// TODO maybe figure out why getOrThrow is bitching about missing biome tag even though it gets generated (manual json causes duplicate error)
 		Advancement.Builder builder = Advancement.Builder.advancement()
 			.parent(enterDim)
 			.display(
@@ -107,24 +108,27 @@ public class ESAdvancementGenerator implements AdvancementSubProvider {
 			)
 			.requirements(RequirementsStrategy.OR);
 
-		HolderSet.Named<Biome> permafrostSet = biomes.getOrThrow(ESTags.Biomes.PERMAFROST);
+		builder.addCriterion(
+			"in_starlight_permafrost_forest",
+			PlayerTrigger.TriggerInstance.located(
+				LocationPredicate.Builder.location()
+					.setBiome(ESBiomes.STARLIGHT_PERMAFROST_FOREST)
+					.setY(MinMaxBounds.Doubles.atMost(-5))
+					.build()
+			)
+		);
 
-		for (Holder<Biome> biome : permafrostSet) {
-			ResourceKey<Biome> key = biome.unwrapKey().orElseThrow();
-
-			builder.addCriterion(
-				"in_" + key.location().getPath(),
-				PlayerTrigger.TriggerInstance.located(
-					LocationPredicate.Builder.location()
-						.setBiome(key)
-						.setY(MinMaxBounds.Doubles.atMost(-5))
-						.build()
-				)
-			);
-		}
+		builder.addCriterion(
+			"in_permafrost_peaks",
+			PlayerTrigger.TriggerInstance.located(
+				LocationPredicate.Builder.location()
+					.setBiome(ESBiomes.PERMAFROST_PEAKS)
+					.setY(MinMaxBounds.Doubles.atMost(-5))
+					.build()
+			)
+		);
 
 		Advancement underPermafrostForest = builder.save(consumer, EternalStarlight.ID + ":under_permafrost_forest");
-
 
 		Advancement glaciteShard = addItemObtain(consumer, underPermafrostForest, "obtain_glacite_shard", ESItems.GLACITE_SHARD.get());
 
@@ -194,7 +198,7 @@ public class ESAdvancementGenerator implements AdvancementSubProvider {
 			.addCriterion("tame", TameAnimalTrigger.TriggerInstance.tamedAnimal(EntityPredicate.Builder.entity().of(ESEntities.CRYSTALLIZED_MOTH.get()).build()))
 			.save(consumer, EternalStarlight.ID + ":tame_crystallized_moth");
 
-		Advancement inEtherFluid = addInFluid(consumer, enterDim, "in_ether_fluid", ESItems.ETHER_BUCKET.get(), fluids.getOrThrow(ESTags.Fluids.ETHER));
+		Advancement inEtherFluid = addInFluid(consumer, enterDim, "in_ether_fluid", ESItems.ETHER_BUCKET.get(), ESTags.Fluids.ETHER);
 
 		Advancement forgottenNocturnalMillet = addItemObtain(consumer, inEtherFluid, "obtain_forgotten_nocturnal_millet", ESItems.FORGOTTEN_NOCTURNAL_MILLET.get());
 
@@ -571,13 +575,26 @@ public class ESAdvancementGenerator implements AdvancementSubProvider {
 			.save(consumer, EternalStarlight.ID + ":" + id);
 	}
 
-	private static Advancement addInFluid(Consumer<Advancement> consumer, Advancement parent, String id, Item display, HolderSet<Fluid> fluids) {
-		return Advancement.Builder.advancement().parent(parent).display(
+	private static Advancement addInFluid(Consumer<Advancement> consumer, Advancement parent, String id, Item display, TagKey<Fluid> fluidTag) {
+		return Advancement.Builder.advancement()
+			.parent(parent)
+			.display(
 				display,
 				Component.translatable("advancements." + EternalStarlight.ID + "." + id + ".title"),
 				Component.translatable("advancements." + EternalStarlight.ID + "." + id + ".description"),
-				null, FrameType.TASK, true, true, false)
-			.addCriterion("in_fluid", PlayerTrigger.TriggerInstance.located(LocationPredicate.Builder.location().setFluid(FluidPredicate.Builder.fluid().of(fluids.unwrapKey().orElseThrow()).build()).build()))
+				null,
+				FrameType.TASK,
+				true, true, false
+			)
+			.addCriterion(
+				"in_fluid",
+				PlayerTrigger.TriggerInstance.located(
+					LocationPredicate.Builder.location()
+						.setFluid(FluidPredicate.Builder.fluid().of(fluidTag).build())
+						.build()
+				)
+			)
 			.save(consumer, EternalStarlight.ID + ":" + id);
 	}
+
 }

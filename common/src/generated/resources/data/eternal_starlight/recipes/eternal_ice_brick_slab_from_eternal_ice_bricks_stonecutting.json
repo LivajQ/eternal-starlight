@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 2,
+  "ingredient": {
+    "item": "eternal_starlight:eternal_ice_bricks"
+  },
+  "result": "eternal_starlight:eternal_ice_brick_slab"
+}

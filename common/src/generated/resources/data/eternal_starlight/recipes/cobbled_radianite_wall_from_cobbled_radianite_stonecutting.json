@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 1,
+  "ingredient": {
+    "item": "eternal_starlight:cobbled_radianite"
+  },
+  "result": "eternal_starlight:cobbled_radianite_wall"
+}

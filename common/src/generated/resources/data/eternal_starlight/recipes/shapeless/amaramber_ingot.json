@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:deepslate"
+    },
+    {
+      "tag": "c:raw_materials/amaramber"
+    }
+  ],
+  "result": {
+    "count": 2,
+    "item": "eternal_starlight:amaramber_ingot"
+  }
+}

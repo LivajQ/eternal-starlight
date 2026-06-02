@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "tag": "c:gems/malarite"
+    },
+    "H": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    "#",
+    "H",
+    "H"
+  ],
+  "result": {
+    "item": "eternal_starlight:malarite_shovel"
+  },
+  "show_notification": true
+}

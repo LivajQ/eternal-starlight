@@ -76,7 +76,7 @@ public class ESBookDefinitionProvider extends BookDefinitionProvider {
                         stack.save(tag);
                         return tag;
 					})),
-					new IndexBookComponent.Entry(simpleColoredTranslated(ESWeathers.METEOR_SHOWER.get().getDescriptionId()), EternalStarlight.id("meteor_shower_display"), new HashSet<>(), 24, 24, EternalStarlight.id("textures/gui/screen/book/chapter_frame.png"), Util.make(() -> {
+					new IndexBookComponent.Entry(simpleColoredTranslated("weather.eternal_starlight.meteor_shower"), EternalStarlight.id("meteor_shower_display"), new HashSet<>(), 24, 24, EternalStarlight.id("textures/gui/screen/book/chapter_frame.png"), Util.make(() -> {
 						ItemStack stack = ESItems.AETHERSTRIKE_ROCKET.get().getDefaultInstance();
 						CompoundTag tag = new CompoundTag();
                         stack.save(tag);
@@ -407,7 +407,7 @@ public class ESBookDefinitionProvider extends BookDefinitionProvider {
 				new ConfiguredBookComponent<>(BookComponentRegistry.DISPLAY, new DisplayBookComponent.Config(EternalStarlight.id("meteor_shower_display"), new HashSet<>(Set.of(
 					Sets.newHashSet(EternalStarlight.id("advancement_enter_starlight"))
 				)), 60)
-					.textDisplay(simpleColoredTranslated(ESWeathers.METEOR_SHOWER.get().getDescriptionId()), true, 65, 45, 110, 12, 3, 1.5f)
+					.textDisplay(simpleColoredTranslated("weather.eternal_starlight.meteor_shower"), true, 65, 45, 110, 12, 3, 1.5f)
 					.imageDisplay(EternalStarlight.id("textures/gui/screen/book/slot.png"), 55, 10, 20, 20)
 					.itemDisplay(Util.make(() -> {
 						ItemStack stack = ESItems.AETHERSTRIKE_ROCKET.get().getDefaultInstance();

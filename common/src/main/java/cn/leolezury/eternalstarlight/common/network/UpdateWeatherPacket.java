@@ -18,13 +18,14 @@ public class UpdateWeatherPacket implements ESPacket {
 	}
 
 	public static UpdateWeatherPacket read(FriendlyByteBuf buf) {
-		AbstractWeather weather = ESWeathers.WEATHERS.registry().byId(buf.readVarInt());
+		ResourceLocation id = buf.readResourceLocation();
+		AbstractWeather weather = ESWeathers.WEATHERS.get(id);
 		return new UpdateWeatherPacket(weather);
 	}
 
 	@Override
 	public void write(FriendlyByteBuf buf) {
-		buf.writeVarInt(ESWeathers.WEATHERS.registry().getId(weather));
+		buf.writeResourceLocation(ESWeathers.WEATHERS.getId(weather));
 	}
 
 	@Override

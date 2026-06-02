@@ -307,7 +307,7 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 			if (entity.overheatTicks >= getTotalOverheatTicks()) {
 				level.destroyBlock(pos, false);
 				if (level instanceof ServerLevel serverLevel) {
-					serverLevel.sendParticles(ESExplosionParticleOptions.LAVA,
+					serverLevel.sendParticles(ESExplosionParticleOptions.lava(),
 						pos.getX() + level.getRandom().nextFloat(),
 						pos.getY() + level.getRandom().nextFloat() + 1.5,
 						pos.getZ() + level.getRandom().nextFloat(),

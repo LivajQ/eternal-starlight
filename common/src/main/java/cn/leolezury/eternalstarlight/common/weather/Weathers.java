@@ -19,7 +19,7 @@ public class Weathers extends SavedData {
 	public Weathers(ServerLevel serverLevel) {
 		this.serverLevel = serverLevel;
 
-		ESWeathers.WEATHERS.registry().forEach(weather -> {
+		ESWeathers.WEATHERS.values().forEach(weather -> {
 			WeatherInstance instance = new WeatherInstance(serverLevel, weather);
 			weathers.add(instance);
 		});
@@ -93,9 +93,9 @@ public class Weathers extends SavedData {
 
 			data.weathers.clear();
 
-			ESWeathers.WEATHERS.registry().forEach(weather -> {
+			ESWeathers.WEATHERS.values().forEach(weather -> {
 				WeatherInstance instance = new WeatherInstance(serverLevel, weather);
-				String id = Objects.requireNonNull(ESWeathers.WEATHERS.registry().getKey(weather)).toString();
+				String id = Objects.requireNonNull(ESWeathers.WEATHERS.getId(weather)).toString();
 
 				if (weathersTag.contains(id, CompoundTag.TAG_COMPOUND)) {
 					instance.load(weathersTag.getCompound(id));
@@ -113,7 +113,7 @@ public class Weathers extends SavedData {
 		CompoundTag weathersTag = new CompoundTag();
 
 		for (WeatherInstance instance : weathers) {
-			String id = Objects.requireNonNull(ESWeathers.WEATHERS.registry().getKey(instance.getWeather())).toString();
+			String id = Objects.requireNonNull(ESWeathers.WEATHERS.getId(instance.getWeather())).toString();
 			CompoundTag weatherTag = new CompoundTag();
 			instance.save(weatherTag);
 			weathersTag.put(id, weatherTag);

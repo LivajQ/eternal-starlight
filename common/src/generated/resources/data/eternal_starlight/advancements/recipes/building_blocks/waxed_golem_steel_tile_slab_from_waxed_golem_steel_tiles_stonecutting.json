@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "eternal_starlight:waxed_golem_steel_tile_slab_from_waxed_golem_steel_tiles_stonecutting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_waxed_golem_steel_tiles": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "eternal_starlight:waxed_golem_steel_tiles"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_waxed_golem_steel_tiles",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "eternal_starlight:waxed_golem_steel_tile_slab_from_waxed_golem_steel_tiles_stonecutting"
+    ]
+  },
+  "sends_telemetry_event": false
+}

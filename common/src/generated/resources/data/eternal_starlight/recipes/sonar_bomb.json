@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "G": {
+      "item": "eternal_starlight:shivering_gel"
+    },
+    "N": {
+      "tag": "c:nuggets/deepsilver"
+    }
+  },
+  "pattern": [
+    " N ",
+    "NGN",
+    " N "
+  ],
+  "result": {
+    "count": 12,
+    "item": "eternal_starlight:sonar_bomb"
+  },
+  "show_notification": true
+}

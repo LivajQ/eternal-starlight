@@ -6,7 +6,7 @@
       "amount_addition": -0.005,
       "attribute": "minecraft:generic.movement_speed",
       "id": "eternal_starlight:crest.boulders_shield.speed",
-      "operation": "add_value"
+      "operation": 0
     }
   ],
   "max_level": 2,

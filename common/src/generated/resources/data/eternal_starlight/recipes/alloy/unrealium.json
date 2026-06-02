@@ -1,0 +1,28 @@
+{
+  "type": "eternal_starlight:alloy",
+  "burn_time": 400,
+  "ingredients": [
+    {
+      "tag": "c:ingots/deepsilver"
+    },
+    {
+      "tag": "c:ingots/golem_steel"
+    },
+    {
+      "tag": "c:gems/malarite"
+    },
+    {
+      "item": "eternal_starlight:soul_dew"
+    }
+  ],
+  "results": [
+    {
+      "amount_max": 1,
+      "amount_min": 1,
+      "item": {
+        "count": 1,
+        "item": "eternal_starlight:unrealium_ingot"
+      }
+    }
+  ]
+}

@@ -275,8 +275,8 @@ public class StarlightGolem extends ESBoss implements RayAttackUser {
 			level().broadcastEntityEvent(this, (byte) 60);
 			playSound(SoundEvents.GENERIC_EXPLODE);
 			if (level() instanceof ServerLevel serverLevel) {
-				serverLevel.sendParticles(ESExplosionParticleOptions.ENERGY, getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
-				serverLevel.sendParticles(ESExplosionParticleOptions.ENERGY_BLAST, getX(), getY() + getBbHeight() / 2, getZ(), 5, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
+				serverLevel.sendParticles(ESExplosionParticleOptions.energy(), getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
+				serverLevel.sendParticles(ESExplosionParticleOptions.energyBlast(), getX(), getY() + getBbHeight() / 2, getZ(), 5, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
 				for (int i = 0; i < 25; i++) {
 					Vec3 speed = new Vec3((this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F, (this.random.nextFloat() - this.random.nextFloat()) * 0.1F).normalize();
 					ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ExplosionShockParticleOptions.ENERGY, position().x + speed.x * 1.2, position().y + speed.y * 1.2, position().z + speed.z * 1.2, speed.x, speed.y, speed.z));
@@ -412,7 +412,7 @@ public class StarlightGolem extends ESBoss implements RayAttackUser {
 				for (BlockPos pos : nearbyEnergyBlocks) {
 					Vec3 energySource = pos.getCenter();
 					Vec3 energyMotion = position().add(0, getBbHeight() / 4, 0).subtract(energySource);
-					ESPlatform.INSTANCE.sendToTrackingClients(serverLevel, this, new ParticlePacket(GatheringTrailParticleOptions.ENERGY, energySource.x, energySource.y, energySource.z, energyMotion.x, energyMotion.y, energyMotion.z));
+					ESPlatform.INSTANCE.sendToTrackingClients(serverLevel, this, new ParticlePacket(GatheringTrailParticleOptions.energy(), energySource.x, energySource.y, energySource.z, energyMotion.x, energyMotion.y, energyMotion.z));
 				}
 			}
 			if (getBehaviorState() == StarlightGolemChargePhase.ID) {
@@ -430,7 +430,7 @@ public class StarlightGolem extends ESBoss implements RayAttackUser {
 					if (pos.distToCenterSqr(position()) < (getBbWidth() * getBbWidth()) * 2 && level().getBlockState(pos).is(Blocks.LAVA) && ESPlatform.INSTANCE.postEntityDestroyBlockEvent(level(), pos, this)) {
 						level().setBlockAndUpdate(pos, Blocks.MAGMA_BLOCK.defaultBlockState());
 						if (level() instanceof ServerLevel serverLevel) {
-							serverLevel.sendParticles(ESExplosionParticleOptions.LAVA, pos.getCenter().x, pos.getCenter().y + 0.6, pos.getCenter().z, 1, 0, 0, 0, 0);
+							serverLevel.sendParticles(ESExplosionParticleOptions.lava(), pos.getCenter().x, pos.getCenter().y + 0.6, pos.getCenter().z, 1, 0, 0, 0, 0);
 						}
 					}
 				}

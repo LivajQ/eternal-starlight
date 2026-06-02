@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "tag": "c:ingots/amaramber"
+    },
+    "H": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    "###",
+    "  H"
+  ],
+  "result": {
+    "item": "eternal_starlight:candlash"
+  },
+  "show_notification": true
+}

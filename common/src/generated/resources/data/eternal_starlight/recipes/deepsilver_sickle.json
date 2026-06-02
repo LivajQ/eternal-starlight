@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "tag": "c:ingots/deepsilver"
+    },
+    "H": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    "##",
+    " #",
+    " H"
+  ],
+  "result": {
+    "item": "eternal_starlight:deepsilver_sickle"
+  },
+  "show_notification": true
+}

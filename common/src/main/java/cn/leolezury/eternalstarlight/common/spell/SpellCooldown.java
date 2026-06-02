@@ -2,6 +2,7 @@ package cn.leolezury.eternalstarlight.common.spell;
 
 import cn.leolezury.eternalstarlight.common.registry.ESSpells;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
 public class SpellCooldown {
 
@@ -34,13 +35,15 @@ public class SpellCooldown {
 	}
 
 	public void write(FriendlyByteBuf buf) {
-		buf.writeVarInt(ESSpells.SPELLS.registry().getId(spell));
+		buf.writeResourceLocation(ESSpells.SPELLS.getId(spell));
 		buf.writeVarInt(cooldown);
 	}
 
 	public static SpellCooldown read(FriendlyByteBuf buf) {
-		AbstractSpell spell = ESSpells.SPELLS.registry().byId(buf.readVarInt());
+		ResourceLocation id = buf.readResourceLocation();
+		AbstractSpell spell = ESSpells.SPELLS.get(id);
 		int cooldown = buf.readVarInt();
 		return new SpellCooldown(spell, cooldown);
 	}
+
 }

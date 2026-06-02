@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "N": {
+      "tag": "forge:nuggets"
+    },
+    "P": {
+      "item": "eternal_starlight:tenacious_petal"
+    },
+    "S": {
+      "item": "eternal_starlight:soul_dew"
+    },
+    "V": {
+      "item": "eternal_starlight:tenacious_vine"
+    }
+  },
+  "pattern": [
+    "P  ",
+    "SVV",
+    "P N"
+  ],
+  "result": {
+    "item": "eternal_starlight:chain_of_souls"
+  },
+  "show_notification": true
+}

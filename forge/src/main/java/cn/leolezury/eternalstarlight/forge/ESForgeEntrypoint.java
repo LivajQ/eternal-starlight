@@ -4,23 +4,23 @@ import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.handler.ESCommonSetupHandler;
 import cn.leolezury.eternalstarlight.forge.platform.ESForgePlatform;
 import cn.leolezury.eternalstarlight.forge.registry.ESFluidTypes;
-import com.mojang.datafixers.util.Pair;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.NewRegistryEvent;
-import net.minecraftforge.registries.RegisterEvent;
+import net.minecraftforge.registries.*;
+
+import java.util.function.Supplier;
 
 @Mod(EternalStarlight.ID)
 public class ESForgeEntrypoint {
 
 	public ESForgeEntrypoint(FMLJavaModLoadingContext context) {
 		IEventBus modBus = context.getModEventBus();
+		ESForgePlatform.init(modBus);
+		ESFluidTypes.loadClass();
+		EternalStarlight.init();
 		modBus.addListener(this::onCommonSetup);
 		modBus.addListener(this::onRegister);
 		modBus.addListener(this::onNewRegistry);
@@ -33,8 +33,6 @@ public class ESForgeEntrypoint {
 
 	private void onCommonSetup(FMLCommonSetupEvent event) {
 		event.enqueueWork(() -> {
-			ESFluidTypes.loadClass();
-			EternalStarlight.init();
 		});
 	}
 
@@ -47,8 +45,13 @@ public class ESForgeEntrypoint {
 	}
 
 	private void onNewRegistry(NewRegistryEvent event) {
-		for (Pair<ResourceKey<? extends Registry<?>>, Registry<?>> pair : ESForgePlatform.PENDING_NEW_REGISTRIES) {
-			ESForgePlatform.registerIntoRoot(pair.getFirst(), pair.getSecond());
+		for (ESForgePlatform.CustomRegistryEntry<?> entry : ESForgePlatform.CUSTOM_REGISTRIES) {
+			bindEntry(event, entry);
 		}
+	}
+
+	private <T> void bindEntry(NewRegistryEvent event, ESForgePlatform.CustomRegistryEntry<T> entry) {
+		Supplier<IForgeRegistry<T>> sup = event.create(entry.builder);
+		entry.provider.bind(sup);
 	}
 }

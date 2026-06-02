@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "item": "eternal_starlight:tooth_of_hunger"
+    },
+    "H": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "pattern": [
+    "#",
+    "#",
+    "H"
+  ],
+  "result": {
+    "item": "eternal_starlight:dagger_of_hunger"
+  },
+  "show_notification": true
+}

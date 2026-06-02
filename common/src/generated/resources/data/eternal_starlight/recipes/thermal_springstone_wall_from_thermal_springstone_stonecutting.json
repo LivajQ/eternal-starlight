@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 1,
+  "ingredient": {
+    "item": "eternal_starlight:thermal_springstone"
+  },
+  "result": "eternal_starlight:thermal_springstone_wall"
+}

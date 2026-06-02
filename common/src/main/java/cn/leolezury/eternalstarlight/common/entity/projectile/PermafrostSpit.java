@@ -86,7 +86,7 @@ public class PermafrostSpit extends ThrowableProjectile implements TrailOwner {
 				}
 			}
 			if (level() instanceof ServerLevel serverLevel) {
-				serverLevel.sendParticles(ESExplosionParticleOptions.ENERGY, getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
+				serverLevel.sendParticles(ESExplosionParticleOptions.energy(), getX(), getY() + getBbHeight() / 2, getZ(), 20, getBbWidth() / 2, getBbHeight() / 2, getBbWidth() / 2, 0);
 			}
 			for (int x = -4; x <= 4; x++) {
 				for (int y = -4; y <= 4; y++) {

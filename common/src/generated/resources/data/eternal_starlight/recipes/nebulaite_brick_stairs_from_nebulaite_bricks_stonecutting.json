@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 1,
+  "ingredient": {
+    "item": "eternal_starlight:nebulaite_bricks"
+  },
+  "result": "eternal_starlight:nebulaite_brick_stairs"
+}

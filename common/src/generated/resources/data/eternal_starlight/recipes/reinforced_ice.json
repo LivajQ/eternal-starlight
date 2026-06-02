@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": {
+      "tag": "c:gems/glacite"
+    },
+    "I": {
+      "item": "minecraft:ice"
+    }
+  },
+  "pattern": [
+    "GIG",
+    "III",
+    "GIG"
+  ],
+  "result": {
+    "count": 8,
+    "item": "eternal_starlight:reinforced_ice"
+  },
+  "show_notification": true
+}

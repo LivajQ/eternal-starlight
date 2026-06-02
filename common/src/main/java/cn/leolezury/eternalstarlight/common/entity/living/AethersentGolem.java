@@ -154,13 +154,13 @@ public class AethersentGolem extends AbstractGolem {
 							Vec3 speed = new Vec3((this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F, (this.random.nextFloat() - this.random.nextFloat()) * 0.1F).normalize().scale(0.15);
 							level().addParticle(ParticleTypes.LARGE_SMOKE, leftMuzzlePos.x, leftMuzzlePos.y, leftMuzzlePos.z, speed.x, speed.y, speed.z);
 						}
-						level().addParticle(ESExplosionParticleOptions.AETHERSENT, leftMuzzlePos.x, leftMuzzlePos.y, leftMuzzlePos.z, 0, 0, 0);
+						level().addParticle(ESExplosionParticleOptions.aethersent(), leftMuzzlePos.x, leftMuzzlePos.y, leftMuzzlePos.z, 0, 0, 0);
 					} else {
 						for (int i = 0; i < 15; i++) {
 							Vec3 speed = new Vec3((this.random.nextFloat() - this.random.nextFloat()) * 0.1F, this.random.nextFloat() * 0.05F, (this.random.nextFloat() - this.random.nextFloat()) * 0.1F).normalize().scale(0.15);
 							level().addParticle(ParticleTypes.LARGE_SMOKE, rightMuzzlePos.x, rightMuzzlePos.y, rightMuzzlePos.z, speed.x, speed.y, speed.z);
 						}
-						level().addParticle(ESExplosionParticleOptions.AETHERSENT, rightMuzzlePos.x, rightMuzzlePos.y, rightMuzzlePos.z, 0, 0, 0);
+						level().addParticle(ESExplosionParticleOptions.aethersent(), rightMuzzlePos.x, rightMuzzlePos.y, rightMuzzlePos.z, 0, 0, 0);
 					}
 					shouldAddShootParticle = false;
 				}

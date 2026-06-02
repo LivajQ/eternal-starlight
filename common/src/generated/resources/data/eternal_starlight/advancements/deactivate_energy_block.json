@@ -1,0 +1,30 @@
+{
+  "parent": "eternal_starlight:freeze_starlight_golem",
+  "criteria": {
+    "deactivate": {
+      "conditions": {},
+      "trigger": "eternal_starlight:deactivate_energy_block"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.eternal_starlight.deactivate_energy_block.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "eternal_starlight:energy_block"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.eternal_starlight.deactivate_energy_block.title"
+    }
+  },
+  "requirements": [
+    [
+      "deactivate"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

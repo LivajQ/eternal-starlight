@@ -7,15 +7,12 @@ import cn.leolezury.eternalstarlight.common.platform.registry.*;
 import cn.leolezury.eternalstarlight.common.registry.ESCreativeModeTabs;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
+import cn.leolezury.eternalstarlight.forge.item.DeferredMobBucketItem;
 import cn.leolezury.eternalstarlight.forge.network.ESForgeNetworkHandler;
-import cn.leolezury.eternalstarlight.forge.platform.registry.LazyRegistryObject;
 import com.google.auto.service.AutoService;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.Lifecycle;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.Registry;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -24,18 +21,20 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -43,9 +42,12 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.*;
 
@@ -53,8 +55,14 @@ import java.util.function.*;
 public class ESForgePlatform implements ESPlatform {
 
 	public static final List<DeferredRegister<?>> REGISTERS = new ArrayList<>();
-	public static final List<Pair<ResourceKey<? extends Registry<?>>, Registry<?>>> PENDING_NEW_REGISTRIES = new ArrayList<>();
+	public static final List<RegistryBuilder<?>> CUSTOM_BUILDERS = new ArrayList<>();
+	public static final List<CustomRegistryEntry<?>> CUSTOM_REGISTRIES = new ArrayList<>();
 
+	public static IEventBus EVENT_BUS;
+
+	public static void init(IEventBus event) {
+		EVENT_BUS = event;
+	}
 
 	@Override
 	public Loader getLoader() {
@@ -71,105 +79,176 @@ public class ESForgePlatform implements ESPlatform {
 		return FMLPaths.CONFIGDIR.get();
 	}
 
-	/*
 	@Override
-	@SuppressWarnings("unchecked")
 	public <T> RegistrationProvider<T> createRegistrationProvider(ResourceKey<? extends Registry<T>> key, String namespace) {
-		Registry<T> reg = (Registry<T>) BuiltInRegistries.REGISTRY.get(key.location());
-		if (reg == null) throw new IllegalStateException("Registry not found: " + key.location());
-
-		return new ForgeVanillaRegistrationProvider<>(key, reg, namespace);
-	}
-	 */
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> RegistrationProvider<T> createRegistrationProvider(ResourceKey<? extends Registry<T>> key, String namespace) {
-		ForgeRegistrationProvider<T> provider = new ForgeRegistrationProvider<>(key, namespace);
+		ForgeRegistrationProvider<T> provider = new ForgeRegistrationProvider<>(key, null, namespace);
 		if (!REGISTERS.contains(provider.deferredRegister)) {
 			REGISTERS.add(provider.deferredRegister);
 		}
 		return provider;
 	}
 
-	/*
 	@Override
 	public <T> RegistrationProvider<T> createNewRegistryProvider(ResourceKey<? extends Registry<T>> key, String namespace) {
-		Registry<T> reg = createMojangRegistry(key);
-		registerIntoRoot(key, reg);
-		return new ForgeVanillaRegistrationProvider<>(key, reg, namespace);
-	}
-	 */
+		RegistryBuilder<T> builder = new RegistryBuilder<>();
+		builder.setName(key.location());
+		ForgeCustomRegistrationProvider<T> provider = new ForgeCustomRegistrationProvider<>(key, namespace, builder);
+		ESForgePlatform.CUSTOM_REGISTRIES.add(new CustomRegistryEntry<>(builder, provider));
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> RegistrationProvider<T> createNewRegistryProvider(ResourceKey<? extends Registry<T>> key, String namespace) {
-		Registry<T> reg = createMojangRegistry(key);
-		PENDING_NEW_REGISTRIES.add(Pair.of((ResourceKey<? extends Registry<?>>) (ResourceKey<?>) key, (Registry<?>) reg));
-		return new ForgeVanillaRegistrationProvider<>(key, reg, namespace);
+		return provider;
 	}
 
-	//more garbage courtesy of forge
-	@SuppressWarnings("unchecked")
-	private static <T> Registry<T> createMojangRegistry(ResourceKey<? extends Registry<T>> key) {
-		ResourceKey<Registry<T>> cast = (ResourceKey<Registry<T>>) key;
-		return new MappedRegistry<>(cast, Lifecycle.stable(), false);
-	}
 
-	@SuppressWarnings("unchecked")
-	public static void registerIntoRoot(ResourceKey<? extends Registry<?>> key, Registry<?> registry) {
-		MappedRegistry<Registry<?>> root = (MappedRegistry<Registry<?>>) BuiltInRegistries.REGISTRY;
-		root.register((ResourceKey<Registry<?>>) (ResourceKey<?>) key, (Registry<Object>) registry, Lifecycle.stable());
-	}
-
-	static class ForgeRegistrationProvider<T> implements RegistrationProvider<T> {
-		private final ResourceKey<? extends Registry<T>> key;
-		private final String namespace;
-		final DeferredRegister<T> deferredRegister;
-
-		@SuppressWarnings("unchecked")
-		public ForgeRegistrationProvider(ResourceKey<? extends Registry<T>> key, String namespace) {
-			this.key = key;
-			this.namespace = namespace;
-			this.deferredRegister = DeferredRegister.create((ResourceKey<Registry<T>>) key, namespace);
-		}
-
-		@Override
-		public Registry<T> registry() {
-			return (Registry<T>) BuiltInRegistries.REGISTRY.get(key.location());
-		}
-
-		@Override
-		public <I extends T> RegistryObject<T, I> register(String id, Supplier<? extends I> supplier) {
-			net.minecraftforge.registries.RegistryObject<I> forgeObj = deferredRegister.register(id, supplier);
-			ResourceLocation rl = new ResourceLocation(namespace, id);
-			return new LazyRegistryObject<>(rl, forgeObj, key);
-		}
-	}
-
-	static class ForgeVanillaRegistrationProvider<T> implements RegistrationProvider<T> {
+	public static class ForgeRegistrationProvider<T> implements RegistrationProvider<T> {
 		private final ResourceKey<? extends Registry<T>> key;
 		private final Registry<T> registry;
+		private final DeferredRegister<T> deferredRegister;
 		private final String namespace;
 
-		public ForgeVanillaRegistrationProvider(ResourceKey<? extends Registry<T>> key, Registry<T> registry, String namespace) {
+		ForgeRegistrationProvider(ResourceKey<? extends Registry<T>> key, Registry<T> registry, String namespace) {
 			this.key = key;
 			this.registry = registry;
+			this.deferredRegister = DeferredRegister.create(key, namespace);
 			this.namespace = namespace;
 		}
 
 		@Override
 		public Registry<T> registry() {
-			return registry;
+			return registry == null ? (Registry<T>) BuiltInRegistries.REGISTRY.get(key.location()) : registry;
+		}
+
+		@Override
+		public T get(ResourceLocation id) {
+			return registry().get(id);
+		}
+
+		@Override
+		public ResourceLocation getId(T value) {
+			return registry().getKey(value);
+		}
+
+		@Override
+		public Collection<T> values() {
+			return registry().stream().toList();
 		}
 
 		@Override
 		public <I extends T> RegistryObject<T, I> register(String id, Supplier<? extends I> supplier) {
-			ResourceLocation rl = new ResourceLocation(namespace, id);
-			I instance = supplier.get();
-			Registry.register(registry, rl, instance);
+			ResourceLocation location = new ResourceLocation(namespace, id);
+			ResourceKey<I> resourceKey = (ResourceKey<I>) ResourceKey.create(key, location);
+			net.minecraftforge.registries.RegistryObject<I> forgeObj = deferredRegister.register(id, supplier);
+			FakeDeferredHolder<T> fakeHolder = new FakeDeferredHolder<>(resourceKey, key);
 
-			return new SimpleRegistryObject<>(rl, instance, key);
+			return new RegistryObject<>() {
+				@Override
+				public Holder<T> asHolder() {
+					return fakeHolder;
+				}
+
+				@Override
+				public ResourceKey<I> getResourceKey() {
+					return resourceKey;
+				}
+
+				@Override
+				public ResourceLocation getId() {
+					return location;
+				}
+
+				@Override
+				public I get() {
+					return forgeObj.get();
+				}
+			};
+		}
+	}
+
+	public static class ForgeCustomRegistrationProvider<T> implements RegistrationProvider<T> {
+		private final ResourceKey<? extends Registry<T>> key;
+		private final String namespace;
+		private final RegistryBuilder<T> builder;
+		private Supplier<IForgeRegistry<T>> registrySupplier;
+
+		ForgeCustomRegistrationProvider(ResourceKey<? extends Registry<T>> key, String namespace, RegistryBuilder<T> builder) {
+			this.key = key;
+			this.namespace = namespace;
+			this.builder = builder;
+		}
+
+		public void bind(Supplier<IForgeRegistry<T>> reg) {
+			System.out.println("WEEE binding supplier: " + reg);
+			this.registrySupplier = reg;
+		}
+
+		private IForgeRegistry<T> forgeRegistry() {
+			IForgeRegistry<T> reg = registrySupplier.get();
+			if (reg == null) {
+				throw new IllegalStateException("Forge custom registry not constructed yet for " + key.location());
+			}
+			return reg;
+		}
+
+
+		@Override
+		public Registry<T> registry() {
+			throw new UnsupportedOperationException("Forge custom registries are IForgeRegistry, not Mojang Registry");
+		}
+
+		@Override
+		public T get(ResourceLocation id) {
+			return forgeRegistry().getValue(id);
+		}
+
+		@Override
+		public ResourceLocation getId(T value) {
+			return forgeRegistry().getKey(value);
+		}
+
+		@Override
+		public Collection<T> values() {
+			return forgeRegistry().getValues();
+		}
+
+		@Override
+		public <I extends T> RegistryObject<T, I> register(String id, Supplier<? extends I> supplier) {
+			ResourceLocation loc = new ResourceLocation(namespace, id);
+
+			return new RegistryObject<>() {
+				@Override
+				public Holder<T> asHolder() {
+					throw new UnsupportedOperationException("Forge custom registries do not support Holder<T>");
+				}
+
+				@Override
+				@SuppressWarnings("unchecked")
+				public ResourceKey<I> getResourceKey() {
+					return (ResourceKey<I>) ResourceKey.create(
+						(ResourceKey<? extends Registry<I>>) key,
+						loc
+					);
+				}
+
+				@Override
+				public ResourceLocation getId() {
+					return loc;
+				}
+
+				@Override
+				@SuppressWarnings("unchecked")
+				public I get() {
+					return (I) forgeRegistry().getValue(loc);
+				}
+			};
+		}
+	}
+
+	public static class CustomRegistryEntry<T> {
+		public final RegistryBuilder<T> builder;
+		public final ForgeCustomRegistrationProvider<T> provider;
+
+		public CustomRegistryEntry(RegistryBuilder<T> builder, ForgeCustomRegistrationProvider<T> provider) {
+			this.builder = builder;
+			this.provider = provider;
 		}
 	}
 
@@ -228,6 +307,16 @@ public class ESForgePlatform implements ESPlatform {
 	@Override
 	public boolean isShield(ItemStack stack) {
 		return stack.getItem() instanceof ShieldItem;
+	}
+
+	@Override
+	public SpawnEggItem createSpawnEgg(Supplier<EntityType<? extends Mob>> type, int bg, int hl, Item.Properties properties) {
+		return new ForgeSpawnEggItem(type, bg, hl, properties);
+	}
+
+	@Override
+	public Item createMobBucket(Supplier<? extends EntityType<? extends Mob>> type, Fluid fluid, SoundEvent sound, Item.Properties props) {
+		return new DeferredMobBucketItem(type, fluid, sound, props);
 	}
 
 	@Override

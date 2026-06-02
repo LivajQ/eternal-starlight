@@ -5,8 +5,10 @@
     "decorations": [],
     "height": {
       "type": "minecraft:uniform",
-      "max_inclusive": 25,
-      "min_inclusive": 15
+      "value": {
+        "max_inclusive": 25,
+        "min_inclusive": 15
+      }
     },
     "pillar": {
       "type": "minecraft:weighted_state_provider",
@@ -27,13 +29,17 @@
     },
     "radius": {
       "type": "minecraft:uniform",
-      "max_inclusive": 5,
-      "min_inclusive": 3
+      "value": {
+        "max_inclusive": 5,
+        "min_inclusive": 3
+      }
     },
     "rotation": {
       "type": "minecraft:uniform",
-      "max_inclusive": 30,
-      "min_inclusive": 15
+      "value": {
+        "max_inclusive": 30,
+        "min_inclusive": 15
+      }
     }
   }
 }

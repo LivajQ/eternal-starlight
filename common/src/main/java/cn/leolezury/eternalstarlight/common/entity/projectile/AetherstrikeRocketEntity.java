@@ -99,7 +99,7 @@ public class AetherstrikeRocketEntity extends Projectile implements ItemSupplier
 
 		this.life++;
 		if (this.level().isClientSide && life % 2 == 0) {
-			this.level().addParticle(ESExplosionParticleOptions.AETHERSENT, this.getX() - movement.x, this.getY() - movement.y, this.getZ() - movement.z, this.random.nextGaussian() * 0.05, -this.getDeltaMovement().y * 0.5, this.random.nextGaussian() * 0.05);
+			this.level().addParticle(ESExplosionParticleOptions.aethersent(), this.getX() - movement.x, this.getY() - movement.y, this.getZ() - movement.z, this.random.nextGaussian() * 0.05, -this.getDeltaMovement().y * 0.5, this.random.nextGaussian() * 0.05);
 		}
 
 		if (!this.level().isClientSide && this.life > this.lifetime) {
@@ -115,7 +115,7 @@ public class AetherstrikeRocketEntity extends Projectile implements ItemSupplier
 				Vec3 vec3 = position().offsetRandom(level().getRandom(), 1.5f);
 				for (int s = 0; s < serverLevel.players().size(); s++) {
 					ServerPlayer serverPlayer = serverLevel.players().get(s);
-					serverLevel.sendParticles(serverPlayer, ESExplosionParticleOptions.AETHERSENT, true, vec3.x, vec3.y, vec3.z, 3, 0, 0, 0, 0);
+					serverLevel.sendParticles(serverPlayer, ESExplosionParticleOptions.aethersent(), true, vec3.x, vec3.y, vec3.z, 3, 0, 0, 0, 0);
 				}
 			}
 			for (int i = 0; i < 30; i++) {
