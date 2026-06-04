@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(modid = EternalStarlight.ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = EternalStarlight.ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ForgeClientSetupEvents {
 
 	@SubscribeEvent
@@ -260,28 +260,28 @@ public class ForgeClientSetupEvents {
 
 		event.registerAbove(
 			VanillaGuiOverlay.VIGNETTE.id(),
-			EternalStarlight.id("offhand_attack_indicator").toString(),
+			"offhand_attack_indicator",
 			(gui, guiGraphics, partialTicks, width, height) ->
 				ESClientHandler.renderOffhandAttackIndicator(guiGraphics)
 		);
 
 		event.registerAbove(
 			VanillaGuiOverlay.CROSSHAIR.id(),
-			EternalStarlight.id("spell_crosshair").toString(),
+			"spell_crosshair",
 			(gui, guiGraphics, partialTicks, width, height) ->
 				ESClientHandler.renderSpellCrosshair(guiGraphics, width, height)
 		);
 
 		event.registerAbove(
 			VanillaGuiOverlay.VIGNETTE.id(),
-			EternalStarlight.id("ether_erosion").toString(),
+			("ether_erosion"),
 			(gui, guiGraphics, partialTicks, width, height) ->
 				ESClientHandler.renderEtherErosion(guiGraphics)
 		);
 
 		event.registerAbove(
 			VanillaGuiOverlay.ARMOR_LEVEL.id(),
-			EternalStarlight.id("ether_armor").toString(),
+			("ether_armor"),
 			(gui, guiGraphics, partialTicks, width, height) -> {
 				if (Minecraft.getInstance().gameMode != null &&
 					Minecraft.getInstance().gameMode.canHurtPlayer()) {
@@ -292,35 +292,35 @@ public class ForgeClientSetupEvents {
 
 		event.registerAbove(
 			VanillaGuiOverlay.VIGNETTE.id(),
-			EternalStarlight.id("orb_of_prophecy_use").toString(),
+			("orb_of_prophecy_use"),
 			(gui, guiGraphics, partialTicks, width, height) ->
 				ESClientHandler.renderOrbOfProphecyUse(guiGraphics)
 		);
 
 		event.registerAbove(
 			VanillaGuiOverlay.VIGNETTE.id(),
-			EternalStarlight.id("dream_catcher").toString(),
+			("dream_catcher"),
 			(gui, guiGraphics, partialTicks, width, height) ->
 				ESClientHandler.renderDreamCatcher(guiGraphics)
 		);
 
 		event.registerAbove(
 			VanillaGuiOverlay.VIGNETTE.id(),
-			EternalStarlight.id("current_crest").toString(),
+			("current_crest"),
 			(gui, guiGraphics, partialTicks, width, height) ->
 				ESClientHandler.renderCurrentCrest(guiGraphics)
 		);
 
 		event.registerAbove(
 			VanillaGuiOverlay.VIGNETTE.id(),
-			EternalStarlight.id("carved_lunaris_cactus_fruit_blur").toString(),
+			("carved_lunaris_cactus_fruit_blur"),
 			(gui, guiGraphics, partialTicks, width, height) ->
 				ESClientHandler.renderCarvedLunarisCactusFruitBlur(guiGraphics)
 		);
 
 		event.registerAbove(
 			VanillaGuiOverlay.PORTAL.id(),
-			EternalStarlight.id("portal").toString(),
+			("portal"),
 			(gui, guiGraphics, partialTicks, width, height) ->
 				ESClientHandler.renderPortalOverlay(guiGraphics)
 		);

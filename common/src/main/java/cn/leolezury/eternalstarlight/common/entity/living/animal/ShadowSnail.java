@@ -157,7 +157,7 @@ public class ShadowSnail extends Animal {
 	}
 
 	@Override
-	public float getEyeHeight(Pose pose, EntityDimensions size) {
+	public float getStandingEyeHeight(Pose pose, EntityDimensions size) {
 		return 0.13F;
 	}
 

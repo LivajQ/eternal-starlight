@@ -49,6 +49,9 @@ allprojects {
             name = "LlamaLad7"
             url = "https://maven.llamalad7.dev/releases"
         }
+        maven {
+            url "https://cursemaven.com"
+        }
     }
 
     tasks.withType(JavaCompile) {

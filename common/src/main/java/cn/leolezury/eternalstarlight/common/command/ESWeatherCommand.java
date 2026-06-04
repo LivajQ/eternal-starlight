@@ -6,6 +6,7 @@ import cn.leolezury.eternalstarlight.common.registry.ESWeathers;
 import cn.leolezury.eternalstarlight.common.util.ESWeatherUtil;
 import cn.leolezury.eternalstarlight.common.weather.AbstractWeather;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -13,6 +14,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.ResourceArgument;
 import net.minecraft.commands.arguments.TimeArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.IntProvider;
 
@@ -20,11 +22,17 @@ public class ESWeatherCommand {
 	public static ArgumentBuilder<CommandSourceStack, ?> register(CommandBuildContext commandBuildContext) {
 		return Commands.literal("weather").requires((commandSourceStack) -> {
 			return commandSourceStack.hasPermission(2);
-		}).then(Commands.argument("weather", ResourceArgument.resource(commandBuildContext, ESWeathers.REGISTRY_KEY)).executes((commandContext) -> {
-			return setWeather(commandContext.getSource(), ResourceArgument.getResource(commandContext, "weather", ESWeathers.REGISTRY_KEY).value(), -1);
-		}).then(Commands.argument("duration", TimeArgument.time(1)).executes((commandContext) -> {
-			return setWeather(commandContext.getSource(), ResourceArgument.getResource(commandContext, "weather", ESWeathers.REGISTRY_KEY).value(), IntegerArgumentType.getInteger(commandContext, "duration"));
-		}))).then(Commands.literal("clear").executes((commandContext) -> {
+		}).then(Commands.argument("weather", StringArgumentType.word()).executes(ctx -> {
+					String id = StringArgumentType.getString(ctx, "weather");
+					AbstractWeather weather = ESWeathers.WEATHERS.get(new ResourceLocation(id));
+					return setWeather(ctx.getSource(), weather, -1);
+				}).then(Commands.argument("duration", TimeArgument.time(1)).executes(ctx -> {
+						String id = StringArgumentType.getString(ctx, "weather");
+						AbstractWeather weather = ESWeathers.WEATHERS.get(new ResourceLocation(id));
+						int duration = IntegerArgumentType.getInteger(ctx, "duration");
+						return setWeather(ctx.getSource(), weather, duration);
+					})))
+			.then(Commands.literal("clear").executes((commandContext) -> {
 			return setClear(commandContext.getSource(), -1);
 		}).then(Commands.argument("duration", TimeArgument.time(1)).executes((commandContext) -> {
 			return setClear(commandContext.getSource(), IntegerArgumentType.getInteger(commandContext, "duration"));

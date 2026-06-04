@@ -2,6 +2,7 @@ package cn.leolezury.eternalstarlight.forge;
 
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.handler.ESCommonSetupHandler;
+import cn.leolezury.eternalstarlight.forge.network.ESForgeNetworkHandler;
 import cn.leolezury.eternalstarlight.forge.platform.ESForgePlatform;
 import cn.leolezury.eternalstarlight.forge.registry.ESFluidTypes;
 import net.minecraft.core.registries.Registries;
@@ -21,6 +22,7 @@ public class ESForgeEntrypoint {
 		ESForgePlatform.init(modBus);
 		ESFluidTypes.loadClass();
 		EternalStarlight.init();
+		ESForgeNetworkHandler.register();
 		modBus.addListener(this::onCommonSetup);
 		modBus.addListener(this::onRegister);
 		modBus.addListener(this::onNewRegistry);

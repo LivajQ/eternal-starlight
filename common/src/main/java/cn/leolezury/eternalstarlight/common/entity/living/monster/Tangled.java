@@ -180,7 +180,7 @@ public class Tangled extends Monster implements MultiBehaviorUser {
 	}
 
 	@Override
-	public float getEyeHeight(Pose pose, EntityDimensions size) {
+	public float getStandingEyeHeight(Pose pose, EntityDimensions size) {
 		return 1.74F;
 	}
 

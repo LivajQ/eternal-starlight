@@ -16,37 +16,44 @@ import net.minecraftforge.fluids.FluidInteractionRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
-@Mod.EventBusSubscriber(modid = EternalStarlight.ID)
 public class ForgeCommonSetupEvents {
 
-	@SubscribeEvent
-	public static void onSetup(FMLCommonSetupEvent event) {
-		event.enqueueWork(() -> FluidInteractionRegistry.addInteraction(ESFluidTypes.ETHER.get(), new FluidInteractionRegistry.InteractionInformation((level, blockPos, relativePos, fluidState) -> level.getFluidState(relativePos).is(FluidTags.LAVA) && !level.getBlockState(relativePos).is(ESBlocks.ETHER.get()), ESBlocks.MOLTEN_STELLAGMITE.get().defaultBlockState())));
-		event.enqueueWork(() -> FluidInteractionRegistry.addInteraction(ESFluidTypes.ETHER.get(), new FluidInteractionRegistry.InteractionInformation((level, blockPos, relativePos, fluidState) -> !level.getFluidState(relativePos).isEmpty() && !level.getFluidState(relativePos).is(FluidTags.LAVA) && !level.getBlockState(relativePos).is(ESBlocks.ETHER.get()), ESBlocks.THIOQUARTZ_BLOCK.get().defaultBlockState())));
-		event.enqueueWork(ESCommonSetupHandler::commonSetup);
+	@Mod.EventBusSubscriber(modid = EternalStarlight.ID)
+	public static class ForgeEvents {
+
+		@SubscribeEvent
+		public static void onSetup(FMLCommonSetupEvent event) {
+			event.enqueueWork(() -> FluidInteractionRegistry.addInteraction(ESFluidTypes.ETHER.get(), new FluidInteractionRegistry.InteractionInformation((level, blockPos, relativePos, fluidState) -> level.getFluidState(relativePos).is(FluidTags.LAVA) && !level.getBlockState(relativePos).is(ESBlocks.ETHER.get()), ESBlocks.MOLTEN_STELLAGMITE.get().defaultBlockState())));
+			event.enqueueWork(() -> FluidInteractionRegistry.addInteraction(ESFluidTypes.ETHER.get(), new FluidInteractionRegistry.InteractionInformation((level, blockPos, relativePos, fluidState) -> !level.getFluidState(relativePos).isEmpty() && !level.getFluidState(relativePos).is(FluidTags.LAVA) && !level.getBlockState(relativePos).is(ESBlocks.ETHER.get()), ESBlocks.THIOQUARTZ_BLOCK.get().defaultBlockState())));
+			event.enqueueWork(ESCommonSetupHandler::commonSetup);
+		}
 	}
 
-	@SubscribeEvent
-	public static void onAttributeCreate(EntityAttributeCreationEvent event) {
-		ESCommonSetupHandler.createAttributes(event::put);
-	}
+	@Mod.EventBusSubscriber(modid = EternalStarlight.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+	public static class ModEvents {
 
-	@SubscribeEvent
-	public static void onSpawnPlacementRegister(SpawnPlacementRegisterEvent event) {
+		@SubscribeEvent
+		public static void onAttributeCreate(EntityAttributeCreationEvent event) {
+			ESCommonSetupHandler.createAttributes(event::put);
+		}
 
-		ESCommonSetupHandler.SpawnPlacementRegisterStrategy strategy =
-			new ESCommonSetupHandler.SpawnPlacementRegisterStrategy() {
-				@Override
-				public <T extends Mob> void register(
-					EntityType<T> entityType,
-					SpawnPlacements.Type placementType,
-					Heightmap.Types heightmap,
-					SpawnPlacements.SpawnPredicate<T> predicate
-				) {
-					event.register(entityType, placementType, heightmap, predicate, SpawnPlacementRegisterEvent.Operation.AND);
-				}
-			};
+		@SubscribeEvent
+		public static void onSpawnPlacementRegister(SpawnPlacementRegisterEvent event) {
 
-		ESCommonSetupHandler.registerSpawnPlacements(strategy);
+			ESCommonSetupHandler.SpawnPlacementRegisterStrategy strategy =
+				new ESCommonSetupHandler.SpawnPlacementRegisterStrategy() {
+					@Override
+					public <T extends Mob> void register(
+						EntityType<T> entityType,
+						SpawnPlacements.Type placementType,
+						Heightmap.Types heightmap,
+						SpawnPlacements.SpawnPredicate<T> predicate
+					) {
+						event.register(entityType, placementType, heightmap, predicate, SpawnPlacementRegisterEvent.Operation.AND);
+					}
+				};
+
+			ESCommonSetupHandler.registerSpawnPlacements(strategy);
+		}
 	}
 }
