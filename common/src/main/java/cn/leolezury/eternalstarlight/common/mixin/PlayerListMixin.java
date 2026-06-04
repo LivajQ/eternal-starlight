@@ -35,8 +35,8 @@ public abstract class PlayerListMixin {
 	}
 
 	@ModifyVariable(method = "placeNewPlayer", at = @At(value = "STORE"), ordinal = 0)
-	private ResourceKey<Level> modifySpawnDimension(ResourceKey<Level> original, Connection connection, ServerPlayer player, @Local Optional<CompoundTag> playerTag) {
-		if (playerTag.isEmpty() && ESConfig.INSTANCE.spawnInEternalStarlight) {
+	private ResourceKey<Level> modifySpawnDimension(ResourceKey<Level> original, Connection connection, ServerPlayer player, @Local CompoundTag compoundTag) {
+		if (compoundTag == null && ESConfig.INSTANCE.spawnInEternalStarlight) {
 			return ESDimensions.STARLIGHT_KEY;
 		}
 		return original;

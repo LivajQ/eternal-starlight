@@ -33,6 +33,7 @@ public class ESBiomeData {
 	public static final ResourceKey<BiomeData> THE_ABYSS_TRANSITION = create("the_abyss_transition");
 	public static final ResourceKey<BiomeData> WARM_SHORE = create("warm_shore");
 	public static final ResourceKey<BiomeData> GRIM_SHORE = create("grim_shore");
+	public static final ResourceKey<BiomeData> SOLARIS_ISLES = create("solaris_isles");
 
 	public static void bootstrap(BootstapContext<BiomeData> context) {
 		HolderGetter<Biome> biomeHolderGetter = context.lookup(Registries.BIOME);
@@ -117,6 +118,11 @@ public class ESBiomeData {
 
 		context.register(GRIM_SHORE, new BiomeData.Builder(biomeHolderGetter.getOrThrow(ESBiomes.GRIM_SHORE), 61, 12)
 			.build());
+
+		context.register(SOLARIS_ISLES, new BiomeData.Builder(biomeHolderGetter.getOrThrow(ESBiomes.SOLARIS_ISLES), 65, 14)
+			.build()
+		);
+
 	}
 
 	public static ResourceKey<BiomeData> create(String name) {

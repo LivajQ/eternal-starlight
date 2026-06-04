@@ -17,6 +17,7 @@ public class ESRegistryProvider extends DatapackBuiltinEntriesProvider {
 		.add(Registries.CONFIGURED_CARVER, ESConfiguredWorldCarvers::bootstrap)
 		.add(Registries.CONFIGURED_FEATURE, ESConfiguredFeatures::bootstrap)
 		.add(Registries.PLACED_FEATURE, ESPlacedFeatures::bootstrap)
+		.add(ESRegistries.BIOME_DATA, ESBiomeData::bootstrap)
 		.add(Registries.BIOME, ESBiomes::bootstrap)
 		.add(Registries.NOISE_SETTINGS, ESDimensions::bootstrapNoiseSettings)
 		.add(Registries.DIMENSION_TYPE, ESDimensions::bootstrapDimType)
@@ -31,7 +32,6 @@ public class ESRegistryProvider extends DatapackBuiltinEntriesProvider {
 		//.add(Registries.JUKEBOX_SONG, ESJukeboxSongs::bootstrap)
 		//.add(Registries.PAINTING_VARIANT, ESPaintingVariants::bootstrap)
 		// custom
-		.add(ESRegistries.BIOME_DATA, ESBiomeData::bootstrap)
 		.add(ESRegistries.BOARWARF_TYPE, ESBoarwarfTypes::bootstrap)
 		.add(ESRegistries.ASTRAL_GOLEM_MATERIAL, ESAstralGolemMaterials::bootstrap)
 		.add(ESRegistries.ENT_VARIANT, ESEntVariants::bootstrap)
