@@ -68,6 +68,7 @@ public class ESChunkGenerator extends NoiseBasedChunkGenerator {
 		BiomeSource.CODEC.fieldOf("biome_source").forGetter(o -> o.biomeSource),
 		NoiseGeneratorSettings.CODEC.fieldOf("settings").forGetter(NoiseBasedChunkGenerator::generatorSettings)
 	).apply(instance, instance.stable(ESChunkGenerator::new)));
+	public static final Codec<ESChunkGenerator> CODEC_INSTANCE = CODEC.codec();
 
 	public ESChunkGenerator(BiomeSource biomeSource, Holder<NoiseGeneratorSettings> settings) {
 		super(biomeSource, settings);
@@ -91,7 +92,7 @@ public class ESChunkGenerator extends NoiseBasedChunkGenerator {
 
 	@Override
 	protected Codec<? extends ChunkGenerator> codec() {
-		return CODEC.codec();
+		return CODEC_INSTANCE;
 	}
 
 	@Override

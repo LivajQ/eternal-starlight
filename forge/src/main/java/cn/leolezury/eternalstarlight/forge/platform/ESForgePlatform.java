@@ -1,5 +1,6 @@
 package cn.leolezury.eternalstarlight.forge.platform;
 
+import cn.leolezury.eternalstarlight.common.block.fluid.EtherFluid;
 import cn.leolezury.eternalstarlight.common.network.ESPacket;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import cn.leolezury.eternalstarlight.common.platform.EntityDataAttachment;
@@ -7,6 +8,7 @@ import cn.leolezury.eternalstarlight.common.platform.registry.*;
 import cn.leolezury.eternalstarlight.common.registry.ESCreativeModeTabs;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
+import cn.leolezury.eternalstarlight.forge.block.fluid.ForgeEtherFluid;
 import cn.leolezury.eternalstarlight.forge.item.DeferredMobBucketItem;
 import cn.leolezury.eternalstarlight.forge.network.ESForgeNetworkHandler;
 import com.google.auto.service.AutoService;
@@ -317,6 +319,16 @@ public class ESForgePlatform implements ESPlatform {
 	@Override
 	public Item createMobBucket(Supplier<? extends EntityType<? extends Mob>> type, Fluid fluid, SoundEvent sound, Item.Properties props) {
 		return new DeferredMobBucketItem(type, fluid, sound, props);
+	}
+
+	@Override
+	public EtherFluid.Still createEtherFluid() {
+		return new ForgeEtherFluid.Still();
+	}
+
+	@Override
+	public EtherFluid.Flowing createFlowingEtherFluid() {
+		return new ForgeEtherFluid.Flowing();
 	}
 
 	@Override

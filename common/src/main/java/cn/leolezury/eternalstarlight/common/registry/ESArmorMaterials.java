@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 public class ESArmorMaterials {
 
 	public static final ArmorMaterial AETHERSENT = new ESArmorMaterial(
+		"aethersent",
 		35,
 		new int[]{3, 6, 7, 3},
 		35,
@@ -22,6 +23,7 @@ public class ESArmorMaterials {
 	);
 
 	public static final ArmorMaterial THERMAL_SPRINGSTONE = new ESArmorMaterial(
+		"thermal_springstone",
 		15,
 		new int[]{2, 5, 6, 3},
 		15,
@@ -32,6 +34,7 @@ public class ESArmorMaterials {
 	);
 
 	public static final ArmorMaterial GLACITE = new ESArmorMaterial(
+		"glacite",
 		9,
 		new int[]{3, 5, 6, 3},
 		9,
@@ -42,6 +45,7 @@ public class ESArmorMaterials {
 	);
 
 	public static final ArmorMaterial STARLIT_DIAMOND = new ESArmorMaterial(
+		"starlit_diamond",
 		22,
 		new int[]{3, 6, 8, 3},
 		22,
@@ -52,6 +56,7 @@ public class ESArmorMaterials {
 	);
 
 	public static final ArmorMaterial DEEPSILVER = new ESArmorMaterial(
+		"deepsilver",
 		25,
 		new int[]{2, 5, 6, 2},
 		25,
@@ -62,6 +67,7 @@ public class ESArmorMaterials {
 	);
 
 	public static final ArmorMaterial UNREALIUM = new ESArmorMaterial(
+		"unrealium",
 		25,
 		new int[]{3, 6, 8, 3},
 		25,
@@ -72,6 +78,7 @@ public class ESArmorMaterials {
 	);
 
 	public static final ArmorMaterial AMARAMBER = new ESArmorMaterial(
+		"amaramber",
 		9,
 		new int[]{2, 5, 5, 2},
 		9,
@@ -82,6 +89,7 @@ public class ESArmorMaterials {
 	);
 
 	public static final ArmorMaterial ALCHEMIST = new ESArmorMaterial(
+		"alchemist",
 		15,
 		new int[]{2, 5, 6, 2},
 		15,
@@ -92,6 +100,7 @@ public class ESArmorMaterials {
 	);
 
 	public static final ArmorMaterial AIR_SAC = new ESArmorMaterial(
+		"air_sac",
 		9,
 		new int[]{1, 4, 4, 1},
 		9,
@@ -105,6 +114,7 @@ public class ESArmorMaterials {
 	}
 
 	public record ESArmorMaterial(
+		String name,
 		int durabilityMultiplier,
 		int[] slotProtections,
 		int enchantmentValue,
@@ -143,7 +153,7 @@ public class ESArmorMaterials {
 
 		@Override
 		public String getName() {
-			return "eternalstarlight:" + this.toString().toLowerCase();
+			return name;
 		}
 
 		@Override

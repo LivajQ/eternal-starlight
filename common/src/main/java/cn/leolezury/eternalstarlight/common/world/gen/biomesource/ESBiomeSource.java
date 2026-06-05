@@ -4,6 +4,7 @@ import cn.leolezury.eternalstarlight.common.data.ESDimensions;
 import cn.leolezury.eternalstarlight.common.data.ESRegistries;
 import cn.leolezury.eternalstarlight.common.util.FastNoise;
 import cn.leolezury.eternalstarlight.common.world.gen.biome.BiomeData;
+import cn.leolezury.eternalstarlight.common.world.gen.chunkgenerator.ESChunkGenerator;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -24,6 +25,7 @@ public class ESBiomeSource extends BiomeSource {
 		Climate.ParameterList.codec(RegistryFileCodec.create(ESRegistries.BIOME_DATA, BiomeData.CODEC).fieldOf("biome_data")).fieldOf("biome_data_parameters").forGetter(o -> o.climateList),
 		RiverEntry.CODEC.listOf().fieldOf("rivers").forGetter(o -> o.rivers)
 	).apply(instance, instance.stable(ESBiomeSource::new)));
+	public static final Codec<ESBiomeSource> CODEC_INSTANCE = CODEC.codec();
 
 	private static final float NOISE_FREQUENCY = 0.005f;
 	private static final float RIVER_NOISE_FREQUENCY = 0.001f;
@@ -92,7 +94,7 @@ public class ESBiomeSource extends BiomeSource {
 
 	@Override
 	protected Codec<? extends BiomeSource> codec() {
-		return CODEC.codec();
+		return CODEC_INSTANCE;
 	}
 
 	@Override

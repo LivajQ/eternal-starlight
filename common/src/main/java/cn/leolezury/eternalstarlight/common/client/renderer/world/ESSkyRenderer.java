@@ -27,7 +27,7 @@ public class ESSkyRenderer {
 	private static final float FIXED_TIME = (float) (Mth.frac(TIME / 24000.0 - 0.25) * 2.0 + 0.5 - Math.cos(Mth.frac(TIME / 24000.0 - 0.25) * Math.PI) / 2.0) / 3.0F;
 	private static VertexBuffer starBuffer;
 
-	public static boolean renderSky(ClientLevel level, Matrix4f modelViewMatrix, Matrix4f matrix, float partialTicks, Camera camera, Runnable setupFog) {
+	public static boolean renderSky(ClientLevel level, PoseStack poseStack, Matrix4f matrix, float partialTicks, Camera camera, Runnable setupFog) {
 		Minecraft minecraft = Minecraft.getInstance();
 		LevelRenderer levelRenderer = minecraft.levelRenderer;
 		setupFog.run();
@@ -38,10 +38,6 @@ public class ESSkyRenderer {
 
 		FogType fogType = camera.getFluidInCamera();
 		if (fogType != FogType.POWDER_SNOW && fogType != FogType.LAVA && !levelRenderer.doesMobEffectBlockSky(camera)) {
-			PoseStack poseStack = new PoseStack();
-			Quaternionf rotation = new Quaternionf();
-			modelViewMatrix.getNormalizedRotation(rotation);
-			poseStack.mulPose(rotation);
 
 			Vec3 vec3 = level.getSkyColor(minecraft.gameRenderer.getMainCamera().getPosition(), partialTicks);
 			float g = (float) vec3.x;

@@ -8,6 +8,15 @@ architectury {
     forge()
 }
 
+sourceSets {
+    main {
+        resources {
+            srcDir project(':common').sourceSets.main.resources.srcDirs
+            srcDir project(':common').file('src/generated/resources')
+        }
+    }
+}
+
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
 
@@ -51,6 +60,7 @@ dependencies {
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     inputs.property "version", project.version
 
     filesMatching("META-INF/mods.toml") {
@@ -73,6 +83,8 @@ remapJar {
 }
 
 sourcesJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }

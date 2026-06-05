@@ -1,6 +1,7 @@
 package cn.leolezury.eternalstarlight.common.client;
 
 import cn.leolezury.eternalstarlight.common.client.renderer.world.ESSkyRenderer;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
@@ -22,7 +23,7 @@ public class ESDimensionSpecialEffects extends DimensionSpecialEffects {
 		return false;
 	}
 
-	public static boolean doRenderSky(ClientLevel level, float partialTick, Matrix4f modelViewMatrix, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog) {
-		return ESSkyRenderer.renderSky(level, modelViewMatrix, projectionMatrix, partialTick, camera, setupFog);
+	public static boolean doRenderSky(ClientLevel level, float partialTick, PoseStack poseStack, Camera camera, Matrix4f projectionMatrix, boolean isFoggy, Runnable setupFog) {
+		return ESSkyRenderer.renderSky(level, poseStack, projectionMatrix, partialTick, camera, setupFog);
 	}
 }
