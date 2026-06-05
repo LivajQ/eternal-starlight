@@ -45,9 +45,9 @@ repositories {
 
 dependencies {
     forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compileOnly("org.spongepowered:mixin:0.8.5:processor")
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.4"))
-    implementation("io.github.llamalad7:mixinextras-forge:0.5.4")
-    modLocalRuntime("curse.maven:huge-structure-blocks-474114:4803547")
+    implementation(include("io.github.llamalad7:mixinextras-forge:0.5.4"))
 
     common(project(path: ":common", configuration: "namedElements")) {
         transitive false
@@ -56,7 +56,6 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
         transitive false
     }
-
 }
 
 processResources {
@@ -74,6 +73,7 @@ shadowJar {
 
     configurations = [project.configurations.shadowCommon]
     archiveClassifier = "dev-shadow"
+
 }
 
 remapJar {

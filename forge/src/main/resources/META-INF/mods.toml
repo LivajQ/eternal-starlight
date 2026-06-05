@@ -4,13 +4,13 @@ loaderVersion = "[47,)"
 license = "MIT"
 
 [[mixins]]
-config = "eternal_starlight.mixins.json"
+config="eternal_starlight-common.mixins.json"
 [[mixins]]
-config = "eternal_starlight-common.mixins.json"
+config="eternal_starlight.mixins.json"
 
 [[mods]]
 modId = "eternal_starlight"
-version = "${version}"
+version = "0.7.0"
 displayName = "Eternal Starlight"
 authors = "LeoLezury"
 description = '''
@@ -29,12 +29,5 @@ side = "BOTH"
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.20.1,)"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.eternal_starlight]]
-modId = "hugestructureblocks"
-mandatory = true
-versionRange = "[1.0.9,)"
 ordering = "NONE"
 side = "BOTH"

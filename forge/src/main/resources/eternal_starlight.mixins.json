@@ -1,8 +1,9 @@
 {
   "required": true,
-  "package": "cn.leolezury.eternalstarlight.neoforge.mixin",
+  "package": "cn.leolezury.eternalstarlight.forge.mixin",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
+  "refmap": "eternalstarlight-common-refmap.json",
   "mixins": [
     "AxeItemMixin",
     "ExtendedBlockMixin",
