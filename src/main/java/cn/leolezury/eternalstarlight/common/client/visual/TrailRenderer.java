@@ -69,26 +69,26 @@ public class TrailRenderer {
 
 			if (particleFormat) {
 				consumer.vertex(pose.pose(), (float) fromUpper.x(), (float) fromUpper.y(), (float) fromUpper.z())
-					.color(r, g, b, fromAlpha)
 					.uv(Mth.lerp(from.progressFactor(), u0, u1), v0)
+					.color(r, g, b, fromAlpha)
 					.uv2(light)
 					.endVertex();
 
 				consumer.vertex(pose.pose(), (float) toUpper.x(), (float) toUpper.y(), (float) toUpper.z())
-					.color(r, g, b, toAlpha)
 					.uv(Mth.lerp(to.progressFactor(), u0, u1), v0)
+					.color(r, g, b, toAlpha)
 					.uv2(light)
 					.endVertex();
 
 				consumer.vertex(pose.pose(), (float) toLower.x(), (float) toLower.y(), (float) toLower.z())
-					.color(r, g, b, toAlpha)
 					.uv(Mth.lerp(to.progressFactor(), u0, u1), v1)
+					.color(r, g, b, toAlpha)
 					.uv2(light)
 					.endVertex();
 
 				consumer.vertex(pose.pose(), (float) fromLower.x(), (float) fromLower.y(), (float) fromLower.z())
-					.color(r, g, b, fromAlpha)
 					.uv(Mth.lerp(from.progressFactor(), u0, u1), v1)
+					.color(r, g, b, fromAlpha)
 					.uv2(light)
 					.endVertex();
 			} else {

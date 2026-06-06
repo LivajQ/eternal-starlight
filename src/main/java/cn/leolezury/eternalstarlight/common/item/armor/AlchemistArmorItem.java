@@ -73,6 +73,11 @@ public class AlchemistArmorItem extends ArmorItem {
 	}
 
 	@Override
+	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
+		return TEXTURE.toString();
+	}
+
+	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
 		tooltip.add(CommonComponents.EMPTY);
 		tooltip.add(Component.translatable("item.modifiers.armor").withStyle(ChatFormatting.GRAY));

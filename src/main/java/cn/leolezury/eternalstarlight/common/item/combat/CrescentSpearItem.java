@@ -1,5 +1,6 @@
 package cn.leolezury.eternalstarlight.common.item.combat;
 
+import cn.leolezury.eternalstarlight.common.client.renderer.ESForgeItemStackRenderer;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
@@ -24,6 +25,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+
+import java.util.function.Consumer;
 
 public class CrescentSpearItem extends TieredItem {
 
@@ -147,5 +151,10 @@ public class CrescentSpearItem extends TieredItem {
 		return repairCandidate.is(ESItems.TENACIOUS_PETAL.get())
 			|| repairCandidate.is(ESItems.TENACIOUS_VINE.get())
 			|| super.isValidRepairItem(stack, repairCandidate);
+	}
+
+	@Override
+	public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+		consumer.accept(ESForgeItemStackRenderer.CLIENT_ITEM_EXTENSION);
 	}
 }

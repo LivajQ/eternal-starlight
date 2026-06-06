@@ -84,6 +84,9 @@ public abstract class LivingEntityMixin {
 	@Nullable
 	public abstract LivingEntity getKillCredit();
 
+	@Unique
+	private boolean es$applyingHammerKnockback = false;
+
 	@Inject(method = "isBlocking", at = @At("RETURN"), cancellable = true)
 	private void isBlocking(CallbackInfoReturnable<Boolean> cir) {
 		if (isUsingItem() && getUseItem().is(ESTags.Items.GREATSWORDS)) {
@@ -91,13 +94,14 @@ public abstract class LivingEntityMixin {
 		}
 	}
 
-	@Inject(method = "knockback", at = @At("HEAD"))
+	@Inject(method = "knockback", at = @At("HEAD"), cancellable = true)
 	private void knockback(double strength, double x, double z, CallbackInfo ci) {
 		LivingEntity entity = (LivingEntity)(Object)this;
 
-		if (entity.getMainHandItem().is(ESTags.Items.HAMMERS)) {
-			double boosted = strength + 1.0;
-			entity.knockback(boosted, x, z);
+		if (!es$applyingHammerKnockback && entity.getMainHandItem().is(ESTags.Items.HAMMERS)) {
+			es$applyingHammerKnockback = true;
+			entity.knockback(strength + 1.0, x, z);
+			es$applyingHammerKnockback = false;
 			ci.cancel();
 		}
 	}

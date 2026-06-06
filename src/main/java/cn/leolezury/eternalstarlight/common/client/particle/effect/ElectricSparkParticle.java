@@ -78,8 +78,8 @@ public class ElectricSparkParticle extends TextureSheetParticle {
 					(float) start.add(sideOffset).x,
 					(float) start.add(sideOffset).y,
 					(float) start.add(sideOffset).z)
-				.color(0.6F, 0.6F, 0.9F, 0.75F)
 				.uv(u0, v0)
+				.color(0.6F, 0.6F, 0.9F, 0.75F)
 				.uv2(LightTexture.FULL_BRIGHT)
 				.endVertex();
 
@@ -87,8 +87,8 @@ public class ElectricSparkParticle extends TextureSheetParticle {
 					(float) start.add(sideOffset.scale(-1)).x,
 					(float) start.add(sideOffset.scale(-1)).y,
 					(float) start.add(sideOffset.scale(-1)).z)
-				.color(0.6F, 0.6F, 0.9F, 0.75F)
 				.uv(u0, v1)
+				.color(0.6F, 0.6F, 0.9F, 0.75F)
 				.uv2(LightTexture.FULL_BRIGHT)
 				.endVertex();
 
@@ -96,8 +96,8 @@ public class ElectricSparkParticle extends TextureSheetParticle {
 					(float) end.add(sideOffset.scale(-1)).x,
 					(float) end.add(sideOffset.scale(-1)).y,
 					(float) end.add(sideOffset.scale(-1)).z)
-				.color(0.6F, 0.6F, 0.9F, 0.75F)
 				.uv(u1, v1)
+				.color(0.6F, 0.6F, 0.9F, 0.75F)
 				.uv2(LightTexture.FULL_BRIGHT)
 				.endVertex();
 
@@ -105,8 +105,8 @@ public class ElectricSparkParticle extends TextureSheetParticle {
 					(float) end.add(sideOffset).x,
 					(float) end.add(sideOffset).y,
 					(float) end.add(sideOffset).z)
-				.color(0.6F, 0.6F, 0.9F, 0.75F)
 				.uv(u1, v0)
+				.color(0.6F, 0.6F, 0.9F, 0.75F)
 				.uv2(LightTexture.FULL_BRIGHT)
 				.endVertex();
 		}

@@ -24,6 +24,7 @@ import cn.leolezury.eternalstarlight.common.item.component.Accessory;
 import cn.leolezury.eternalstarlight.common.item.interfaces.SwingAttackWeapon;
 import cn.leolezury.eternalstarlight.common.item.interfaces.TickableArmor;
 import cn.leolezury.eternalstarlight.common.item.misc.ManaCrystalItem;
+import cn.leolezury.eternalstarlight.common.mixin.AbstractArrowAccessor;
 import cn.leolezury.eternalstarlight.common.network.ParticlePacket;
 import cn.leolezury.eternalstarlight.common.network.SimpleActionPacket;
 import cn.leolezury.eternalstarlight.common.network.UpdateWeatherPacket;
@@ -704,7 +705,7 @@ public class ESCommonHandler {
 			}
 		}
 		if (!level.isClientSide && entity instanceof AbstractArrow arrow) {
-			ItemStack pickup = arrow.getPickupItem();
+			ItemStack pickup = ((AbstractArrowAccessor) arrow).invokeGetPickupItem();
 			if (!pickup.isEmpty() && pickup.hasTag()) {
 				CompoundTag tag = pickup.getTag();
 				if (tag.getBoolean("FromQuiver")) {

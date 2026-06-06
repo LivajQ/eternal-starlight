@@ -436,6 +436,7 @@ public class ESClientSetupHandler {
 	public static final SimplexNoise COLOR_NOISE = new SimplexNoise(new WorldgenRandom(new LegacyRandomSource(1225L)));
 
 	public static void clientSetup() {
+		/*
 		registerSimpleSpecialModel("thermal_springstone_scythe");
 		registerSimpleSpecialModel("thermal_springstone_hammer");
 		registerSimpleSpecialModel("glacite_scythe");
@@ -461,6 +462,7 @@ public class ESClientSetupHandler {
 		registerSimpleSpecialModel("doomeden_rapier");
 		registerSimpleSpecialModel("orb_of_prophecy");
 		registerSimpleSpecialModel("orb_of_prophecy_with_crests");
+		 */
 
 		PlayerAnimator.register(new PlayerAnimator.UseItemAnimationTrigger(ESItems.ORB_OF_PROPHECY), ((player) -> new PlayerAnimator.PlayerAnimationState(PlayerAnimation.ORB_OF_PROPHECY_USE, PlayerAnimation.FIRST_PERSON_ORB_OF_PROPHECY_USE, List.of(new PlayerAnimator.UseItemHandAnimationTransformer(), new PlayerAnimator.CopyOuterLayerAnimationTransformer()), true, true, true, true)));
 		PlayerAnimator.register(new PlayerAnimator.CastSpellAnimationTrigger(ESSpells.LASER_BEAM), ((player) -> new PlayerAnimator.PlayerAnimationState(PlayerAnimation.GATHER_HANDS, PlayerAnimation.FIRST_PERSON_GATHER_HANDS, List.of(new PlayerAnimator.CastSpellHandAnimationTransformer(), new PlayerAnimator.CopyOuterLayerAnimationTransformer()), true, true, true, true)));

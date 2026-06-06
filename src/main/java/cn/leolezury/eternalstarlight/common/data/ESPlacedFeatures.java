@@ -135,6 +135,16 @@ public class ESPlacedFeatures {
 
 	public static void bootstrap(BootstapContext<PlacedFeature> context) {
 		HolderGetter<ConfiguredFeature<?, ?>> configuredFeatures = context.lookup(Registries.CONFIGURED_FEATURE);
+		System.out.println("ConfiguredFeature exists? " + configuredFeatures.get(ESConfiguredFeatures.FINAL_MODIFICATION));
+		System.out.println("ConfiguredFeature exists? " + configuredFeatures.get(ESConfiguredFeatures.STONE_SPIKE));
+		System.out.println("ConfiguredFeature exists? " + configuredFeatures.get(ESConfiguredFeatures.MONOLITH));
+		System.out.println("ConfiguredFeature exists? " + configuredFeatures.get(ESConfiguredFeatures.LUSH_MONOLITH));
+		System.out.println("ConfiguredFeature exists? " + configuredFeatures.get(ESConfiguredFeatures.GLACITE));
+		System.out.println("ConfiguredFeature exists? " + configuredFeatures.get(ESConfiguredFeatures.ICICLE));
+		System.out.println("ConfiguredFeature exists? " + configuredFeatures.get(ESConfiguredFeatures.STONE_ORE));
+		System.out.println("ConfiguredFeature exists? " + configuredFeatures.get(ESConfiguredFeatures.DEEPSLATE_ORE));
+		System.out.println("ConfiguredFeature exists? " + configuredFeatures.get(ESConfiguredFeatures.GLOWING_GRIMSTONE_ORE));
+		System.out.println("ConfiguredFeature exists? " + configuredFeatures.get(ESConfiguredFeatures.GLOWING_VOIDSTONE_ORE));
 		HolderGetter<Structure> structures = context.lookup(Registries.STRUCTURE);
 		BlockPredicate snowPredicate = BlockPredicate.matchesBlocks(Direction.DOWN.getNormal(), Blocks.SNOW_BLOCK, Blocks.POWDER_SNOW);
 		List<PlacementModifier> onSnow = List.of(EnvironmentScanPlacement.scanningFor(Direction.UP, BlockPredicate.not(BlockPredicate.matchesBlocks(Blocks.POWDER_SNOW)), 8), BlockPredicateFilter.forPredicate(snowPredicate));

@@ -60,26 +60,26 @@ public class ExplosionShockParticle extends TextureSheetParticle {
 		float b = Easing.IN_OUT_QUAD.interpolate(progress, fromColor.z(), toColor.z());
 
 		consumer.vertex(pose.pose(), (float)(start.x + sideOffset.x), (float)(start.y + sideOffset.y), (float)(start.z + sideOffset.z))
-			.color(r, g, b, 1.0F)
 			.uv(u0, v0)
+			.color(r, g, b, 1.0F)
 			.uv2(LightTexture.FULL_BRIGHT)
 			.endVertex();
 
 		consumer.vertex(pose.pose(), (float)(start.x - sideOffset.x), (float)(start.y - sideOffset.y), (float)(start.z - sideOffset.z))
-			.color(r, g, b, 1.0F)
 			.uv(u0, v1)
+			.color(r, g, b, 1.0F)
 			.uv2(LightTexture.FULL_BRIGHT)
 			.endVertex();
 
 		consumer.vertex(pose.pose(), (float)(end.x - sideOffset.x), (float)(end.y - sideOffset.y), (float)(end.z - sideOffset.z))
-			.color(r, g, b, 1.0F)
 			.uv(u1, v1)
+			.color(r, g, b, 1.0F)
 			.uv2(LightTexture.FULL_BRIGHT)
 			.endVertex();
 
 		consumer.vertex(pose.pose(), (float)(end.x + sideOffset.x), (float)(end.y + sideOffset.y), (float)(end.z + sideOffset.z))
-			.color(r, g, b, 1.0F)
 			.uv(u1, v0)
+			.color(r, g, b, 1.0F)
 			.uv2(LightTexture.FULL_BRIGHT)
 			.endVertex();
 		stack.popPose();

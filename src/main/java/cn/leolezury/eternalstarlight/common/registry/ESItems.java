@@ -1,6 +1,7 @@
 package cn.leolezury.eternalstarlight.common.registry;
 
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
+import cn.leolezury.eternalstarlight.common.client.renderer.ESForgeItemStackRenderer;
 import cn.leolezury.eternalstarlight.common.entity.misc.ESBoat;
 import cn.leolezury.eternalstarlight.common.item.armor.AethersentArmorItem;
 import cn.leolezury.eternalstarlight.common.item.armor.AirSacArmorItem;
@@ -38,8 +39,10 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ESItems {
@@ -1432,7 +1435,12 @@ public class ESItems {
 		});
 
 	// loot chest
-	public static final RegistryObject<Item, Item> LOOT_CHEST = registerItem("loot_chest", () -> new BlockItem(ESBlocks.LOOT_CHEST.get(), new Item.Properties()));
+	public static final RegistryObject<Item, Item> LOOT_CHEST = registerItem("loot_chest", () -> new BlockItem(ESBlocks.LOOT_CHEST.get(), new Item.Properties()) {
+		@Override
+		public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+			consumer.accept(ESForgeItemStackRenderer.CLIENT_ITEM_EXTENSION);
+		}
+	});
 
 	// boss spawners
 	public static final RegistryObject<Item, Item> THE_GATEKEEPER_SPAWNER = registerItem("the_gatekeeper_spawner", () -> new BlockItem(ESBlocks.THE_GATEKEEPER_SPAWNER.get(), new Item.Properties()));

@@ -29,6 +29,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.boss.EnderDragonPart;
@@ -116,6 +117,11 @@ public interface ESPlatform {
 				if (level.getGameTime() % 20 == 0 && !level.isClientSide && level.getGameTime() % 20 == 0) {
 					stack.getOrCreateTag().putInt("AccessorySlotCount", 3);
 				}
+			}
+
+			@Override
+			public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
+				return EternalStarlight.id("textures/armor/starlit_diamond_layer_" + ((slot == EquipmentSlot.LEGS) ? "2.png" : "1.png")).toString();
 			}
 		};
 	}

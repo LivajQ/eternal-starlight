@@ -117,6 +117,11 @@ public class UnrealiumArmorItem extends ArmorItem {
 	}
 
 	@Override
+	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
+		return EternalStarlight.id("textures/armor/unrealium_layer_" + ((slot == EquipmentSlot.LEGS) ? "2.png" : "1.png")).toString();
+	}
+
+	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
 
 		tooltip.add(CommonComponents.EMPTY);

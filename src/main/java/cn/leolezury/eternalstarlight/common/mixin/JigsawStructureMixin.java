@@ -23,10 +23,6 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 	priority = 999
 )
 public abstract class JigsawStructureMixin {
-	static{
-		EternalStarlight.LOGGER.info("JigsawStructureMixin static");
-	}
-
 	@Shadow
 	@Final
 	@Mutable

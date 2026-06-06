@@ -631,8 +631,8 @@ public class ESItemModelProvider extends ItemModelProvider {
 		handheld(ESItems.THERMAL_SPRINGSTONE_HOE.get());
 		handheld(ESItems.THERMAL_SPRINGSTONE_SHOVEL.get());
 		largeHandheld(ESItems.THERMAL_SPRINGSTONE_SCYTHE.get());
-		inventoryHandheld(ESItems.THERMAL_SPRINGSTONE_SCYTHE.get());
-		inventoryHandheld(ESItems.THERMAL_SPRINGSTONE_HAMMER.get());
+		//inventoryHandheld(ESItems.THERMAL_SPRINGSTONE_SCYTHE.get());
+		//inventoryHandheld(ESItems.THERMAL_SPRINGSTONE_HAMMER.get());
 		basicItem(ESItems.THERMAL_SPRINGSTONE_HELMET.get());
 		basicItem(ESItems.THERMAL_SPRINGSTONE_CHESTPLATE.get());
 		basicItem(ESItems.THERMAL_SPRINGSTONE_LEGGINGS.get());
@@ -648,7 +648,7 @@ public class ESItemModelProvider extends ItemModelProvider {
 		handheld(ESItems.GLACITE_HOE.get());
 		handheld(ESItems.GLACITE_SHOVEL.get());
 		largeHandheld(ESItems.GLACITE_SCYTHE.get());
-		inventoryHandheld(ESItems.GLACITE_SCYTHE.get());
+		//inventoryHandheld(ESItems.GLACITE_SCYTHE.get());
 		armorWithTrim((ArmorItem) ESItems.GLACITE_HELMET.get());
 		armorWithTrim((ArmorItem) ESItems.GLACITE_CHESTPLATE.get());
 		armorWithTrim((ArmorItem) ESItems.GLACITE_LEGGINGS.get());
@@ -724,7 +724,7 @@ public class ESItemModelProvider extends ItemModelProvider {
 		handheld(ESItems.MALARITE_HOE.get());
 		handheld(ESItems.MALARITE_SHOVEL.get());
 		handheld(ESItems.MALARITE_SICKLE.get());
-		inventoryHandheld(ESItems.MALARITE_SPEAR.get());
+		//inventoryHandheld(ESItems.MALARITE_SPEAR.get());
 
 		basicItem(ESItems.PUNGENCY_FRUIT_SEEDS.get());
 		basicItem(ESItems.PUNGENCY_FRUIT.get());
@@ -734,9 +734,9 @@ public class ESItemModelProvider extends ItemModelProvider {
 		basicItem(ESItems.TEAR_BOMB_MINECART.get());
 		basicItem(ESItems.PUNGENCY_FRUIT_UPGRADE_SMITHING_TEMPLATE.get());
 		handheld(ESItems.PUNGENCY_FRUIT_AXE.get());
-		inventoryHandheld(ESItems.PUNGENCY_FRUIT_SPEAR.get());
+		//inventoryHandheld(ESItems.PUNGENCY_FRUIT_SPEAR.get());
 
-		inventoryHandheld(ESItems.SEEDS_LAUNCHER.get());
+		//inventoryHandheld(ESItems.SEEDS_LAUNCHER.get());
 
 		basicItem(ESItems.DRYING_RACK.get());
 		basicItem(ESItems.ROTTEN_FLESH_JERKY.get());
@@ -769,8 +769,8 @@ public class ESItemModelProvider extends ItemModelProvider {
 		handheld(ESItems.STARFIRE_HOE.get());
 		handheld(ESItems.STARFIRE_SHOVEL.get());
 		largeHandheld(ESItems.STARFIRE_SCYTHE.get());
-		inventoryHandheld(ESItems.STARFIRE_SCYTHE.get());
-		inventoryHandheld(ESItems.STARFIRE_HAMMER.get());
+		//inventoryHandheld(ESItems.STARFIRE_SCYTHE.get());
+		//inventoryHandheld(ESItems.STARFIRE_HAMMER.get());
 		crossbow(ESItems.STARFIRE_CROSSBOW.get());
 
 		block(ESItems.RAW_FLOWGLAZE.get());
@@ -787,7 +787,7 @@ public class ESItemModelProvider extends ItemModelProvider {
 		handheld(ESItems.FLOWGLAZE_HOE.get());
 		handheld(ESItems.FLOWGLAZE_SHOVEL.get());
 		largeHandheld(ESItems.FLOWGLAZE_SCYTHE.get());
-		inventoryHandheld(ESItems.FLOWGLAZE_SCYTHE.get());
+		//inventoryHandheld(ESItems.FLOWGLAZE_SCYTHE.get());
 		bow(ESItems.FLOWGLAZE_BOW.get());
 
 		block(ESItems.GRIMSTONE_SALTPETER_ORE.get());
@@ -964,8 +964,8 @@ public class ESItemModelProvider extends ItemModelProvider {
 		basicItem(ESItems.SEEKING_EYE.get());
 		handheld(ESItems.GLISTERING_SWORD.get());
 		greatsword(ESItems.GLISTERING_GREATSWORD.get());
-		greatswordInventory(ESItems.GLISTERING_GREATSWORD.get());
-		inventoryHandheld(ESItems.GLISTERING_MORNING_STAR.get());
+		//greatswordInventory(ESItems.GLISTERING_GREATSWORD.get());
+		//inventoryHandheld(ESItems.GLISTERING_MORNING_STAR.get());
 		bow(ESItems.GLISTERING_BOW.get());
 
 		basicItem(ESItems.GOLEM_STEEL_INGOT.get());
@@ -975,12 +975,12 @@ public class ESItemModelProvider extends ItemModelProvider {
 		whip(ESItems.COLDSNAP.get());
 		handheld(ESItems.ENERGY_SWORD.get());
 		greatsword(ESItems.GOLEM_STEEL_GREATSWORD.get());
-		greatswordInventory(ESItems.GOLEM_STEEL_GREATSWORD.get());
+		//greatswordInventory(ESItems.GOLEM_STEEL_GREATSWORD.get());
 		crossbow(ESItems.MECHANICAL_CROSSBOW.get());
 		handheld(ESItems.ENERGY_BOOMERANG.get());
 		handheld(ESItems.UNDERMINER.get());
 		greatsword(ESItems.CRYSTAL_GREATSWORD.get());
-		greatswordInventory(ESItems.CRYSTAL_GREATSWORD.get());
+		//greatswordInventory(ESItems.CRYSTAL_GREATSWORD.get());
 		crossbow(ESItems.CRYSTAL_CROSSBOW.get());
 		block(ESItems.GOLEM_STEEL_BLOCK.get());
 		otherBlock(ESItems.WAXED_GOLEM_STEEL_BLOCK.get(), ESItems.GOLEM_STEEL_BLOCK.get());
@@ -1031,12 +1031,12 @@ public class ESItemModelProvider extends ItemModelProvider {
 		crossbow(ESItems.WILTED_CROSSBOW.get());
 		bow(ESItems.MOONRING_BOW.get());
 		greatsword(ESItems.MOONRING_GREATSWORD.get());
-		greatswordInventory(ESItems.MOONRING_GREATSWORD.get());
+		//greatswordInventory(ESItems.MOONRING_GREATSWORD.get());
 		largeHandheld(ESItems.PETAL_SCYTHE.get());
-		inventoryHandheld(ESItems.PETAL_SCYTHE.get());
+		//(ESItems.PETAL_SCYTHE.get());
 		handheld(ESItems.WAND_OF_TELEPORTATION.get());
 		whip(ESItems.CHAIN_OF_SOULS.get());
-		inventoryHandheld(ESItems.CRESCENT_SPEAR.get());
+		//inventoryHandheld(ESItems.CRESCENT_SPEAR.get());
 		block(ESItems.SHADEGRIEVE.get());
 		block(ESItems.BLOOMING_SHADEGRIEVE.get());
 		basicItem(ESItems.LUNAR_VINE.get());
@@ -1058,7 +1058,7 @@ public class ESItemModelProvider extends ItemModelProvider {
 
 		basicItem(ESItems.BROKEN_DOOMEDEN_BONE.get());
 		greatsword(ESItems.BONEMORE.get());
-		greatswordInventory(ESItems.BONEMORE.get());
+		//greatswordInventory(ESItems.BONEMORE.get());
 		bow(ESItems.BOW_OF_BLOOD.get());
 		handheld(ESItems.LIVING_ARM.get());
 		flatBlockTexture(ESItems.DOOMED_TORCH.get());
@@ -1068,7 +1068,7 @@ public class ESItemModelProvider extends ItemModelProvider {
 		basicItem(ESItems.EYE_OF_DOOM.get());
 		basicItem(ESItems.DOOMEDEN_RAG.get());
 		handheld(ESItems.FLESH_GRINDER.get());
-		inventoryHandheld(ESItems.DOOMEDEN_RAPIER.get());
+		//inventoryHandheld(ESItems.DOOMEDEN_RAPIER.get());
 		block(ESItems.DOOMEDEN_BRICKS.get());
 		block(ESItems.DOOMEDEN_BRICK_SLAB.get());
 		block(ESItems.DOOMEDEN_BRICK_STAIRS.get());
@@ -1087,7 +1087,7 @@ public class ESItemModelProvider extends ItemModelProvider {
 		block(ESItems.DOOMEDEN_KEYHOLE.get());
 		block(ESItems.REDSTONE_DOOMEDEN_KEYHOLE.get());
 
-		inventoryModel(ESItems.ORB_OF_PROPHECY.get());
+		//inventoryModel(ESItems.ORB_OF_PROPHECY.get());
 		block(ESItems.STELLAR_RACK.get());
 		block(ESItems.ENCHANTED_GRIMSTONE_BRICKS.get());
 		basicItem(ESItems.MANA_CRYSTAL.get());
@@ -1156,12 +1156,14 @@ public class ESItemModelProvider extends ItemModelProvider {
 			.override().predicate(ResourceLocation.withDefaultNamespace("blocking"), 1).model(blocking).end();
 	}
 
+	/*
 	private void greatswordInventory(Item item) {
 		withExistingParent(name(item) + "_blocking_inventory", ResourceLocation.withDefaultNamespace("item/handheld"))
 			.texture("layer0", itemTexture(item).withSuffix("_inventory"));
 		withExistingParent(name(item) + "_inventory", ResourceLocation.withDefaultNamespace("item/handheld"))
 			.texture("layer0", itemTexture(item).withSuffix("_inventory"));
 	}
+	 */
 
 	private void whip(Item item) {
 		ModelFile extendedModel = withExistingParent(name(item) + "_extended", EternalStarlight.id("item/gui_only"))
@@ -1319,6 +1321,7 @@ public class ESItemModelProvider extends ItemModelProvider {
 			.texture("layer0", texture);
 	}
 
+	/*
 	private void inventoryHandheld(Item item) {
 		getBuilder(item.toString() + "_inventory")
 			.parent(new ModelFile.UncheckedModelFile("item/handheld"))
@@ -1330,6 +1333,8 @@ public class ESItemModelProvider extends ItemModelProvider {
 			.parent(new ModelFile.UncheckedModelFile("item/generated"))
 			.texture("layer0", itemTexture(item) + "_inventory");
 	}
+
+	 */
 
 	public ResourceLocation blockTexture(Block block) {
 		ResourceLocation name = key(block);
