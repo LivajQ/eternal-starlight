@@ -1,0 +1,297 @@
+accessWidener v2 named
+
+# init
+accessible method net/minecraft/world/item/context/UseOnContext getHitResult ()Lnet/minecraft/world/phys/BlockHitResult;
+accessible method net/minecraft/world/item/PickaxeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+accessible method net/minecraft/world/item/SwordItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+accessible method net/minecraft/world/item/HoeItem <init> (Lnet/minecraft/world/item/Tier;IFLnet/minecraft/world/item/Item$Properties;)V
+accessible method net/minecraft/world/item/ShovelItem <init> (Lnet/minecraft/world/item/Tier;FFLnet/minecraft/world/item/Item$Properties;)V
+accessible method net/minecraft/world/item/AxeItem <init> (Lnet/minecraft/world/item/Tier;FFLnet/minecraft/world/item/Item$Properties;)V
+accessible method net/minecraft/world/item/RecordItem <init> (ILnet/minecraft/sounds/SoundEvent;Lnet/minecraft/world/item/Item$Properties;I)V
+accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
+accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
+accessible method net/minecraft/world/effect/MobEffect <init> (Lnet/minecraft/world/effect/MobEffectCategory;I)V
+accessible method net/minecraft/world/entity/ai/sensing/SensorType <init> (Ljava/util/function/Supplier;)V
+accessible method net/minecraft/world/level/levelgen/feature/treedecorators/TreeDecoratorType <init> (Lcom/mojang/serialization/Codec;)V
+accessible method net/minecraft/world/level/levelgen/feature/trunkplacers/TrunkPlacerType <init> (Lcom/mojang/serialization/Codec;)V
+accessible method net/minecraft/world/level/levelgen/feature/foliageplacers/FoliagePlacerType <init> (Lcom/mojang/serialization/Codec;)V
+
+accessible field net/minecraft/server/level/ServerPlayerGameMode isDestroyingBlock Z
+accessible field net/minecraft/server/level/ServerPlayerGameMode destroyPos Lnet/minecraft/core/BlockPos;
+
+accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
+
+# client init
+accessible field net/minecraft/client/renderer/LevelRenderer renderBuffers Lnet/minecraft/client/renderer/RenderBuffers;
+accessible field net/minecraft/world/entity/Entity isInsidePortal Z
+accessible field net/minecraft/world/entity/Entity portalEntrancePos Lnet/minecraft/core/BlockPos;
+accessible field net/minecraft/client/renderer/blockentity/SkullBlockRenderer SKIN_BY_TYPE Ljava/util/Map;
+
+accessible method net/minecraft/client/gui/screens/MenuScreens register (Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V
+accessible method net/minecraft/client/renderer/entity/LivingEntityRenderer addLayer (Lnet/minecraft/client/renderer/entity/layers/RenderLayer;)Z
+accessible method net/minecraft/client/renderer/item/ItemProperties register (Lnet/minecraft/world/item/Item;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/renderer/item/ClampedItemPropertyFunction;)V
+
+accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
+
+# blocks
+accessible method net/minecraft/world/level/block/GrowingPlantBlock canAttachTo (Lnet/minecraft/world/level/block/state/BlockState;)Z
+accessible method net/minecraft/world/level/block/state/properties/WoodType register (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/world/level/block/state/properties/WoodType;
+accessible method net/minecraft/world/level/block/StairBlock <init> (Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/DoorBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;Lnet/minecraft/world/level/block/state/properties/BlockSetType;)V
+accessible method net/minecraft/world/level/block/TrapDoorBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;Lnet/minecraft/world/level/block/state/properties/BlockSetType;)V
+accessible method net/minecraft/world/level/block/PressurePlateBlock <init> (Lnet/minecraft/world/level/block/PressurePlateBlock$Sensitivity;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;Lnet/minecraft/world/level/block/state/properties/BlockSetType;)V
+accessible method net/minecraft/world/level/block/ButtonBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;Lnet/minecraft/world/level/block/state/properties/BlockSetType;IZ)V
+accessible method net/minecraft/world/level/block/FenceGateBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;Lnet/minecraft/world/level/block/state/properties/WoodType;)V
+accessible method net/minecraft/world/level/block/SaplingBlock <init> (Lnet/minecraft/world/level/block/grower/AbstractTreeGrower;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/MangroveRootsBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/HalfTransparentBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/IronBarsBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/DeadBushBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/WaterlilyBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/BaseCoralPlantBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/CoralPlantBlock <init> (Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/BaseCoralWallFanBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/CoralWallFanBlock <init> (Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/BaseCoralFanBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/CoralFanBlock <init> (Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/FarmBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/DirtPathBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/SnowyDirtBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/LiquidBlock <init> (Lnet/minecraft/world/level/material/FlowingFluid;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/SkullBlock <init> (Lnet/minecraft/world/level/block/SkullBlock$Type;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/WallSkullBlock <init> (Lnet/minecraft/world/level/block/SkullBlock$Type;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+accessible method net/minecraft/world/level/block/TorchBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;Lnet/minecraft/core/particles/ParticleOptions;)V
+accessible method net/minecraft/world/level/block/WallTorchBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;Lnet/minecraft/core/particles/ParticleOptions;)V
+
+accessible field com/mojang/math/OctahedralGroup permutation Lcom/mojang/math/SymmetricGroup3;
+
+accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+
+# cave carver
+extendable method net/minecraft/world/level/levelgen/carver/WorldCarver getCarveState (Lnet/minecraft/world/level/levelgen/carver/CarvingContext;Lnet/minecraft/world/level/levelgen/carver/CarverConfiguration;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/levelgen/Aquifer;)Lnet/minecraft/world/level/block/state/BlockState;
+
+# criterion
+accessible method net/minecraft/advancements/CriteriaTriggers register (Lnet/minecraft/advancements/CriterionTrigger;)Lnet/minecraft/advancements/CriterionTrigger;
+
+# entity ai
+
+#entities
+accessible method net/minecraft/world/entity/projectile/Projectile <init> (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V
+accessible method net/minecraft/world/entity/projectile/AbstractArrow getPickupItem ()Lnet/minecraft/world/item/ItemStack;
+
+accessible field net/minecraft/world/entity/projectile/AbstractArrow inGround Z
+
+# custom tnt
+accessible field net/minecraft/world/entity/item/PrimedTnt owner Lnet/minecraft/world/entity/LivingEntity;
+
+extendable method net/minecraft/world/entity/item/PrimedTnt explode ()V
+
+# equipment changes check
+
+# flowglaze destroy block check
+
+# whip knockback
+
+# chain of souls
+
+# crescent spear
+
+# enchantment
+
+# tooltip
+
+# chunkgen
+extendable class net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator
+extendable method net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator doFill (Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/chunk/ChunkAccess;II)Lnet/minecraft/world/level/chunk/ChunkAccess;
+accessible method net/minecraft/world/level/chunk/ChunkGenerator getStructureGeneratingAt (Ljava/util/Set;Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/world/level/StructureManager;ZLnet/minecraft/world/level/levelgen/structure/placement/StructurePlacement;Lnet/minecraft/world/level/ChunkPos;)Lcom/mojang/datafixers/util/Pair;
+
+# surface rules
+accessible class net/minecraft/world/level/levelgen/SurfaceRules$Context
+accessible class net/minecraft/world/level/levelgen/SurfaceRules$Condition
+
+accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context system Lnet/minecraft/world/level/levelgen/SurfaceSystem;
+accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context blockX I
+accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context blockY I
+accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context blockZ I
+accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context randomState Lnet/minecraft/world/level/levelgen/RandomState;
+
+# sweep attack for scythes and hammers
+
+# items
+
+# custom arrow for wilted crossbow
+
+# gatekeeper skin
+
+# render types
+accessible method net/minecraft/client/renderer/RenderType create (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
+
+# world visual effects
+
+# particle
+accessible method net/minecraft/core/particles/SimpleParticleType <init> (Z)V
+accessible method net/minecraft/client/particle/GlowParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDDLnet/minecraft/client/particle/SpriteSet;)V
+accessible method net/minecraft/client/particle/DripParticle$DripHangParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;Lnet/minecraft/core/particles/ParticleOptions;)V
+accessible method net/minecraft/client/particle/DripParticle$DripLandParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;)V
+accessible method net/minecraft/client/particle/DripParticle$FallAndLandParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;Lnet/minecraft/core/particles/ParticleOptions;)V
+accessible method net/minecraft/client/particle/SquidInkParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDDILnet/minecraft/client/particle/SpriteSet;)V
+
+accessible field net/minecraft/client/particle/Particle stoppedByCollision Z
+accessible field net/minecraft/client/particle/ParticleEngine spriteSets Ljava/util/Map;
+
+accessible class net/minecraft/client/particle/ParticleEngine$SpriteParticleRegistration
+
+# spellcasting camera
+
+# astral golem
+
+# mixin
+accessible class net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection
+accessible method net/minecraft/world/level/block/CropBlock getGrowthSpeed (Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F
+accessible method net/minecraft/world/level/levelgen/structure/structures/JigsawStructure verifyRange (Lnet/minecraft/world/level/levelgen/structure/structures/JigsawStructure;)Lcom/mojang/serialization/DataResult;
+
+accessible field net/minecraft/world/level/levelgen/structure/structures/JigsawStructure startPool Lnet/minecraft/core/Holder;
+accessible field net/minecraft/world/level/levelgen/structure/structures/JigsawStructure startJigsawName Ljava/util/Optional;
+accessible field net/minecraft/world/level/levelgen/structure/structures/JigsawStructure maxDepth I
+accessible field net/minecraft/world/level/levelgen/structure/structures/JigsawStructure startHeight Lnet/minecraft/world/level/levelgen/heightproviders/HeightProvider;
+accessible field net/minecraft/world/level/levelgen/structure/structures/JigsawStructure useExpansionHack Z
+accessible field net/minecraft/world/level/levelgen/structure/structures/JigsawStructure projectStartToHeightmap Ljava/util/Optional;
+accessible field net/minecraft/world/level/levelgen/structure/structures/JigsawStructure maxDistanceFromCenter I
+
+# datagen
+accessible class net/minecraft/data/models/ItemModelGenerators$TrimModelData
+accessible field net/minecraft/data/models/ItemModelGenerators GENERATED_TRIM_MODELS Ljava/util/List;
+accessible method net/minecraft/data/models/ItemModelGenerators$TrimModelData itemModelIndex ()F
+
+# sprite source list mixin
+
+# sky rendering
+accessible method net/minecraft/client/renderer/LevelRenderer doesMobEffectBlockSky (Lnet/minecraft/client/Camera;)Z
+
+accessible field net/minecraft/client/renderer/LevelRenderer skyBuffer Lcom/mojang/blaze3d/vertex/VertexBuffer;
+
+# player animator
+
+# gui
+accessible field net/minecraft/client/gui/components/AbstractWidget height I
+
+# freeze rendertype
+
+# custom witch
+
+# layer attachment
+
+# model utils
+extendable method net/minecraft/client/model/Model renderType (Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+accessible method net/minecraft/world/entity/Entity calculateViewVector (FF)Lnet/minecraft/world/phys/Vec3;
+accessible method net/minecraft/client/renderer/entity/player/PlayerRenderer setModelProperties (Lnet/minecraft/client/player/AbstractClientPlayer;)V
+accessible method net/minecraft/client/renderer/entity/player/PlayerRenderer scale (Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;F)V
+accessible method net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer renderArmorPiece (Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;)V
+accessible method net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer getArmorModel (Lnet/minecraft/world/entity/EquipmentSlot;)Lnet/minecraft/client/model/HumanoidModel;
+
+accessible field net/minecraft/client/model/geom/ModelPart children Ljava/util/Map;
+
+# equipment changes check
+
+# flowglaze destroy block check
+
+# whip knockback
+
+# chain of souls
+
+# crescent spear
+
+# enchantment
+
+# tooltip
+
+# chunkgen
+public-f class net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator
+public-f method net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator doFill (Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/chunk/ChunkAccess;II)Lnet/minecraft/world/level/chunk/ChunkAccess;
+public method net.minecraft.world.level.chunk.ChunkGenerator getStructureGeneratingAt (Ljava/util/Set;Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/world/level/StructureManager;ZLnet/minecraft/world/level/levelgen/structure/placement/StructurePlacement;Lnet/minecraft/world/level/ChunkPos;)Lcom/mojang/datafixers/util/Pair;
+
+# surface rules
+public class net.minecraft.world.level.levelgen.SurfaceRules$Context
+public class net.minecraft.world.level.levelgen.SurfaceRules$Condition
+
+public field net.minecraft.world.level.levelgen.SurfaceRules$Context system
+public field net.minecraft.world.level.levelgen.SurfaceRules$Context blockX
+public field net.minecraft.world.level.levelgen.SurfaceRules$Context blockY
+public field net.minecraft.world.level.levelgen.SurfaceRules$Context blockZ
+public field net.minecraft.world.level.levelgen.SurfaceRules$Context randomState
+
+# sweep attack for scythes and hammers
+
+# items
+
+# custom arrow for wilted crossbow
+
+# gatekeeper skin
+
+# render types
+public method net.minecraft.client.renderer.RenderType create (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
+
+# world visual effects
+
+# particle
+public method net.minecraft.core.particles.SimpleParticleType <init> (Z)V
+public method net.minecraft.client.particle.GlowParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDDLnet/minecraft/client/particle/SpriteSet;)V
+public method net.minecraft.client.particle.DripParticle$DripHangParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;Lnet/minecraft/core/particles/ParticleOptions;)V
+public method net.minecraft.client.particle.DripParticle$DripLandParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;)V
+public method net.minecraft.client.particle.DripParticle$FallAndLandParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDLnet/minecraft/world/level/material/Fluid;Lnet/minecraft/core/particles/ParticleOptions;)V
+public method net.minecraft.client.particle.SquidInkParticle <init> (Lnet/minecraft/client/multiplayer/ClientLevel;DDDDDDILnet/minecraft/client/particle/SpriteSet;)V
+
+public field net.minecraft.client.particle.Particle stoppedByCollision
+public field net.minecraft.client.particle.ParticleEngine spriteSets
+
+public class net.minecraft.client.particle.ParticleEngine$SpriteParticleRegistration
+
+# spellcasting camera
+
+# astral golem
+
+# mixin
+public class net.minecraft.client.renderer.ItemInHandRenderer$HandRenderSelection
+public method net.minecraft.world.level.block.CropBlock getGrowthSpeed (Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)F
+public method net.minecraft.world.level.levelgen.structure.structures.JigsawStructure verifyRange (Lnet/minecraft/world/level/levelgen/structure/structures/JigsawStructure;)Lcom/mojang/serialization/DataResult;
+
+public field net.minecraft.world.level.levelgen.structure.structures.JigsawStructure startPool
+public field net.minecraft.world.level.levelgen.structure.structures.JigsawStructure startJigsawName
+public field net.minecraft.world.level.levelgen.structure.structures.JigsawStructure maxDepth
+public field net.minecraft.world.level.levelgen.structure.structures.JigsawStructure startHeight
+public field net.minecraft.world.level.levelgen.structure.structures.JigsawStructure useExpansionHack
+public field net.minecraft.world.level.levelgen.structure.structures.JigsawStructure projectStartToHeightmap
+public field net.minecraft.world.level.levelgen.structure.structures.JigsawStructure maxDistanceFromCenter
+
+# datagen
+public class net.minecraft.data.models.ItemModelGenerators$TrimModelData
+public field net.minecraft.data.models.ItemModelGenerators GENERATED_TRIM_MODELS
+public method net.minecraft.data.models.ItemModelGenerators$TrimModelData itemModelIndex ()F
+
+# sprite source list mixin
+
+# sky rendering
+public method net.minecraft.client.renderer.LevelRenderer doesMobEffectBlockSky (Lnet/minecraft/client/Camera;)Z
+
+public field net.minecraft.client.renderer.LevelRenderer skyBuffer
+
+# player animator
+
+# gui
+public field net.minecraft.client.gui.components.AbstractWidget height
+
+# freeze rendertype
+
+# custom witch
+
+# layer attachment
+
+# model utils
+public-f method net.minecraft.client.model.Model renderType (Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;
+public method net.minecraft.world.entity.Entity calculateViewVector (FF)Lnet/minecraft/world/phys/Vec3;
+public method net.minecraft.client.renderer.entity.player.PlayerRenderer setModelProperties (Lnet/minecraft/client/player/AbstractClientPlayer;)V
+public method net.minecraft.client.renderer.entity.player.PlayerRenderer scale (Lnet/minecraft/client/player/AbstractClientPlayer;Lcom/mojang/blaze3d/vertex/PoseStack;F)V
+public method net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer renderArmorPiece (Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/EquipmentSlot;ILnet/minecraft/client/model/HumanoidModel;)V
+public method net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer getArmorModel (Lnet/minecraft/world/entity/EquipmentSlot;)Lnet/minecraft/client/model/HumanoidModel;
+
+public field net.minecraft.client.model.geom.ModelPart children
