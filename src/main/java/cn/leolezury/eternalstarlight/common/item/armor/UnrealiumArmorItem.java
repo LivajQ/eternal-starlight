@@ -1,14 +1,19 @@
 package cn.leolezury.eternalstarlight.common.item.armor;
 
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
+import cn.leolezury.eternalstarlight.common.client.model.armor.UnrealiumArmorModel;
 import cn.leolezury.eternalstarlight.common.registry.ESAttributes;
+import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -17,9 +22,12 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class UnrealiumArmorItem extends ArmorItem {
 
@@ -119,6 +127,35 @@ public class UnrealiumArmorItem extends ArmorItem {
 	@Override
 	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
 		return EternalStarlight.id("textures/armor/unrealium_layer_" + ((slot == EquipmentSlot.LEGS) ? "2.png" : "1.png")).toString();
+	}
+
+	@Override
+	public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+		consumer.accept(new IClientItemExtensions() {
+			private UnrealiumArmorModel<LivingEntity> innerModel;
+			private UnrealiumArmorModel<LivingEntity> outerModel;
+
+			@Override
+			public @NotNull HumanoidModel<?> getHumanoidArmorModel(
+				LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original
+			) {
+				if (innerModel == null || outerModel == null) {
+					var models = Minecraft.getInstance().getEntityModels();
+					innerModel = new UnrealiumArmorModel<>(models.bakeLayer(UnrealiumArmorModel.INNER_LOCATION));
+					outerModel = new UnrealiumArmorModel<>(models.bakeLayer(UnrealiumArmorModel.OUTER_LOCATION));
+				}
+
+				if (stack.is(ESItems.UNREALIUM_LEGGINGS.get()))
+					return innerModel;
+
+				if (stack.is(ESItems.UNREALIUM_HELMET.get())
+					|| stack.is(ESItems.UNREALIUM_CHESTPLATE.get())
+					|| stack.is(ESItems.UNREALIUM_BOOTS.get()))
+					return outerModel;
+
+				return original;
+			}
+		});
 	}
 
 	@Override

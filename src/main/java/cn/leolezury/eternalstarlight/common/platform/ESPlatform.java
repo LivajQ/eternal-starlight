@@ -3,6 +3,7 @@ package cn.leolezury.eternalstarlight.common.platform;
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.block.TearBombBlock;
 import cn.leolezury.eternalstarlight.common.block.fluid.EtherFluid;
+import cn.leolezury.eternalstarlight.common.client.model.armor.StarlitDiamondArmorModel;
 import cn.leolezury.eternalstarlight.common.item.armor.AlchemistArmorItem;
 import cn.leolezury.eternalstarlight.common.item.armor.ThermalSpringstoneArmorItem;
 import cn.leolezury.eternalstarlight.common.item.armor.UnrealiumArmorItem;
@@ -12,9 +13,12 @@ import cn.leolezury.eternalstarlight.common.item.combat.PetalScytheItem;
 import cn.leolezury.eternalstarlight.common.item.combat.ScytheItem;
 import cn.leolezury.eternalstarlight.common.network.ESPacket;
 import cn.leolezury.eternalstarlight.common.platform.registry.RegistrationProvider;
+import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.resource.gatekeeper.TheGatekeeperNameManager;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -27,10 +31,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -46,6 +47,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -122,6 +125,35 @@ public interface ESPlatform {
 			@Override
 			public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
 				return EternalStarlight.id("textures/armor/starlit_diamond_layer_" + ((slot == EquipmentSlot.LEGS) ? "2.png" : "1.png")).toString();
+			}
+
+			@Override
+			public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+				consumer.accept(new IClientItemExtensions() {
+					private StarlitDiamondArmorModel<LivingEntity> innerModel;
+					private StarlitDiamondArmorModel<LivingEntity> outerModel;
+
+					@Override
+					public @NotNull HumanoidModel<?> getHumanoidArmorModel(
+						LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original
+					) {
+						if (innerModel == null || outerModel == null) {
+							var models = Minecraft.getInstance().getEntityModels();
+							innerModel = new StarlitDiamondArmorModel<>(models.bakeLayer(StarlitDiamondArmorModel.INNER_LOCATION));
+							outerModel = new StarlitDiamondArmorModel<>(models.bakeLayer(StarlitDiamondArmorModel.OUTER_LOCATION));
+						}
+
+						if (stack.is(ESItems.STARLIT_DIAMOND_LEGGINGS.get()))
+							return innerModel;
+
+						if (stack.is(ESItems.STARLIT_DIAMOND_HELMET.get())
+							|| stack.is(ESItems.STARLIT_DIAMOND_CHESTPLATE.get())
+							|| stack.is(ESItems.STARLIT_DIAMOND_BOOTS.get()))
+							return outerModel;
+
+						return original;
+					}
+				});
 			}
 		};
 	}

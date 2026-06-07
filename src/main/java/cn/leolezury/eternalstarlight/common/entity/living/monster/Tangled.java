@@ -83,6 +83,7 @@ public class Tangled extends Monster implements MultiBehaviorUser {
 
 	@Override
 	protected void defineSynchedData() {
+		super.defineSynchedData();
 		this.entityData.define(BEHAVIOR_STATE, 0);
 		this.entityData.define(BEHAVIOR_TICKS, 0);
 		this.entityData.define(VARIANT, 0);

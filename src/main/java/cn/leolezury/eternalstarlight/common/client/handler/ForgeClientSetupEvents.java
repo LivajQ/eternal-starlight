@@ -47,8 +47,8 @@ public class ForgeClientSetupEvents {
 		ESClientSetupHandler.registerItemColors(event::register);
 	}
 
-
 	/* TODO deal with this somehow
+	should be done but in case still here for reference
 	@SubscribeEvent
 	private static void onRegisterClientExtensions(IClientItemExtensions event) {
 		event.registerItem(ESForgeItemStackRenderer.CLIENT_ITEM_EXTENSION, ESItems.GLACITE_SHIELD.get());

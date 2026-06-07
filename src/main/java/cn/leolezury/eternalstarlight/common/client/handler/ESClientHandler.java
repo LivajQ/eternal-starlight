@@ -75,10 +75,7 @@ public class ESClientHandler {
 	public static final Set<Mob> BOSSES = Collections.newSetFromMap(new WeakHashMap<>());
 	public static final List<WorldVisualEffect> VISUAL_EFFECTS = new ArrayList<>();
 	public static final List<ScreenShake> SCREEN_SHAKES = new ArrayList<>();
-	private static final ResourceLocation[] BAR_BACKGROUND_SPRITES = new ResourceLocation[]{new ResourceLocation("minecraft", "boss_bar/pink_background"), new ResourceLocation("minecraft", "boss_bar/blue_background"), new ResourceLocation("minecraft", "boss_bar/red_background"), new ResourceLocation("minecraft", "boss_bar/green_background"), new ResourceLocation("minecraft", "boss_bar/yellow_background"), new ResourceLocation("minecraft", "boss_bar/purple_background"), new ResourceLocation("minecraft", "boss_bar/white_background")};
-	private static final ResourceLocation[] BAR_PROGRESS_SPRITES = new ResourceLocation[]{new ResourceLocation("minecraft", "boss_bar/pink_progress"), new ResourceLocation("minecraft", "boss_bar/blue_progress"), new ResourceLocation("minecraft", "boss_bar/red_progress"), new ResourceLocation("minecraft", "boss_bar/green_progress"), new ResourceLocation("minecraft", "boss_bar/yellow_progress"), new ResourceLocation("minecraft", "boss_bar/purple_progress"), new ResourceLocation("minecraft", "boss_bar/white_progress")};
-	private static final ResourceLocation[] OVERLAY_BACKGROUND_SPRITES = new ResourceLocation[]{new ResourceLocation("minecraft", "boss_bar/notched_6_background"), new ResourceLocation("minecraft", "boss_bar/notched_10_background"), new ResourceLocation("minecraft", "boss_bar/notched_12_background"), new ResourceLocation("minecraft", "boss_bar/notched_20_background")};
-	private static final ResourceLocation[] OVERLAY_PROGRESS_SPRITES = new ResourceLocation[]{new ResourceLocation("minecraft", "boss_bar/notched_6_progress"), new ResourceLocation("minecraft", "boss_bar/notched_10_progress"), new ResourceLocation("minecraft", "boss_bar/notched_12_progress"), new ResourceLocation("minecraft", "boss_bar/notched_20_progress")};
+	private static final ResourceLocation GUI_BARS_LOCATION = new ResourceLocation("minecraft", "textures/gui/bars.png");
 	private static final ResourceLocation ETHER_EROSION_OVERLAY = EternalStarlight.id("textures/misc/ether_erosion.png");
 	private static final ResourceLocation ETHER_ARMOR_EMPTY = EternalStarlight.id("textures/gui/hud/ether_armor_empty.png");
 	private static final ResourceLocation ETHER_ARMOR_HALF = EternalStarlight.id("textures/gui/hud/ether_armor_half.png");
@@ -559,24 +556,22 @@ public class ESClientHandler {
 		return true;
 	}
 
-	public static void drawBar(GuiGraphics guiGraphics, int x, int y, BossEvent event, ResourceLocation barLocation) {
-		drawBar(guiGraphics, x, y, event, 182, BAR_BACKGROUND_SPRITES, OVERLAY_BACKGROUND_SPRITES);
-
-		int k = Mth.floor(event.getProgress() * 182.0F);
-		if (k > 0) {
-			drawBar(guiGraphics, x, y, event, k, BAR_PROGRESS_SPRITES, OVERLAY_PROGRESS_SPRITES);
-		}
-
-		guiGraphics.blit(barLocation, x - 1, y - 5, 0.0F, 0.0F, 184, 16, 184, 16);
-	}
-
-	private static void drawBar(GuiGraphics guiGraphics, int x, int y, BossEvent bossEvent, int progress, ResourceLocation[] bars, ResourceLocation[] overlays) {
-		guiGraphics.blit(bars[bossEvent.getColor().ordinal()], x, y, 0, 0, progress, 5);
+	private static void drawBar(GuiGraphics guiGraphics, int x, int y, BossEvent bossEvent, int width, int yOffset) {
+		guiGraphics.blit(GUI_BARS_LOCATION, x, y, 0, bossEvent.getColor().ordinal() * 5 * 2 + yOffset, width, 5);
 		if (bossEvent.getOverlay() != BossEvent.BossBarOverlay.PROGRESS) {
 			RenderSystem.enableBlend();
-			guiGraphics.blit(overlays[bossEvent.getOverlay().ordinal() - 1], x, y, 0, 0, progress, 5);
+			guiGraphics.blit(GUI_BARS_LOCATION, x, y, 0, 80 + (bossEvent.getOverlay().ordinal() - 1) * 5 * 2 + yOffset, width, 5);
 			RenderSystem.disableBlend();
 		}
+	}
+
+	public static void drawBar(GuiGraphics guiGraphics, int x, int y, BossEvent event, ResourceLocation barLocation) {
+		drawBar(guiGraphics, x, y, event, 182, 0);
+		int k = (int)(event.getProgress() * 183.0F);
+		if (k > 0) {
+			drawBar(guiGraphics, x, y, event, k, 5);
+		}
+		guiGraphics.blit(barLocation, x - 1, y - 5, 0.0F, 0.0F, 184, 16, 184, 16);
 	}
 
 	public static int getEtherTint(BlockAndTintGetter getter, BlockPos pos) {
