@@ -128,20 +128,14 @@ public class ESParticles {
 				}
 			});
 
-	//TODO no ColorParticle here so for now simple type and sent using new ParticlePacket. Might adapt later
-	public static final RegistryObject<ParticleType<?>, SimpleParticleType> COLORED_INK =
-		PARTICLE_TYPES.register("colored_ink", () -> new SimpleParticleType(false));
-
-	/*
-	public static final RegistryObject<ParticleType<?>, ParticleType<ColorParticleOption>> COLORED_INK =
+	public static final RegistryObject<ParticleType<?>, ParticleType<ForgeColorParticleOption>> COLORED_INK =
 		PARTICLE_TYPES.register("colored_ink", () ->
-			new ParticleType<>(false, ColorParticleOption.DESERIALIZER) {
+			new ParticleType<>(false, ForgeColorParticleOption.DESERIALIZER) {
 				@Override
-				public Codec<ColorParticleOption> codec() {
-					return ColorParticleOption.codec(ESParticles.COLORED_INK.get()).codec();
+				public Codec<ForgeColorParticleOption> codec() {
+					return ForgeColorParticleOption.codec(ESParticles.COLORED_INK.get()).codec();
 				}
 			});
-	 */
 
 	public static final RegistryObject<ParticleType<?>, ParticleType<GeyserParticleOptions>> GEYSER =
 		PARTICLE_TYPES.register("geyser", () ->

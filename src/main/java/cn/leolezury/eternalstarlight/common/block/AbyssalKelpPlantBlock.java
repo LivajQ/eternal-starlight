@@ -80,7 +80,7 @@ public class AbyssalKelpPlantBlock extends GrowingPlantBodyBlock implements Liqu
 
 	@Override
 	public boolean canAttachTo(BlockState blockState) {
-		return this.getHeadBlock().canAttachTo(blockState);
+		return ESBlocks.ABYSSAL_KELP.get().canAttachTo(blockState);
 	}
 
 	@Override

@@ -19,6 +19,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -114,10 +116,9 @@ public class StarfireBirdNestBlock extends BaseEntityBlock {
 	public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack stack) {
 		super.playerDestroy(level, player, pos, state, blockEntity, stack);
 		if (!level.isClientSide && blockEntity instanceof StarfireBirdNestBlockEntity nest) {
-			//TODO which enchant?
-			//if (EnchantmentHelper.getItemEnchantmentLevel(ESEnchantments.PREVENTS_STARFIRE_BIRD_SPAWNS_WHEN_MINING.get(), stack) == 0) {
-			//	nest.releaseAllOccupants(state, true);
-			//}
+			if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, stack) == 0) {
+				nest.releaseAllOccupants(state, true);
+			}
 		}
 	}
 

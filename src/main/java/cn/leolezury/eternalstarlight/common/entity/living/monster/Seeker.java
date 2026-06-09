@@ -4,6 +4,7 @@ import cn.leolezury.eternalstarlight.common.config.ESConfig;
 import cn.leolezury.eternalstarlight.common.data.ESRegistries;
 import cn.leolezury.eternalstarlight.common.data.ESSeekerVariants;
 import cn.leolezury.eternalstarlight.common.network.ParticlePacket;
+import cn.leolezury.eternalstarlight.common.particle.ForgeColorParticleOption;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import cn.leolezury.eternalstarlight.common.registry.ESParticles;
 import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
@@ -205,8 +206,7 @@ public class Seeker extends Monster implements VariantHolder<Holder<SeekerVarian
 							serverLevel,
 							this,
 							new ParticlePacket(
-								ESParticles.COLORED_INK.get(),
-								getX() - nextMovement.x() * 0.5,
+								ForgeColorParticleOption.create(ESParticles.COLORED_INK.get(), getVariant().value().particleColor()),								getX() - nextMovement.x() * 0.5,
 								getY() + getBbHeight() / 2 - nextMovement.y() * 0.5,
 								getZ() - nextMovement.z() * 0.5,
 								-particleMovement.x() * particleSpeed,

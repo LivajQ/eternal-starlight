@@ -85,8 +85,8 @@ public class LunarSlashParticle extends TextureSheetParticle {
 						(float) renderLastInnerPos.x,
 						(float) renderLastInnerPos.y,
 						(float) renderLastInnerPos.z)
-					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha0)
 					.uv(u0, v0)
+					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha0)
 					.uv2(LightTexture.FULL_BRIGHT)
 					.endVertex();
 
@@ -94,8 +94,8 @@ public class LunarSlashParticle extends TextureSheetParticle {
 						(float) renderLastOuterPos.x,
 						(float) renderLastOuterPos.y,
 						(float) renderLastOuterPos.z)
-					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha0)
 					.uv(u0, v1)
+					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha0)
 					.uv2(LightTexture.FULL_BRIGHT)
 					.endVertex();
 
@@ -103,8 +103,8 @@ public class LunarSlashParticle extends TextureSheetParticle {
 						(float) renderOuterPos.x,
 						(float) renderOuterPos.y,
 						(float) renderOuterPos.z)
-					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha1)
 					.uv(u1, v1)
+					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha1)
 					.uv2(LightTexture.FULL_BRIGHT)
 					.endVertex();
 
@@ -112,8 +112,8 @@ public class LunarSlashParticle extends TextureSheetParticle {
 						(float) renderInnerPos.x,
 						(float) renderInnerPos.y,
 						(float) renderInnerPos.z)
-					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha1)
 					.uv(u1, v0)
+					.color(128 / 255f, 156 / 255f, 240 / 255f, alpha1)
 					.uv2(LightTexture.FULL_BRIGHT)
 					.endVertex();
 			}

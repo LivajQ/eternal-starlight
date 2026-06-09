@@ -224,6 +224,7 @@ public class TangledSkull extends Monster {
 
 	@Override
 	protected void defineSynchedData() {
+		super.defineSynchedData();
 		this.entityData.define(CHARGING, false);
 		this.entityData.define(SHOT, false);
 		this.entityData.define(SHOT_FROM_MONSTROSITY, false);

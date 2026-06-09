@@ -7,6 +7,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraftforge.common.ForgeMod;
 
 public class AirSacArmorItem extends ArmorItem {
 
@@ -15,20 +16,16 @@ public class AirSacArmorItem extends ArmorItem {
 	public AirSacArmorItem(ArmorMaterial material, Type type, Properties properties) {
 		super(material, type, properties);
 
-		/* TODO no water speed attr in vanilla so sth else
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 
 		String id = "armor." + type.getName() + "_water_movement";
 
 		builder.put(
-			Attributes.WATER_MOVEMENT_EFFICIENCY,
+			ForgeMod.SWIM_SPEED.get(),
 			new AttributeModifier(id, 0.9, AttributeModifier.Operation.ADDITION)
 		);
 
 		this.extraModifiers = builder.build();
-		 */
-
-		this.extraModifiers = ImmutableMultimap.of();
 	}
 
 	@Override

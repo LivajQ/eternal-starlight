@@ -85,10 +85,10 @@ public class RingParticle extends SimpleAnimatedParticle {
 		float b = this.bCol;
 		float a = this.alpha;
 
-		consumer.vertex(p0.x, p0.y, p0.z).color(r, g, b, a).uv(u0, v1).uv2(LightTexture.FULL_BRIGHT).endVertex();
-		consumer.vertex(p1.x, p1.y, p1.z).color(r, g, b, a).uv(u0, v0).uv2(LightTexture.FULL_BRIGHT).endVertex();
-		consumer.vertex(p2.x, p2.y, p2.z).color(r, g, b, a).uv(u1, v0).uv2(LightTexture.FULL_BRIGHT).endVertex();
-		consumer.vertex(p3.x, p3.y, p3.z).color(r, g, b, a).uv(u1, v1).uv2(LightTexture.FULL_BRIGHT).endVertex();
+		consumer.vertex(p0.x, p0.y, p0.z).uv(u0, v1).color(r, g, b, a).uv2(LightTexture.FULL_BRIGHT).endVertex();
+		consumer.vertex(p1.x, p1.y, p1.z).uv(u0, v0).color(r, g, b, a).uv2(LightTexture.FULL_BRIGHT).endVertex();
+		consumer.vertex(p2.x, p2.y, p2.z).uv(u1, v0).color(r, g, b, a).uv2(LightTexture.FULL_BRIGHT).endVertex();
+		consumer.vertex(p3.x, p3.y, p3.z).uv(u1, v1).color(r, g, b, a).uv2(LightTexture.FULL_BRIGHT).endVertex();
 	}
 
 	@Override

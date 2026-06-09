@@ -2,6 +2,7 @@ package cn.leolezury.eternalstarlight.common.block.flammable;
 
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,10 +17,19 @@ public class ESFlammabilityRegistry {
 
 	public static Optional<Flammability> getBlockFlammability(Block block) {
 		for (Supplier<? extends Block> blockSupplier : BLOCK_TO_FLAMMABILITY.keySet()) {
-			if (blockSupplier.get().defaultBlockState().is(block)) {
+
+			Block supplied = null;
+			try {
+				supplied = blockSupplier.get();
+			} catch (Exception ignored) {
+				continue;
+			}
+
+			if (supplied != null && supplied.defaultBlockState().is(block)) {
 				return Optional.ofNullable(BLOCK_TO_FLAMMABILITY.get(blockSupplier));
 			}
 		}
+
 		return Optional.empty();
 	}
 

@@ -77,9 +77,7 @@ public class SolarCreeperRenderer<T extends SolarCreeper> extends MobRenderer<T,
 			poseStack.scale(shineScale, shineScale, shineScale);
 			poseStack.mulPose(new Quaternionf(this.entityRenderDispatcher.cameraOrientation()).rotateY(Mth.PI));
 			PoseStack.Pose pose = poseStack.last();
-			//VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.dragonRays());
-			//TODO see if fits
-			VertexConsumer vertexConsumer = buffer.getBuffer(ESRenderType.entityTranslucentGlow(SUN_TEXTURE));
+			VertexConsumer vertexConsumer = buffer.getBuffer(ESRenderType.DRAGON_RAYS);
 
 			Matrix4f poseMat = pose.pose();
 			Matrix3f normalMat = pose.normal();

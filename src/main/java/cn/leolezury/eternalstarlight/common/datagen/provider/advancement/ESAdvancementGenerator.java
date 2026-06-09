@@ -95,7 +95,6 @@ public class ESAdvancementGenerator implements AdvancementSubProvider {
 
 		Advancement redVelvetumossFlower = addItemObtain(consumer, enterAbyss, "obtain_red_velvetumoss_flower", ESItems.RED_VELVETUMOSS_FLOWER.get());
 
-		// TODO maybe figure out why getOrThrow is bitching about missing biome tag even though it gets generated (manual json causes duplicate error)
 		Advancement.Builder builder = Advancement.Builder.advancement()
 			.parent(enterDim)
 			.display(

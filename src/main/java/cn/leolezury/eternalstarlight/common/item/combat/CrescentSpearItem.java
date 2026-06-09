@@ -97,8 +97,6 @@ public class CrescentSpearItem extends TieredItem {
 		));
 
 		if (useTime >= 10 && (result.getType() != HitResult.Type.MISS || player.getAbilities().instabuild)) {
-
-			//float spinStrength = EnchantmentHelper.getTridentSpinAttackStrength(stack, player) + 1.75f; TODO ?
 			float spinStrength = 2.0F;
 
 			if (!level.isClientSide) {

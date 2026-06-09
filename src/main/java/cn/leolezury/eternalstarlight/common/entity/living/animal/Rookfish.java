@@ -1,6 +1,7 @@
 package cn.leolezury.eternalstarlight.common.entity.living.animal;
 
 import cn.leolezury.eternalstarlight.common.data.ESDimensions;
+import cn.leolezury.eternalstarlight.common.particle.ForgeColorParticleOption;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.registry.ESParticles;
 import net.minecraft.core.BlockPos;
@@ -12,6 +13,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -39,7 +41,7 @@ public class Rookfish extends Squid implements Bucketable {
 
 	@Override
 	protected ParticleOptions getInkParticle() {
-		return ESParticles.COLORED_INK.get();
+		return ForgeColorParticleOption.create(ESParticles.COLORED_INK.get(), FastColor.ARGB32.color(255, 51, 61, 58));
 	}
 
 	@Override

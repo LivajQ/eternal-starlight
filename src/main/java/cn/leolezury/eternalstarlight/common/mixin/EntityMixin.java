@@ -1,5 +1,6 @@
 package cn.leolezury.eternalstarlight.common.mixin;
 
+import cn.leolezury.eternalstarlight.common.particle.ForgeColorParticleOption;
 import cn.leolezury.eternalstarlight.common.registry.ESDataAttachments;
 import cn.leolezury.eternalstarlight.common.registry.ESItems;
 import cn.leolezury.eternalstarlight.common.registry.ESMobEffects;
@@ -11,6 +12,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -62,7 +64,7 @@ public abstract class EntityMixin {
 			Vec3 pos = bottomCenter.offsetRandom(living.getRandom(), living.getBbWidth());
 			Vec3 speed = living.getDeltaMovement().normalize().offsetRandom(living.getRandom(), 0.3f).scale(-0.2);
 
-			level().addParticle(ESParticles.COLORED_INK.get(), pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
+			level().addParticle(ForgeColorParticleOption.create(ESParticles.COLORED_INK.get(), FastColor.ARGB32.color(255, 51, 61, 58)), pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
 		}
 	}
 

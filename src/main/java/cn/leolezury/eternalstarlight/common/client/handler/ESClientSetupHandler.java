@@ -37,6 +37,7 @@ import cn.leolezury.eternalstarlight.common.entity.misc.ESBoat;
 import cn.leolezury.eternalstarlight.common.entity.projectile.ChainOfSouls;
 import cn.leolezury.eternalstarlight.common.item.combat.ShatteredSwordItem;
 import cn.leolezury.eternalstarlight.common.item.misc.GalacticQuiverItem;
+import cn.leolezury.eternalstarlight.common.particle.ForgeColorParticleOption;
 import cn.leolezury.eternalstarlight.common.platform.ESClientPlatform;
 import cn.leolezury.eternalstarlight.common.platform.ESPlatform;
 import cn.leolezury.eternalstarlight.common.registry.*;
@@ -902,15 +903,15 @@ public class ESClientSetupHandler {
 		strategy.register(ESParticles.ASHEN_SNOW.get(), AshenSnowParticle.Provider::new);
 		strategy.register(ESParticles.ORBITAL_ASHEN_SNOW.get(), OrbitalAshenSnowParticle.Provider::new);
 		strategy.register(ESParticles.EXPLOSION_SHOCK.get(), ExplosionShockParticle.Provider::new);
-		strategy.register(ESParticles.COLORED_INK.get(), spriteSet -> new ParticleProvider<SimpleParticleType>() {
-			@Override
-			public @NotNull Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double dx, double dy, double dz) {
-				int color = FastColor.ARGB32.color(255, 0, 0, 0);
-
-				return new SquidInkParticle(level, x, y, z, dx, dy, dz, color, spriteSet);
+		strategy.register(ESParticles.COLORED_INK.get(), spriteSet ->
+			(type, level, x, y, z, dx, dy, dz) -> {
+				ForgeColorParticleOption option = (ForgeColorParticleOption) type;
+				int color = ((int)(option.getR() * 255) << 16) | ((int)(option.getG() * 255) << 8) | (int)(option.getB() * 255);
+				SquidInkParticle particle = new SquidInkParticle(level, x, y, z, dx, dy, dz, color, spriteSet);
+				particle.setColor(color);
+				return particle;
 			}
-		});
-
+		);
 		strategy.register(ESParticles.AMARAMBER_WAX_ON.get(), spriteSet -> (type, level, x, y, z, dx, dy, dz) -> {
 			GlowParticle particle = new GlowParticle(level, x, y, z, 0.0F, 0.0F, 0.0F, spriteSet);
 			particle.setParticleSpeed(dx * 0.01 / (double) 2.0F, dy * 0.01, dz * 0.01 / (double) 2.0F);

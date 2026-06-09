@@ -1,5 +1,6 @@
 package cn.leolezury.eternalstarlight.common.item.combat;
 
+import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import cn.leolezury.eternalstarlight.common.network.ParticlePacket;
 import cn.leolezury.eternalstarlight.common.particle.ESExplosionParticleOptions;
 import cn.leolezury.eternalstarlight.common.particle.ExplosionShockParticleOptions;
@@ -15,6 +16,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -154,16 +159,23 @@ public class CrystalGreatswordItem extends GreatswordItem {
 		return result;
 	}
 
-	/* TODO not sure
-	@Override
-	public float getAttackDamageBonus(Entity target, float damage, DamageSource source) {
-		if (target instanceof LivingEntity living) {
-			MobEffectInstance instance = living.getEffect(ESMobEffects.CRYSTAL_INFECTION.asHolder());
+	@Mod.EventBusSubscriber(modid = EternalStarlight.ID)
+	public static class Handler {
+
+		@SubscribeEvent(priority = EventPriority.HIGH)
+		public static void onLivingHurt(LivingHurtEvent event) {
+			if (!(event.getSource().getEntity() instanceof LivingEntity attacker)) return;
+			LivingEntity target = event.getEntity();
+			ItemStack weapon = attacker.getMainHandItem();
+			if (!(weapon.getItem() instanceof CrystalGreatswordItem)) return;
+
+			MobEffectInstance instance = target.getEffect(ESMobEffects.CRYSTAL_INFECTION.get());
 			if (instance != null) {
-				return instance.getAmplifier() * (instance.getAmplifier() >= 4 ? 0.25f : 0.15f) * damage;
+				int amp = instance.getAmplifier();
+				float base = event.getAmount();
+				float bonus = amp * (amp >= 4 ? 0.25f : 0.15f) * base;
+				event.setAmount(base + bonus);
 			}
 		}
-		return 0;
 	}
-	 */
 }

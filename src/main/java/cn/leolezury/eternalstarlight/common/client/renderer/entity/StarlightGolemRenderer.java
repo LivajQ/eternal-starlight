@@ -54,8 +54,7 @@ public class StarlightGolemRenderer<T extends StarlightGolem> extends MobRendere
 			poseStack.mulPose(new Quaternionf(this.entityRenderDispatcher.cameraOrientation()).rotateY(Mth.PI));
 			PoseStack.Pose pose = poseStack.last();
 			//VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.dragonRays());
-			//TODO also check if fits
-			VertexConsumer vertexConsumer = buffer.getBuffer(ESRenderType.entityTranslucentGlow(getTextureLocation(entity)));
+			VertexConsumer vertexConsumer = buffer.getBuffer(ESRenderType.DRAGON_RAYS);
 
 			Matrix4f poseMat = pose.pose();
 			Matrix3f normalMat = pose.normal();

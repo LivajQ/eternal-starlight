@@ -15,8 +15,8 @@ public class DesertFlowerBlock extends FlowerBlock {
 
 	public DesertFlowerBlock(Holder<MobEffect> holder, int duration, Properties properties) {
 		// TODO holder null at reg time
-		// super(holder.value(), duration, properties);
-		super(MobEffects.WEAKNESS, duration, properties);
+		 super(holder::value, duration, properties);
+		//super(MobEffects.WEAKNESS, duration, properties);
 	}
 
 	@Override
