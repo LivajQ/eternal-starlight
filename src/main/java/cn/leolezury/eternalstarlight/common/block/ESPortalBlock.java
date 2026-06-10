@@ -6,14 +6,16 @@ import cn.leolezury.eternalstarlight.common.data.ESDimensions;
 import cn.leolezury.eternalstarlight.common.registry.ESBlockEntities;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
+import cn.leolezury.eternalstarlight.common.world.ESTeleporter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
@@ -93,26 +95,33 @@ public class ESPortalBlock extends BaseEntityBlock {
 	public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
 		if (level.isClientSide) return;
 		if (!entity.canChangeDimensions()) return;
+
+		entity.handleInsidePortal(pos);
+
 		if (entity.isOnPortalCooldown()) return;
 
 		ServerLevel currentLevel = (ServerLevel) level;
-		MinecraftServer server = currentLevel.getServer();
+		ResourceKey<Level> destination = currentLevel.dimension() == ESDimensions.STARLIGHT_KEY
+			? Level.OVERWORLD : ESDimensions.STARLIGHT_KEY;
 
-		ResourceKey<Level> destination =
-			currentLevel.dimension() == ESDimensions.STARLIGHT_KEY
-				? Level.OVERWORLD
-				: ESDimensions.STARLIGHT_KEY;
+		ServerLevel destinationLevel = currentLevel.getServer().getLevel(destination);
+		if (destinationLevel == null) return;
 
-		ServerLevel destinationLevel = server.getLevel(destination);
-
-		if (destinationLevel == null) {
-			return;
-		}
+		ESTeleporter teleporter = new ESTeleporter(entity, pos, destinationLevel);
+		if (!teleporter.isValid()) return;
 
 		entity.setPortalCooldown();
 
-		//this is kinda cooked as in 1.20.1 we cannot pass ESTeleporter, but surely it's fine!
-		entity.changeDimension(destinationLevel);
+		Entity result = entity.changeDimension(destinationLevel, teleporter);
+		if (result != null) {
+			result.setPortalCooldown();
+			destinationLevel.getChunkSource().addRegionTicket(
+				TicketType.PORTAL,
+				new ChunkPos(teleporter.getTarget()),
+				3,
+				teleporter.getTarget()
+			);
+		}
 	}
 
 	@Override
