@@ -4,7 +4,7 @@
     "srcrgb": "srcalpha",
     "dstrgb": "1-srcalpha"
   },
-  "vertex": "eternal_starlight:rendertype_starlight_portal",
+  "vertex": "rendertype_entity_translucent",
   "fragment": "eternal_starlight:rendertype_starlight_portal",
   "attributes": [
     "Position",
