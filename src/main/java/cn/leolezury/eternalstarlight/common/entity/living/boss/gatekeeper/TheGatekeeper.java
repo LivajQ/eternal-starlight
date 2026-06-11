@@ -753,8 +753,6 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 	public ItemStack getGatekeeperHammer() {
 		LivingEntity target = getTarget();
 		if (target instanceof ServerPlayer serverPlayer && isPlayerPermitted(serverPlayer) && ESDataAttachments.GATEKEEPER_CHALLENGE_COUNT.getData(target) > 0) {
-			// TODO no mace so replace with whatever later
-			// ItemStack mace = Items.MACE.getDefaultInstance();
 			ItemStack weapon = Items.NETHERITE_AXE.getDefaultInstance();
 			ItemStack source = ESItems.GLISTERING_MORNING_STAR.get().getDefaultInstance();
 			Multimap<Attribute, AttributeModifier> mods = source.getAttributeModifiers(EquipmentSlot.MAINHAND);

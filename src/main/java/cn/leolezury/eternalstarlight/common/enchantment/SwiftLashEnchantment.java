@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class SwiftLashEnchantment extends Enchantment {
 
-	private static final UUID SWIFT_LASH_UUID = UUID.fromString("d3f3a1b2-9c4e-4c7f-8b1a-123456789abc");
+	public static final UUID SWIFT_LASH_UUID = UUID.fromString("d3f3a1b2-9c4e-4c7f-8b1a-123456789abc");
 
 	public SwiftLashEnchantment() {
 		super(Rarity.COMMON, EnchantmentCategory.WEAPON, new EquipmentSlot[]{ EquipmentSlot.MAINHAND });
@@ -36,25 +36,4 @@ public class SwiftLashEnchantment extends Enchantment {
 		return stack.is(ESTags.Items.WHIP_ENCHANTABLE)
 			|| super.canEnchant(stack);
 	}
-
-	//TODO this will likely have to be added through ItemStack
-	/*
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack, int level) {
-		if (slot != EquipmentSlot.MAINHAND) {
-			return ImmutableMultimap.of();
-		}
-
-		float amount = 0.2F * level;
-
-		return ImmutableMultimap.of(
-			Attributes.ATTACK_SPEED,
-			new AttributeModifier(
-				SWIFT_LASH_UUID,
-				"Swift Lash attack speed",
-				amount,
-				AttributeModifier.Operation.ADDITION
-			)
-		);
-	}
-	 */
 }

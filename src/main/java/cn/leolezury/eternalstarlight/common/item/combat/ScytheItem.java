@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -21,6 +22,7 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -81,20 +83,6 @@ public class ScytheItem extends TieredItem {
 				);
 			}
 
-			/* TODO sweep needs sth else
-			Attribute sweep = ESPlatform.INSTANCE.getSweep();
-			if (sweep != null) {
-				builder.put(
-					sweep,
-					new AttributeModifier(
-						EternalStarlight.id("weapon.sweep").toString(),
-						this.sweep,
-						AttributeModifier.Operation.ADDITION
-					)
-				);
-			}
-			 */
-
 			return builder.build();
 		}
 
@@ -140,5 +128,14 @@ public class ScytheItem extends TieredItem {
 	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		stack.hurtAndBreak(1, attacker, (e) -> e.broadcastBreakEvent(EquipmentSlot.MAINHAND));
 		return true;
+	}
+
+	@Override
+	public boolean canPerformAction(ItemStack stack, net.minecraftforge.common.ToolAction action) {
+		return action == net.minecraftforge.common.ToolActions.SWORD_SWEEP || super.canPerformAction(stack, action);
+	}
+
+	public float getSweep() {
+		return sweep;
 	}
 }

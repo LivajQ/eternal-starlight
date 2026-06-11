@@ -1,23 +1,24 @@
 package cn.leolezury.eternalstarlight.common.handler;
 
 import cn.leolezury.eternalstarlight.common.EternalStarlight;
-import cn.leolezury.eternalstarlight.common.handler.ESCommonHandler;
-import cn.leolezury.eternalstarlight.common.handler.ESCommonSetupHandler;
+import cn.leolezury.eternalstarlight.common.data.ESEnchantments;
+import cn.leolezury.eternalstarlight.common.enchantment.SwiftLashEnchantment;
 import cn.leolezury.eternalstarlight.common.registry.ESAttributes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.VanillaGameEvent;
+import net.minecraftforge.event.*;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.living.*;
@@ -281,6 +282,20 @@ public class ForgeCommonEvents {
 					}
 				}
 			}
+		}
+	}
+
+	@SubscribeEvent
+	public static void onItemAttributes(ItemAttributeModifierEvent event) {
+		if (event.getSlotType() != EquipmentSlot.MAINHAND) return;
+		int level = EnchantmentHelper.getItemEnchantmentLevel(ESEnchantments.SWIFT_LASH.get(), event.getItemStack());
+		if (level > 0) {
+			event.addModifier(Attributes.ATTACK_SPEED, new AttributeModifier(
+				SwiftLashEnchantment.SWIFT_LASH_UUID,
+				"Swift Lash attack speed",
+				0.2F * level,
+				AttributeModifier.Operation.ADDITION
+			));
 		}
 	}
 

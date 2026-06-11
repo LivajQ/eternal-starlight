@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(SpriteSources.class)
 public abstract class SpriteSourceListMixin {
 
-	/* TODO sth
+	/*
 	@Inject(method = "<init>", at = @At("RETURN"))
 	private void init(List<SpriteSource> list, CallbackInfo ci) {
 		for (SpriteSource source : list) {

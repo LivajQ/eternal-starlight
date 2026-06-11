@@ -16,6 +16,7 @@
     "CropBlockMixin",
     "DiggerItemMixin",
     "DirtPathBlockMixin",
+    "EnchantmentHelperMixin",
     "EntityFlagsPredicateMixin",
     "EntityMixin",
     "FarmBlockMixin",

@@ -2,13 +2,16 @@ package cn.leolezury.eternalstarlight.common.item.combat;
 
 import cn.leolezury.eternalstarlight.common.entity.projectile.ShotSeeds;
 import cn.leolezury.eternalstarlight.common.registry.ESParticles;
+import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
 import cn.leolezury.eternalstarlight.common.util.ESMathUtil;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -16,7 +19,10 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -48,11 +54,22 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 			List<ItemStack> list = draw(stack, projectile, living);
 			if (!list.isEmpty()) {
 				if (level instanceof ServerLevel serverLevel) {
-					for (ItemStack ammoStack : list) {
-
+					int count = list.size();
+					for (int i = 0; i < count; i++) {
+						ItemStack ammoStack = list.get(i);
+						SeedsLauncherAmmoType type = SeedsLauncherAmmoType.getAmmoType(level.registryAccess(), ammoStack.getItem()).value();
 						ShotSeeds seeds = new ShotSeeds(level, living, ammoStack, stack);
-						seeds.shootFromRotation(living, living.getXRot(), living.getYRot(), 0.0F, 0.75F, 7.5F);
+
+						float angle = count > 1 ? (i / (float)(count - 1) - 0.5f) * 2f * 10.0f : 0f;
+
+						Vec3 upVector = living.getUpVector(1.0F);
+						Quaternionf rotation = new Quaternionf().setAngleAxis(angle * (Math.PI / 180.0), upVector.x, upVector.y, upVector.z);
+						Vec3 viewVector = living.getViewVector(1.0F);
+						Vector3f direction = viewVector.toVector3f().rotate(rotation);
+
+						seeds.shoot(direction.x(), direction.y(), direction.z(), 0.75F * type.speedMultiplier(), 7.5F);
 						level.addFreshEntity(seeds);
+						level.playSound(null, living.getX(), living.getY(), living.getZ(), ESSoundEvents.SEEDS_LAUNCHER_SHOOT.get(), living.getSoundSource(), 1.0F, 1.0F);
 					}
 					Vec3 particlePos = ESMathUtil.rotationToPosition(living.position().add(0, 3 * living.getBbHeight() / 4, 0), 1f, -living.getXRot(), living.getYHeadRot() + 90);
 					serverLevel.sendParticles(ESParticles.PUNGENCY_FRUIT_SMOKE.get(), particlePos.x(), particlePos.y(), particlePos.z(), 20, 0.1, 0.1, 0.1, 0.025);
@@ -65,25 +82,17 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 		return false;
 	}
 
-	@NotNull
 	protected static List<ItemStack> draw(ItemStack weapon, ItemStack ammo, LivingEntity shooter) {
-		if (ammo.isEmpty()) {
-			return List.of();
-		} else {
-			int multishot = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.MULTISHOT, weapon);
-			int count = multishot > 0 ? 3 : 1;
-			List<ItemStack> list = new ArrayList<>(count);
-			ItemStack ammoCopy = ammo.copy();
-
-			for (int i = 0; i < count; i++) {
-				ItemStack itemstack = useAmmo(weapon, i == 0 ? ammo : ammoCopy, shooter, i > 0);
-				if (!itemstack.isEmpty()) {
-					list.add(itemstack);
-				}
-			}
-
-			return list;
+		if (ammo.isEmpty()) return List.of();
+		int multishot = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.MULTISHOT, weapon);
+		int count = 6 + (multishot > 0 ? 2 : 0); // base 6, multishot adds extras
+		List<ItemStack> list = new ArrayList<>(count);
+		ItemStack ammoCopy = ammo.copy();
+		for (int i = 0; i < count; i++) {
+			ItemStack itemstack = useAmmo(weapon, i == 0 ? ammo : ammoCopy, shooter, i > 0);
+			if (!itemstack.isEmpty()) list.add(itemstack);
 		}
+		return list;
 	}
 
 	protected static ItemStack useAmmo(ItemStack weapon, ItemStack ammo, LivingEntity shooter, boolean simulate) {
@@ -92,21 +101,17 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 		ItemStack copy = ammo.copy();
 
 		if (!simulate) {
-			if (shooter instanceof Player player) {
+			if (shooter instanceof Player player && !player.getAbilities().instabuild) {
 				ammo.shrink(1);
-
 				if (ammo.isEmpty()) {
 					player.getInventory().removeItem(ammo);
 				}
-			} else {
-				ammo.shrink(1);
 			}
 		}
 
 		return copy;
 	}
 
-	/* TODO something... with all that
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
@@ -119,6 +124,7 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 		return success ? InteractionResultHolder.consume(stack) : super.use(level, player, hand);
 	}
 
+	/*
 	@Override
 	protected int getDurabilityUse(ItemStack itemStack) {
 		return 0;
@@ -165,4 +171,5 @@ public class SeedsLauncherItem extends ProjectileWeaponItem {
 		return new Vector3f(direction).rotateAxis(angle * (float) (Math.PI / 180.0), rotated.x, rotated.y, rotated.z);
 	}
 	 */
+
 }
