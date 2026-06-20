@@ -1,6 +1,5 @@
 package cn.leolezury.eternalstarlight.common.mixin;
 
-import cn.leolezury.eternalstarlight.common.EternalStarlight;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +39,6 @@ public abstract class JigsawStructureMixin {
 		require = 0
 	)
 	private static int init1(int value) {
-		EternalStarlight.LOGGER.info("init1");
 		return 512;
 	}
 
@@ -52,7 +50,6 @@ public abstract class JigsawStructureMixin {
 		require = 0
 	)
 	private static int init2(int value) {
-		EternalStarlight.LOGGER.info("init2");
 		return 512;
 	}
 
@@ -64,7 +61,6 @@ public abstract class JigsawStructureMixin {
 		require = 0
 	)
 	private static int maxDistanceFromCenter(int value) {
-		EternalStarlight.LOGGER.info("maxDistanceFromCenter");
 		return 512;
 	}
 }

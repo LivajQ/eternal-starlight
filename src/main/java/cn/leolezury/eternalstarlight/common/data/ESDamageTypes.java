@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ESDamageTypes {
 	// misc
+	public static final ResourceKey<DamageType> ABYSSAL_FIRE = create("abyssal_fire");
 	public static final ResourceKey<DamageType> ETHER = create("ether");
 	public static final ResourceKey<DamageType> METEOR = create("meteor");
 	public static final ResourceKey<DamageType> CRYSTAL_INFECTION = create("crystal_infection");
@@ -53,6 +54,7 @@ public class ESDamageTypes {
 	}
 
 	public static void bootstrap(BootstapContext<DamageType> context) {
+		context.register(ABYSSAL_FIRE, new DamageType(name("abyssal_fire"), 0.1F, DamageEffects.BURNING));
 		context.register(ETHER, new DamageType(name("ether"), 0.1F));
 		context.register(METEOR, new DamageType(name("meteor"), 0.1F));
 		context.register(CRYSTAL_INFECTION, new DamageType(name("crystal_infection"), 0.1F));

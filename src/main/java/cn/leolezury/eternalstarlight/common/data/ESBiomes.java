@@ -76,7 +76,7 @@ public class ESBiomes {
 		context.register(THE_ABYSS, baseBiomeBuilder(baseEffectsBuilder(false).waterFogColor(3409191).backgroundMusic(MUSIC_THE_ABYSS), theAbyssSpawns(), theAbyssGenSettings(featureHolderGetter, carverHolderGetter)).build());
 		context.register(WARM_SHORE, baseBiomeBuilder(baseEffectsBuilder(), baseLushSpawnBuilder(), warmShoreGenSettings(featureHolderGetter, carverHolderGetter)).build());
 		context.register(GRIM_SHORE, baseBiomeBuilder(baseEffectsBuilder(), baseLushSpawnBuilder(), grimShoreGenSettings(featureHolderGetter, carverHolderGetter)).build());
-		context.register(SOLARIS_ISLES, baseBiomeBuilder(baseEffectsBuilder(), baseLushSpawnBuilder(), grimShoreGenSettings(featureHolderGetter, carverHolderGetter)).build());
+		context.register(SOLARIS_ISLES, baseBiomeBuilder(baseEffectsBuilder(), baseLushSpawnBuilder(), solarisIslesGenSettings(featureHolderGetter, carverHolderGetter)).build());
 	}
 
 	private static Biome.BiomeBuilder baseBiomeBuilder(BiomeSpecialEffects.Builder specialEffects, MobSpawnSettings.Builder mobSpawnSettings, BiomeGenerationSettings.Builder genSettings) {
@@ -486,8 +486,8 @@ public class ESBiomes {
 	private static BiomeGenerationSettings.Builder solarisIslesGenSettings(HolderGetter<PlacedFeature> featureGetter, HolderGetter<ConfiguredWorldCarver<?>> carverGetter) {
 		BiomeGenerationSettings.Builder builder = baseLandGenSettings(featureGetter, carverGetter, false);
 
-		//builder.addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, ESPlacedFeatures.STONE_SPIKE);
-		//builder.addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, ESPlacedFeatures.MONOLITH);
+		builder.addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, ESPlacedFeatures.STONE_SPIKE);
+		builder.addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, ESPlacedFeatures.MONOLITH);
 
 		return builder;
 	}

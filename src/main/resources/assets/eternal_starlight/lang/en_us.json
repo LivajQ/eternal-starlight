@@ -1618,6 +1618,8 @@
   "container.eternal_starlight.alloy_furnace": "Alloy Furnace",
   "container.eternal_starlight.dusk_lockbox": "Dusk Lockbox",
   "container.eternal_starlight.stellar_rack": "Stellar Rack",
+  "death.attack.eternal_starlight.abyssal_fire": "%1$s was consumed by the flames of the abyss",
+  "death.attack.eternal_starlight.abyssal_fire.player": "%1$s tossed themself into the flames of the abyss to escape %2$s",
   "death.attack.eternal_starlight.ether": "%1$s drifts away",
   "death.attack.eternal_starlight.ether.player": "%1$s drifts away while trying to escape %2$s",
   "death.attack.eternal_starlight.ether.item": "%1$s drifts away under the influence of %3$s",

@@ -28,13 +28,15 @@ public class ESDamageTypeTagsProvider extends TagsProvider<DamageType> {
 			.add(
 				ESDamageTypes.ETHER,
 				ESDamageTypes.CRYSTAL_INFECTION,
-				ESDamageTypes.SOUL_ABSORB
+				ESDamageTypes.SOUL_ABSORB,
+				ESDamageTypes.ABYSSAL_FIRE
 			);
 		tag(DamageTypeTags.BYPASSES_ENCHANTMENTS)
 			.add(
 				ESDamageTypes.ETHER,
 				ESDamageTypes.CRYSTAL_INFECTION,
-				ESDamageTypes.SOUL_ABSORB
+				ESDamageTypes.SOUL_ABSORB,
+				ESDamageTypes.ABYSSAL_FIRE
 			);
 		tag(DamageTypeTags.BYPASSES_SHIELD)
 			.add(
@@ -42,7 +44,8 @@ public class ESDamageTypeTagsProvider extends TagsProvider<DamageType> {
 				ESDamageTypes.CRYSTAL_INFECTION,
 				ESDamageTypes.SONAR,
 				ESDamageTypes.SOUL_ABSORB,
-				ESDamageTypes.NUMBNESS
+				ESDamageTypes.NUMBNESS,
+				ESDamageTypes.ABYSSAL_FIRE
 			);
 		tag(DamageTypeTags.NO_IMPACT)
 			.add(

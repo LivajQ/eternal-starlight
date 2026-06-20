@@ -25,8 +25,11 @@ public record SpellCastData(boolean hasSpell, AbstractSpell spell, int strength,
 	}
 
 	public void write(FriendlyByteBuf buf) {
-		buf.writeBoolean(hasSpell());
-		buf.writeResourceLocation(ESSpells.SPELLS.getId(spell()));
+		boolean has = hasSpell();
+		buf.writeBoolean(has);
+		if (has) {
+			buf.writeResourceLocation(ESSpells.SPELLS.getId(spell()));
+		}
 		buf.writeInt(strength());
 		buf.writeInt(castTicks());
 		buf.writeBoolean(offhand());
@@ -34,8 +37,16 @@ public record SpellCastData(boolean hasSpell, AbstractSpell spell, int strength,
 
 	public static SpellCastData read(FriendlyByteBuf buf) {
 		boolean hasSpell = buf.readBoolean();
-		ResourceLocation id = buf.readResourceLocation();
-		AbstractSpell spell = ESSpells.SPELLS.get(id);
+		AbstractSpell spell = ESSpells.GUIDANCE_OF_STARS.get();
+		if (hasSpell) {
+			ResourceLocation id = buf.readResourceLocation();
+			AbstractSpell resolved = ESSpells.SPELLS.get(id);
+			if (resolved != null) {
+				spell = resolved;
+			} else {
+				hasSpell = false;
+			}
+		}
 		int strength = buf.readInt();
 		int ticks = buf.readInt();
 		boolean offhand = buf.readBoolean();
