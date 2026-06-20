@@ -155,7 +155,7 @@ public class ESCommonHandler {
 	}
 
 	public static void onPlayerJoin(Player player) {
-		if (ESConfig.INSTANCE.startWithGuidebook && !player.level().isClientSide && !ESDataAttachments.RECEIVED_GUIDEBOOK.getData(player)) {
+		if (ESConfig.startWithGuidebook.get() && !player.level().isClientSide && !ESDataAttachments.RECEIVED_GUIDEBOOK.getData(player)) {
 			ESDataAttachments.RECEIVED_GUIDEBOOK.setData(player, true);
 			ESEntityUtil.givePlayerItem(player, ESItems.BOOK.get().getDefaultInstance());
 		}
@@ -334,10 +334,10 @@ public class ESCommonHandler {
 				modified *= (1 + Mth.clamp(ESDataAttachments.GATEKEEPER_CHALLENGE_COUNT.getData(entity), 0, 40) * 0.05f);
 			}
 			if (sourceEntity.getType() == ESEntities.STARLIGHT_GOLEM.get()) {
-				modified *= (float) ESConfig.INSTANCE.mobsConfig.starlightGolem.attackDamageScale();
+				modified *= ESConfig.starlightGolem.attackDamageScale.get().floatValue();
 			}
 			if (sourceEntity.getType() == ESEntities.LUNAR_MONSTROSITY.get()) {
-				modified *= (float) ESConfig.INSTANCE.mobsConfig.lunarMonstrosity.attackDamageScale();
+				modified *= ESConfig.lunarMonstrosity.attackDamageScale.get().floatValue();
 			}
 		}
 		if (source.is(DamageTypeTags.IS_FIRE)) {
@@ -615,7 +615,7 @@ public class ESCommonHandler {
 	public static LivingEntity onLivingChangeTarget(LivingEntity entity, LivingEntity newTarget) {
 		if (newTarget != null && entity.hasEffect(ESMobEffects.TEARY.get())) {
 			int tearyTicks = ESDataAttachments.TEARY_TICKS.getData(entity);
-			if (tearyTicks <= ESConfig.INSTANCE.mobMaxTearyTicks) {
+			if (tearyTicks <= ESConfig.mobMaxTearyTicks.get()) {
 				return null;
 			}
 		}
@@ -867,7 +867,7 @@ public class ESCommonHandler {
 				}
 				if (!livingEntity.getType().is(ESTags.EntityTypes.TEARY_IMMUNE) && livingEntity.hasEffect(ESMobEffects.TEARY.get())) {
 					int tearyTicks = ESDataAttachments.TEARY_TICKS.getData(entity);
-					if (tearyTicks <= ESConfig.INSTANCE.mobMaxTearyTicks) {
+					if (tearyTicks <= ESConfig.mobMaxTearyTicks.get()) {
 						if (livingEntity instanceof Mob mob && mob.getTarget() != null) {
 							mob.setTarget(null);
 							mob.getBrain().eraseMemory(MemoryModuleType.ATTACK_TARGET);

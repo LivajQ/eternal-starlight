@@ -138,8 +138,8 @@ public class ShimmerLacewing extends Animal implements VariantHolder<Holder<Shim
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Mob.createMobAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.shimmerLacewing.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.shimmerLacewing.armor())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.3)
 			.add(Attributes.FLYING_SPEED, 0.6);
 	}
@@ -159,8 +159,15 @@ public class ShimmerLacewing extends Animal implements VariantHolder<Holder<Shim
 
 	@Override
 	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag compoundTag) {
+		SpawnGroupData spawnGroupData = super.finalizeSpawn(level, instance, spawnType, data, compoundTag);
 		setVariant(ShimmerLacewingVariant.getSpawnVariant(level.registryAccess(), level.getBiome(blockPosition())));
-		return super.finalizeSpawn(level, instance, spawnType, data, null);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.shimmerLacewing.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.shimmerLacewing.armor.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return spawnGroupData;
 	}
 
 	@Override
@@ -192,6 +199,6 @@ public class ShimmerLacewing extends Animal implements VariantHolder<Holder<Shim
 	}
 
 	public static boolean checkLacewingSpawnRules(EntityType<? extends ShimmerLacewing> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return pos.getY() >= level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos).getY() && ESConfig.INSTANCE.mobsConfig.shimmerLacewing.canSpawn();
+		return pos.getY() >= level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos).getY() && ESConfig.shimmerLacewing.canSpawn.get();
 	}
 }

@@ -4,9 +4,11 @@ import cn.leolezury.eternalstarlight.common.config.ESConfig;
 import cn.leolezury.eternalstarlight.common.registry.ESEntities;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -17,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.Nullable;
 
 public class Ratlin extends Animal {
@@ -43,9 +46,22 @@ public class Ratlin extends Animal {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Mob.createMobAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.ratlin.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.ratlin.armor())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.25D);
+	}
+
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag dataTag) {
+
+		SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.ratlin.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.ratlin.armor.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return data;
 	}
 
 	@Override
@@ -68,6 +84,6 @@ public class Ratlin extends Animal {
 	}
 
 	public static boolean checkRatlinSpawnRules(EntityType<? extends Ratlin> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return level.getBlockState(pos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON) && ESConfig.INSTANCE.mobsConfig.ratlin.canSpawn();
+		return level.getBlockState(pos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON) && ESConfig.ratlin.canSpawn.get();
 	}
 }

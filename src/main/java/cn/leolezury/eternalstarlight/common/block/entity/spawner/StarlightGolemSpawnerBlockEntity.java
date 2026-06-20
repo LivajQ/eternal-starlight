@@ -17,7 +17,7 @@ public class StarlightGolemSpawnerBlockEntity extends BossSpawnerBlockEntity<Sta
 
 	@Override
 	protected boolean spawnBoss(ServerLevelAccessor accessor) {
-		if (!ESConfig.INSTANCE.mobsConfig.starlightGolem.canSpawn()) {
+		if (!ESConfig.starlightGolem.canSpawn.get()) {
 			return false;
 		}
 		return super.spawnBoss(accessor);

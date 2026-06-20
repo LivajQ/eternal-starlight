@@ -6,11 +6,13 @@ import cn.leolezury.eternalstarlight.common.registry.ESSoundEvents;
 import cn.leolezury.eternalstarlight.common.util.ESTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -28,8 +30,11 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import javax.annotation.Nullable;
 
 public class Freeze extends Monster implements RangedAttackMob {
 	public AnimationState idleAnimationState = new AnimationState();
@@ -124,11 +129,25 @@ public class Freeze extends Monster implements RangedAttackMob {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.freeze.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.freeze.armor())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.freeze.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.3)
 			.add(Attributes.FLYING_SPEED, 0.6);
+	}
+
+	@Nullable
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
+		SpawnGroupData result = super.finalizeSpawn(level, instance, spawnType, data, tag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.freeze.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.freeze.armor.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.freeze.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return result;
 	}
 
 	@Override
@@ -202,6 +221,6 @@ public class Freeze extends Monster implements RangedAttackMob {
 	}
 
 	public static boolean checkFreezeSpawnRules(EntityType<? extends Freeze> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.INSTANCE.mobsConfig.freeze.canSpawn();
+		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.freeze.canSpawn.get();
 	}
 }

@@ -17,6 +17,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -37,10 +38,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 public class TinyCreteor extends Monster implements PowerableMob {
@@ -108,12 +111,27 @@ public class TinyCreteor extends Monster implements PowerableMob {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.tinyCreteor.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.tinyCreteor.armor())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.tinyCreteor.attackDamage())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.tinyCreteor.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0D)
 			.add(Attributes.FLYING_SPEED, 1D);
+	}
+
+	@Nullable
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag dataTag) {
+		SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.tinyCreteor.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.tinyCreteor.armor.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.tinyCreteor.attackDamage.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.tinyCreteor.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return data;
 	}
 
 	@Override

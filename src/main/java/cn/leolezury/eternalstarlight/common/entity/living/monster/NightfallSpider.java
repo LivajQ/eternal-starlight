@@ -26,12 +26,13 @@ public class NightfallSpider extends Spider {
 
 	public static AttributeSupplier.Builder createNightfallSpider() {
 		return Spider.createAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.nightfallSpider.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.nightfallSpider.armor())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.nightfallSpider.attackDamage())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.nightfallSpider.followRange());
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0);
 	}
 
+	@Nullable
 	@Override
 	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
 		SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnData, dataTag);
@@ -48,6 +49,13 @@ public class NightfallSpider extends Spider {
 				}
 			}
 		});
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.nightfallSpider.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.nightfallSpider.armor.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.nightfallSpider.attackDamage.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.nightfallSpider.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
 
 		return data;
 	}
@@ -80,6 +88,6 @@ public class NightfallSpider extends Spider {
 	 */
 
 	public static boolean checkNightfallSpiderSpawnRules(EntityType<? extends NightfallSpider> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.INSTANCE.mobsConfig.nightfallSpider.canSpawn();
+		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.nightfallSpider.canSpawn.get();
 	}
 }

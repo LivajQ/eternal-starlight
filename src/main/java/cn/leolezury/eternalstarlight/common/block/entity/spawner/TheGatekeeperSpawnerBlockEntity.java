@@ -17,7 +17,7 @@ public class TheGatekeeperSpawnerBlockEntity extends BossSpawnerBlockEntity<TheG
 
 	@Override
 	protected boolean spawnBoss(ServerLevelAccessor accessor) {
-		if (!ESConfig.INSTANCE.mobsConfig.theGatekeeper.canSpawn()) {
+		if (!ESConfig.theGatekeeper.canSpawn.get()) {
 			return false;
 		}
 		return super.spawnBoss(accessor);

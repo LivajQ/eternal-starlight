@@ -17,6 +17,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -36,9 +37,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.EnumSet;
 
@@ -137,11 +140,26 @@ public class Creteor extends Monster implements PowerableMob {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.creteor.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.creteor.armor())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.creteor.attackDamage())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.creteor.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.3);
+	}
+
+	@Nullable
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
+		SpawnGroupData result = super.finalizeSpawn(level, instance, spawnType, data, tag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.creteor.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.creteor.armor.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.creteor.attackDamage.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.creteor.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return result;
 	}
 
 	@Override
@@ -264,7 +282,7 @@ public class Creteor extends Monster implements PowerableMob {
 			this.spawnLingeringCloud();
 			//this.triggerOnDeathMobEffects(RemovalReason.KILLED);
 			this.discard();
-			if (ESConfig.INSTANCE.mobsConfig.tinyCreteor.canSpawn()) {
+			if (ESConfig.tinyCreteor.canSpawn.get()) {
 				int splitCount = getRandom().nextInt(2, 5);
 				for (int i = 0; i < splitCount; i++) {
 					TinyCreteor tinyCreteor = new TinyCreteor(ESEntities.TINY_CRETEOR.get(), level());
@@ -334,6 +352,6 @@ public class Creteor extends Monster implements PowerableMob {
 	}
 
 	public static boolean checkCreteorSpawnRules(EntityType<? extends Creteor> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.INSTANCE.mobsConfig.creteor.canSpawn();
+		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.creteor.canSpawn.get();
 	}
 }

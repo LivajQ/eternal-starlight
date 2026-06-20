@@ -138,7 +138,7 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 	}
 
 	public static int getTotalOverheatTicks() {
-		return ESConfig.INSTANCE.itemsConfig.alloyFurnace.totalOverheatTicks();
+		return ESConfig.alloyFurnace.totalOverheatTicks.get();
 	}
 
 	public static int getOverheatAnimationThreshold() {
@@ -323,7 +323,7 @@ public class AlloyFurnaceBlockEntity extends BaseContainerBlockEntity implements
 					pos.getX() + 0.5,
 					pos.getY() + 0.5,
 					pos.getZ() + 0.5,
-					ESConfig.INSTANCE.itemsConfig.alloyFurnace.explosionRadius(),
+					ESConfig.alloyFurnace.explosionRadius.get(),
 					Level.ExplosionInteraction.BLOCK
 				);
 

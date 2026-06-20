@@ -44,10 +44,10 @@ public class LonestarSkeleton extends Skeleton {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.lonestarSkeleton.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.lonestarSkeleton.armor())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.lonestarSkeleton.attackDamage())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.lonestarSkeleton.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.25);
 	}
 
@@ -64,6 +64,13 @@ public class LonestarSkeleton extends Skeleton {
 		if (!getItemBySlot(EquipmentSlot.CHEST).isEmpty() || random.nextInt(5) == 0) {
 			setItemSlot(EquipmentSlot.CHEST, ESItems.AMARAMBER_CHESTPLATE.get().getDefaultInstance());
 		}
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.lonestarSkeleton.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.lonestarSkeleton.armor.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.lonestarSkeleton.attackDamage.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.lonestarSkeleton.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
 
 		return data;
 	}
@@ -129,6 +136,6 @@ public class LonestarSkeleton extends Skeleton {
 	}
 
 	public static boolean checkLonestarSkeletonSpawnRules(EntityType<? extends LonestarSkeleton> type, ServerLevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return checkMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.INSTANCE.mobsConfig.lonestarSkeleton.canSpawn();
+		return checkMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.lonestarSkeleton.canSpawn.get();
 	}
 }

@@ -49,7 +49,7 @@ public class StranghoulDenStructure extends Structure {
 	public void afterPlace(WorldGenLevel level, StructureManager structureManager, ChunkGenerator chunkGenerator, RandomSource random, BoundingBox boundingBox, ChunkPos chunkPos, PiecesContainer piecesContainer) {
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		BoundingBox piecesBox = piecesContainer.calculateBoundingBox();
-		if (ESConfig.INSTANCE.mobsConfig.stranghoul.canSpawn()) {
+		if (ESConfig.stranghoul.canSpawn.get()) {
 			int num = random.nextInt(3, 6);
 			boolean farmer = false;
 			for (int x = boundingBox.minX(); x <= boundingBox.maxX() && num > 0; x++) {

@@ -34,6 +34,7 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
@@ -49,12 +50,14 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -201,12 +204,26 @@ public class StarlightGolem extends ESBoss implements RayAttackUser {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.starlightGolem.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.starlightGolem.armor())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.starlightGolem.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0)
-			.add(Attributes.ATTACK_DAMAGE, 0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
 			.add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
+	}
+
+	@Nullable
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag dataTag) {
+		SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.starlightGolem.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.starlightGolem.armor.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.starlightGolem.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return data;
 	}
 
 	@Override

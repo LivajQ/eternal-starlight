@@ -63,7 +63,7 @@ public class ESPortalBlock extends BaseEntityBlock {
 
 	@Override
 	public RenderShape getRenderShape(BlockState blockState) {
-		return ESConfig.INSTANCE.enablePortalShader ? RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.MODEL;
+		return ESConfig.enablePortalShader.get() ? RenderShape.ENTITYBLOCK_ANIMATED : RenderShape.MODEL;
 	}
 
 	@Override

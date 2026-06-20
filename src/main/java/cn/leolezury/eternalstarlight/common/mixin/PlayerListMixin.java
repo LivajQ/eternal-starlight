@@ -34,7 +34,7 @@ public abstract class PlayerListMixin {
 
 	@ModifyVariable(method = "placeNewPlayer", at = @At(value = "STORE"), ordinal = 0)
 	private ResourceKey<Level> modifySpawnDimension(ResourceKey<Level> original, Connection connection, ServerPlayer player, @Local CompoundTag compoundTag) {
-		if (compoundTag == null && ESConfig.INSTANCE.spawnInEternalStarlight) {
+		if (compoundTag == null && ESConfig.spawnInEternalStarlight.get()) {
 			return ESDimensions.STARLIGHT_KEY;
 		}
 		return original;
@@ -42,7 +42,7 @@ public abstract class PlayerListMixin {
 
 	@WrapOperation(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))
 	private ServerLevel modifyDefaultSpawnDimension(MinecraftServer instance, Operation<ServerLevel> original) {
-		if (ESConfig.INSTANCE.spawnInEternalStarlight) {
+		if (ESConfig.spawnInEternalStarlight.get()) {
 			return instance.getLevel(ESDimensions.STARLIGHT_KEY);
 		}
 		return original.call(instance);
@@ -50,7 +50,7 @@ public abstract class PlayerListMixin {
 
 	@WrapOperation(method = "getPlayerForLogin", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))
 	private ServerLevel modifyLoginDimension(MinecraftServer instance, Operation<ServerLevel> original) {
-		if (ESConfig.INSTANCE.spawnInEternalStarlight) {
+		if (ESConfig.spawnInEternalStarlight.get()) {
 			return instance.getLevel(ESDimensions.STARLIGHT_KEY);
 		}
 		return original.call(instance);
@@ -58,7 +58,7 @@ public abstract class PlayerListMixin {
 
 	@WrapOperation(method = "respawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;overworld()Lnet/minecraft/server/level/ServerLevel;"))
 	private ServerLevel es$modifyRespawnDimension(MinecraftServer server, Operation<ServerLevel> original) {
-		if (ESConfig.INSTANCE.respawnInEternalStarlight) {
+		if (ESConfig.respawnInEternalStarlight.get()) {
 			return server.getLevel(ESDimensions.STARLIGHT_KEY);
 		}
 		return original.call(server);

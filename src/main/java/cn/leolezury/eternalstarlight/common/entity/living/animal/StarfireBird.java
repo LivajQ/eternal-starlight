@@ -520,8 +520,8 @@ public class StarfireBird extends Animal implements FlyingAnimal {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Mob.createMobAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.starfireBird.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.starfireBird.armor())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.3)
 			.add(Attributes.FLYING_SPEED, 0.75);
 	}
@@ -618,10 +618,17 @@ public class StarfireBird extends Animal implements FlyingAnimal {
 
 	@Override
 	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
+		SpawnGroupData spawnGroupData = super.finalizeSpawn(level, instance, spawnType, data, tag);
 		if (random.nextInt(20) == 0) {
 			setSpecialVariant(true);
 		}
-		return super.finalizeSpawn(level, instance, spawnType, data, tag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.starfireBird.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.starfireBird.armor.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return spawnGroupData;
 	}
 
 	@Override
@@ -723,6 +730,6 @@ public class StarfireBird extends Animal implements FlyingAnimal {
 	}
 
 	public static boolean checkStarfireBirdSpawnRules(EntityType<? extends StarfireBird> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return level.getBlockState(pos.below()).is(BlockTags.DIRT) && ESConfig.INSTANCE.mobsConfig.starfireBird.canSpawn();
+		return level.getBlockState(pos.below()).is(BlockTags.DIRT) && ESConfig.starfireBird.canSpawn.get();
 	}
 }

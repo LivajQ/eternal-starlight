@@ -18,6 +18,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -32,8 +33,11 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import javax.annotation.Nullable;
 
 public class Gleech extends Monster {
 	private static final String TAG_LARVAL = "larval";
@@ -87,11 +91,26 @@ public class Gleech extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.gleech.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.gleech.armor())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.gleech.attackDamage())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.gleech.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.25);
+	}
+
+	@Nullable
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
+		SpawnGroupData result = super.finalizeSpawn(level, instance, spawnType, data, tag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.gleech.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.gleech.armor.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.gleech.attackDamage.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.gleech.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return result;
 	}
 
 	@Override
@@ -227,7 +246,7 @@ public class Gleech extends Monster {
 	}
 
 	public static boolean checkGleechSpawnRules(EntityType<? extends Gleech> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return level.getBlockState(pos.below()).is(BlockTags.SAND) && ESConfig.INSTANCE.mobsConfig.gleech.canSpawn();
+		return level.getBlockState(pos.below()).is(BlockTags.SAND) && ESConfig.gleech.canSpawn.get();
 	}
 }
 

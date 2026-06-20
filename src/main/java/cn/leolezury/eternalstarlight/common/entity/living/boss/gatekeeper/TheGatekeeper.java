@@ -283,10 +283,10 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.theGatekeeper.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.theGatekeeper.armor())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.theGatekeeper.attackDamage())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.theGatekeeper.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.6)
 			.add(Attributes.ARMOR_TOUGHNESS, 5.0)
 			.add(Attributes.KNOCKBACK_RESISTANCE, 0.8);
@@ -300,9 +300,15 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 		RandomSource random = level.getRandom();
 		this.populateDefaultEquipmentSlots(random, difficulty);
 
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.theGatekeeper.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.theGatekeeper.armor.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.theGatekeeper.attackDamage.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.theGatekeeper.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
 		return spawnGroupData;
 	}
-
 
 	@Override
 	protected void populateDefaultEquipmentSlots(RandomSource randomSource, DifficultyInstance difficultyInstance) {
@@ -545,7 +551,7 @@ public class TheGatekeeper extends ESBoss implements Npc, Merchant {
 		if (!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && source.getEntity() == this) {
 			return false;
 		}
-		if (!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !(ESConfig.INSTANCE.mobsConfig.theGatekeeper.canAlwaysHurtWhenFighting() && isActivated()) && (source.getEntity() == null || getTarget() == null || getBehaviorState() == 0)) {
+		if (!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && !(ESConfig.theGatekeeper.canAlwaysHurtWhenFighting.get() && isActivated()) && (source.getEntity() == null || getTarget() == null || getBehaviorState() == 0)) {
 			if (isActivated()) {
 				if (getBehaviorState() == 0 && source.getEntity() != null) {
 					level().broadcastEntityEvent(this, EVENT_BLOCK);

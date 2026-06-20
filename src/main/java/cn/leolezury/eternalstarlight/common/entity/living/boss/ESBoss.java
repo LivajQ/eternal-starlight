@@ -243,14 +243,14 @@ public class ESBoss extends Monster implements MultiBehaviorUser {
 	public void remove(RemovalReason reason) {
 		if (reason == RemovalReason.KILLED) {
 			trySpawnLoot();
-			if (ESConfig.INSTANCE.enableBossRespawn) {
+			if (ESConfig.enableBossRespawn.get()) {
 				BlockState spawnerState = getBossSpawner();
 				if (!spawnerState.isAir() && initialPos.dimension() == level().dimension()) {
 					BlockPos spawnerPos = BlockPos.containing(initialPos.pos());
 					if (canBossSpawnerReplace(spawnerPos, level().getBlockState(spawnerPos))) {
 						level().setBlockAndUpdate(spawnerPos, spawnerState);
 						if (level().getBlockEntity(spawnerPos) instanceof BossSpawnerBlockEntity<?> blockEntity) {
-							blockEntity.setSpawnCooldown(ESConfig.INSTANCE.bossRespawnCooldown);
+							blockEntity.setSpawnCooldown(ESConfig.bossRespawnCooldown.get());
 						}
 					}
 				}
@@ -268,7 +268,7 @@ public class ESBoss extends Monster implements MultiBehaviorUser {
 	}
 
 	protected boolean shouldSpawnLootChest() {
-		return ESConfig.INSTANCE.enableLootChest && !fightParticipants.isEmpty();
+		return ESConfig.enableLootChest.get() && !fightParticipants.isEmpty();
 	}
 
 	protected void trySpawnLoot() {

@@ -133,10 +133,10 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Mob.createMobAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.astralGolem.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.astralGolem.armor())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.astralGolem.followRange())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.astralGolem.attackDamage())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
 			.add(Attributes.ATTACK_KNOCKBACK, 3.0D)
 			.add(Attributes.KNOCKBACK_RESISTANCE, 1.0D)
 			.add(Attributes.FLYING_SPEED, 1.0D)
@@ -147,8 +147,18 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 	@Override
 	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
 		homePos = blockPosition();
-		return super.finalizeSpawn(level, instance, spawnType, data, tag);
+		SpawnGroupData result = super.finalizeSpawn(level, instance, spawnType, data, tag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.astralGolem.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.astralGolem.armor.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.astralGolem.followRange.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.astralGolem.attackDamage.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return result;
 	}
+
 
 	public AstralGolemMaterial getMaterial() {
 		return level().registryAccess().registryOrThrow(ESRegistries.ASTRAL_GOLEM_MATERIAL).get(getMaterialId());
@@ -351,6 +361,6 @@ public class AstralGolem extends AbstractGolem implements NeutralMob {
 	}
 
 	public static boolean checkAstralGolemSpawnRules(EntityType<? extends AstralGolem> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return checkMobSpawnRules(type, level, spawnType, pos, random) && ESConfig.INSTANCE.mobsConfig.astralGolem.canSpawn();
+		return checkMobSpawnRules(type, level, spawnType, pos, random) && ESConfig.astralGolem.canSpawn.get();
 	}
 }

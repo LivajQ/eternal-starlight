@@ -1,12 +1,12 @@
 package cn.leolezury.eternalstarlight.common.entity.living;
 
 import cn.leolezury.eternalstarlight.common.config.ESConfig;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.AnimationState;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -14,7 +14,9 @@ import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 
 public class GrimstoneGolem extends AbstractGolem {
@@ -28,9 +30,22 @@ public class GrimstoneGolem extends AbstractGolem {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Mob.createMobAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.grimstoneGolem.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.grimstoneGolem.armor())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.25D);
+	}
+
+	@Nullable
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
+		SpawnGroupData result = super.finalizeSpawn(level, instance, spawnType, data, tag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.grimstoneGolem.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.grimstoneGolem.armor.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return result;
 	}
 
 	@Override

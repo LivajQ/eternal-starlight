@@ -128,15 +128,23 @@ public class Ent extends Animal implements VariantHolder<Holder<EntVariant>> {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Mob.createMobAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.ent.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.ent.armor())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.25D);
 	}
 
 	@Override
 	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag compoundTag) {
 		setVariant(EntVariant.getSpawnVariant(level.registryAccess(), level.getBiome(blockPosition())));
-		return super.finalizeSpawn(level, instance, spawnType, data, null);
+
+		SpawnGroupData result = super.finalizeSpawn(level, instance, spawnType, data, null);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.ent.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.ent.armor.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return result;
 	}
 
 	@Override
@@ -194,6 +202,6 @@ public class Ent extends Animal implements VariantHolder<Holder<EntVariant>> {
 	}
 
 	public static boolean checkEntSpawnRules(EntityType<? extends Ent> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return level.getBlockState(pos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON) && ESConfig.INSTANCE.mobsConfig.ent.canSpawn();
+		return level.getBlockState(pos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON) && ESConfig.ent.canSpawn.get();
 	}
 }

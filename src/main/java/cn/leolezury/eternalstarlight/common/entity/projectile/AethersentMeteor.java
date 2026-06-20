@@ -174,7 +174,7 @@ public class AethersentMeteor extends AbstractHurtingProjectile implements Trail
 					entity.setGlowingTag(true);
 				}
 				if (!clean) {
-					if (ESConfig.INSTANCE.aethersentMeteorReplaceBlocks) {
+					if (ESConfig.aethersentMeteorReplaceBlocks.get()) {
 						for (int x = -3; x <= 3; x++) {
 							for (int y = -3; y <= 3; y++) {
 								for (int z = -3; z <= 3; z++) {
@@ -187,7 +187,7 @@ public class AethersentMeteor extends AbstractHurtingProjectile implements Trail
 							}
 						}
 					}
-					if (ESConfig.INSTANCE.mobsConfig.creteor.canSpawn() && random.nextFloat() < ESConfig.INSTANCE.mobsConfig.creteor.spawnChance() && level().getEntitiesOfClass(Creteor.class, getBoundingBox().inflate(32)).isEmpty()) {
+					if (ESConfig.creteor.canSpawn.get() && random.nextFloat() < ESConfig.creteor.spawnChance.get() && level().getEntitiesOfClass(Creteor.class, getBoundingBox().inflate(32)).isEmpty()) {
 						Creteor creteor = new Creteor(ESEntities.CRETEOR.get(), level());
 						creteor.setPos(position());
 						creteor.setPersistenceRequired();
@@ -223,7 +223,7 @@ public class AethersentMeteor extends AbstractHurtingProjectile implements Trail
 					for (LivingEntity livingEntity : level().getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(getSize(), 0, getSize()))) {
 						if (ESEntityUtil.shouldHarm(getOwner(), livingEntity)) {
 							livingEntity.invulnerableTime = 0;
-							livingEntity.hurt(ESDamageTypes.getEntityDamageSource(level(), ESDamageTypes.METEOR, getOwner()), getSize() * 5 * (getOwner() instanceof LivingEntity ? 0.08f : 1f) * (getOwner() instanceof Player ? (float) ESConfig.INSTANCE.itemsConfig.playerAethersentMeteorDamageScale : 1));
+							livingEntity.hurt(ESDamageTypes.getEntityDamageSource(level(), ESDamageTypes.METEOR, getOwner()), getSize() * 5 * (getOwner() instanceof LivingEntity ? 0.08f : 1f) * (getOwner() instanceof Player ? ESConfig.playerAethersentMeteorDamageScale.get().floatValue() : 1));
 						}
 					}
 					serverLevel.sendParticles(getSize() >= 10 ? ParticleTypes.EXPLOSION_EMITTER : ESExplosionParticleOptions.aethersent(), getX(), getY() + 0.05 * getSize(), getZ(), 1, 0, 0, 0, 0);

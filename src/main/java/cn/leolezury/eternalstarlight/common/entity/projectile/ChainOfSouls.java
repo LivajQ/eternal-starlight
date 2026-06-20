@@ -134,7 +134,7 @@ public class ChainOfSouls extends Projectile implements Grappling {
 						Player playerOwner = getPlayerOwner();
 						if (playerOwner != null) {
 
-							float damage = (float) ESConfig.INSTANCE.itemsConfig.chainOfSouls.soulAbsorbDamage();
+							float damage = ESConfig.chainOfSouls.soulAbsorbDamage.get().floatValue();
 							DamageSource damageSource = ESDamageTypes.getIndirectEntityDamageSource(level(), ESDamageTypes.SOUL_ABSORB, this, playerOwner);
 
 							if (getWeaponItem() != null) {
@@ -146,7 +146,7 @@ public class ChainOfSouls extends Projectile implements Grappling {
 								EnchantmentHelper.doPostHurtEffects(living, playerOwner);
 								EnchantmentHelper.doPostDamageEffects(playerOwner, living);
 
-								playerOwner.heal((float)(damage * ESConfig.INSTANCE.itemsConfig.chainOfSouls.healPercentage()));
+								playerOwner.heal((float)(damage * ESConfig.chainOfSouls.healPercentage.get()));
 								playSound(ESSoundEvents.CHAIN_OF_SOULS_ABSORB.get());
 
 								for (int i = 0; i < 7; i++) {
@@ -230,7 +230,7 @@ public class ChainOfSouls extends Projectile implements Grappling {
 	}
 
 	private double getMaxRange() {
-		return ESConfig.INSTANCE.itemsConfig.chainOfSouls.maxRange();
+		return ESConfig.chainOfSouls.maxRange.get();
 	}
 
 	public boolean isValidTarget(Entity entity) {

@@ -24,7 +24,7 @@ public class ESPortalRenderer<T extends ESPortalBlockEntity> implements BlockEnt
 
 	@Override
 	public void render(T portal, float partialTicks, PoseStack stack, MultiBufferSource bufferSource, int light, int overlay) {
-		if (ESConfig.INSTANCE.enablePortalShader && portal.getBlockState().getValue(ESPortalBlock.CENTER)) {
+		if (ESConfig.enablePortalShader.get() && portal.getBlockState().getValue(ESPortalBlock.CENTER)) {
 			VertexConsumer consumer = ESClientHandler.AFTER_LEVEL_BUFFER_SOURCE.getBuffer(ESRenderType.PORTAL);
 			PoseStack.Pose pose = stack.last();
 			Matrix4f poseMat = pose.pose();

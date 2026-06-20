@@ -876,10 +876,10 @@ public class Stranghoul extends Monster implements NeutralMob, OwnableEntity, Ra
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.stranghoul.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.stranghoul.armor())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.stranghoul.attackDamage())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.stranghoul.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.3);
 	}
 
@@ -945,7 +945,16 @@ public class Stranghoul extends Monster implements NeutralMob, OwnableEntity, Ra
 
 		this.breedCooldown = random.nextInt(24000, 36000);
 
-		return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+		SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.stranghoul.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.stranghoul.armor.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.stranghoul.attackDamage.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.stranghoul.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return data;
 	}
 
 	@Override
@@ -1047,7 +1056,7 @@ public class Stranghoul extends Monster implements NeutralMob, OwnableEntity, Ra
 
 			setHirer(player);
 			ESDataAttachments.STRANGHOUL_HIRING_COOLDOWN.setData(player,
-				ESConfig.INSTANCE.mobsConfig.stranghoul.hiringCooldown());
+				ESConfig.stranghoul.hiringCooldown.get());
 			hiredTicksLeft = 24000;
 			hiredEatAnim = true;
 
@@ -1336,6 +1345,6 @@ public class Stranghoul extends Monster implements NeutralMob, OwnableEntity, Ra
 	}
 
 	public static boolean checkStranghoulSpawnRules(EntityType<? extends Stranghoul> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.INSTANCE.mobsConfig.stranghoul.canSpawn();
+		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.stranghoul.canSpawn.get();
 	}
 }

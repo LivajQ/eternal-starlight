@@ -44,7 +44,7 @@ public class CursedGardenStructure extends Structure {
 	public void afterPlace(WorldGenLevel level, StructureManager structureManager, ChunkGenerator chunkGenerator, RandomSource random, BoundingBox boundingBox, ChunkPos chunkPos, PiecesContainer piecesContainer) {
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		BoundingBox piecesBox = piecesContainer.calculateBoundingBox();
-		if (ESConfig.INSTANCE.mobsConfig.tangled.canSpawn()) {
+		if (ESConfig.tangled.canSpawn.get()) {
 			for (int x = boundingBox.minX(); x <= boundingBox.maxX(); x++) {
 				for (int z = boundingBox.minZ(); z <= boundingBox.maxZ(); z++) {
 					for (int y = piecesBox.minY(); y <= piecesBox.maxY(); y++) {

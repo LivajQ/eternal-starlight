@@ -193,8 +193,8 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Mob.createMobAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.boarwarf.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.boarwarf.armor())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.5D);
 	}
 
@@ -210,7 +210,14 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 				}
 			});
 
-		return super.finalizeSpawn(level, instance, spawnType, data, tag);
+		SpawnGroupData result = super.finalizeSpawn(level, instance, spawnType, data, tag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.boarwarf.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.boarwarf.armor.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return result;
 	}
 
 	@Override
@@ -494,6 +501,6 @@ public class Boarwarf extends PathfinderMob implements Npc, Merchant {
 	}
 
 	public static boolean checkBoarwarfSpawnRules(EntityType<? extends Boarwarf> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return checkMobSpawnRules(type, level, spawnType, pos, random) && ESConfig.INSTANCE.mobsConfig.boarwarf.canSpawn();
+		return checkMobSpawnRules(type, level, spawnType, pos, random) && ESConfig.boarwarf.canSpawn.get();
 	}
 }

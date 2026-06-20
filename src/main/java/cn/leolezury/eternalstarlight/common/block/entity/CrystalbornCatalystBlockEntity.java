@@ -79,7 +79,7 @@ public class CrystalbornCatalystBlockEntity extends BaseContainerBlockEntity {
 	public static void tick(Level level, BlockPos pos, BlockState state, CrystalbornCatalystBlockEntity entity) {
 		if (level instanceof ServerLevel serverLevel) {
 			if (state.getValue(CrystalbornCatalystBlock.LIT)) {
-				entity.cursors.removeIf(cursor -> cursor.energyLeft <= 0 || cursor.pos.distSqr(pos) > ESConfig.INSTANCE.itemsConfig.crystalbornCatalyst.maxRange() * ESConfig.INSTANCE.itemsConfig.crystalbornCatalyst.maxRange());
+				entity.cursors.removeIf(cursor -> cursor.energyLeft <= 0 || cursor.pos.distSqr(pos) > ESConfig.crystalbornCatalyst.maxRange.get() * ESConfig.crystalbornCatalyst.maxRange.get());
 				if (entity.energyLeft > 0 && entity.cursors.size() < 8) {
 					int energy = Math.min(entity.random.nextInt(10, 20), entity.energyLeft);
 					entity.cursors.add(new Cursor(pos, Direction.getRandom(entity.random), energy));
@@ -105,7 +105,7 @@ public class CrystalbornCatalystBlockEntity extends BaseContainerBlockEntity {
 				entity.charge = Mth.clamp(entity.charge, 0, 30);
 				if (entity.charge == 30) {
 					entity.items.get(0).shrink(1);
-					entity.energyLeft += ESConfig.INSTANCE.itemsConfig.crystalbornCatalyst.energyPerShard();
+					entity.energyLeft += ESConfig.crystalbornCatalyst.energyPerShard.get();
 					for (int i = 0; i <= 10; i++) {
 						ESPlatform.INSTANCE.sendToAllClients(serverLevel, new ParticlePacket(ExplosionShockParticleOptions.CRYSTAL, pos.getCenter().x + (entity.random.nextFloat() - 0.5f) * 4, pos.getY(), pos.getCenter().z + (entity.random.nextFloat() - 0.5f) * 4, 0, 1, 0));
 					}

@@ -32,6 +32,7 @@ import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.BossEvent;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -51,6 +52,7 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -180,12 +182,27 @@ public class LunarMonstrosity extends ESBoss implements RayAttackUser {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.lunarMonstrosity.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.lunarMonstrosity.armor())
-			.add(Attributes.ATTACK_DAMAGE, 5)
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.lunarMonstrosity.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 5.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.35F)
 			.add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
+	}
+
+	@Nullable
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag dataTag) {
+
+		SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.lunarMonstrosity.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.lunarMonstrosity.armor.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.lunarMonstrosity.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return data;
 	}
 
 	@Override

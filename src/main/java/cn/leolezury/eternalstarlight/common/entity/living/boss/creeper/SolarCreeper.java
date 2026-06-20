@@ -9,9 +9,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.util.Mth;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -23,8 +26,10 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class SolarCreeper extends ESBoss {
@@ -66,12 +71,26 @@ public class SolarCreeper extends ESBoss {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.solarCreeper.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.solarCreeper.armor())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.solarCreeper.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.3)
-			.add(Attributes.ATTACK_DAMAGE, 12)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
 			.add(Attributes.KNOCKBACK_RESISTANCE, 0.9);
+	}
+
+	@Nullable
+	@Override
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag dataTag) {
+		SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.solarCreeper.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.solarCreeper.armor.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.solarCreeper.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return data;
 	}
 
 	public void stopAllAnimStates() {

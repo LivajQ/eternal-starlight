@@ -107,18 +107,27 @@ public class Tangled extends Monster implements MultiBehaviorUser {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.tangled.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.tangled.armor())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.tangled.attackDamage())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.tangled.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0.2);
 	}
 
 	@Nullable
 	@Override
 	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag dataTag) {
+		SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
 		setVariant(random.nextInt(3));
-		return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData, dataTag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.tangled.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.tangled.armor.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.tangled.attackDamage.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.tangled.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return data;
 	}
 
 	@Override
@@ -187,7 +196,7 @@ public class Tangled extends Monster implements MultiBehaviorUser {
 
 	@Override
 	protected void tickDeath() {
-		if (!level().isClientSide && this.deathTime == 0 && getRandom().nextBoolean() && ESConfig.INSTANCE.mobsConfig.tangledSkull.canSpawn()) {
+		if (!level().isClientSide && this.deathTime == 0 && getRandom().nextBoolean() && ESConfig.tangledSkull.canSpawn.get()) {
 			TangledSkull skull = new TangledSkull(ESEntities.TANGLED_SKULL.get(), level());
 			skull.setPos(getX(), getY(0.75), getZ());
 			skull.setTarget(getTarget());
@@ -237,6 +246,6 @@ public class Tangled extends Monster implements MultiBehaviorUser {
 	}
 
 	public static boolean checkTangledSpawnRules(EntityType<? extends Tangled> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.INSTANCE.mobsConfig.tangled.canSpawn();
+		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.tangled.canSpawn.get();
 	}
 }

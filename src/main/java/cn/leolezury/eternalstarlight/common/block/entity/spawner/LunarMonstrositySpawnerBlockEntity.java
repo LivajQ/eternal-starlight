@@ -17,7 +17,7 @@ public class LunarMonstrositySpawnerBlockEntity extends BossSpawnerBlockEntity<L
 
 	@Override
 	protected boolean spawnBoss(ServerLevelAccessor accessor) {
-		if (!ESConfig.INSTANCE.mobsConfig.lunarMonstrosity.canSpawn()) {
+		if (!ESConfig.lunarMonstrosity.canSpawn.get()) {
 			return false;
 		}
 		return super.spawnBoss(accessor);

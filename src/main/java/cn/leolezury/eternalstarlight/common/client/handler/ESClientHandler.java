@@ -355,7 +355,7 @@ public class ESClientHandler {
 	}
 
 	public static float getScreenShakeYawOffset() {
-		if (!ESConfig.INSTANCE.enableScreenShake) {
+		if (!ESConfig.enableScreenShake.get()) {
 			return 0;
 		}
 		float sum = 0;
@@ -366,7 +366,7 @@ public class ESClientHandler {
 	}
 
 	public static float getScreenShakePitchOffset() {
-		if (!ESConfig.INSTANCE.enableScreenShake) {
+		if (!ESConfig.enableScreenShake.get()) {
 			return 0;
 		}
 		float sum = 0;

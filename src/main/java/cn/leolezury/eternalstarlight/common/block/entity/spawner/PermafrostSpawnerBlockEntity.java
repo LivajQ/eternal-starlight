@@ -17,7 +17,7 @@ public class PermafrostSpawnerBlockEntity extends BossSpawnerBlockEntity<Permafr
 
 	@Override
 	protected boolean spawnBoss(ServerLevelAccessor accessor) {
-		if (!ESConfig.INSTANCE.mobsConfig.permafrost.canSpawn()) {
+		if (!ESConfig.permafrost.canSpawn.get()) {
 			return false;
 		}
 		return super.spawnBoss(accessor);

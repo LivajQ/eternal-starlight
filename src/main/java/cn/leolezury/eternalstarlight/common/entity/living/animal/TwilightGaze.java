@@ -49,6 +49,13 @@ public class TwilightGaze extends WaterAnimal {
 		this.setAirSupply(this.getMaxAirSupply());
 		this.setXRot(0.0F);
 
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.twilightGaze.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.twilightGaze.armor.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.twilightGaze.attackDamage.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.twilightGaze.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
 		return spawnData;
 	}
 
@@ -79,10 +86,10 @@ public class TwilightGaze extends WaterAnimal {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Mob.createMobAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.twilightGaze.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.twilightGaze.armor())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.twilightGaze.attackDamage())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.twilightGaze.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 1.2);
 	}
 
@@ -149,7 +156,7 @@ public class TwilightGaze extends WaterAnimal {
 
 	public static boolean checkTwilightGazeSpawnRules(EntityType<? extends TwilightGaze> entityType, LevelAccessor levelAccessor, MobSpawnType mobSpawnType, BlockPos blockPos, RandomSource randomSource) {
 		int seaLevel = levelAccessor.getSeaLevel();
-		return blockPos.getY() <= seaLevel - 40 && levelAccessor.getFluidState(blockPos.below()).is(FluidTags.WATER) && levelAccessor.getBlockState(blockPos.above()).is(Blocks.WATER) && ESConfig.INSTANCE.mobsConfig.twilightGaze.canSpawn();
+		return blockPos.getY() <= seaLevel - 40 && levelAccessor.getFluidState(blockPos.below()).is(FluidTags.WATER) && levelAccessor.getBlockState(blockPos.above()).is(Blocks.WATER) && ESConfig.twilightGaze.canSpawn.get();
 	}
 }
 

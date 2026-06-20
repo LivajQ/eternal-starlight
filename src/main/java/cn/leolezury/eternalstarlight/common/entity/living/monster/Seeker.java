@@ -131,10 +131,10 @@ public class Seeker extends Monster implements VariantHolder<Holder<SeekerVarian
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-			.add(Attributes.MAX_HEALTH, ESConfig.INSTANCE.mobsConfig.seeker.maxHealth())
-			.add(Attributes.ARMOR, ESConfig.INSTANCE.mobsConfig.seeker.armor())
-			.add(Attributes.ATTACK_DAMAGE, ESConfig.INSTANCE.mobsConfig.seeker.attackDamage())
-			.add(Attributes.FOLLOW_RANGE, ESConfig.INSTANCE.mobsConfig.seeker.followRange())
+			.add(Attributes.MAX_HEALTH, 1.0)
+			.add(Attributes.ARMOR, 0.0)
+			.add(Attributes.ATTACK_DAMAGE, 1.0)
+			.add(Attributes.FOLLOW_RANGE, 16.0)
 			.add(Attributes.MOVEMENT_SPEED, 0)
 			.add(Attributes.FLYING_SPEED, 1);
 	}
@@ -279,8 +279,17 @@ public class Seeker extends Monster implements VariantHolder<Holder<SeekerVarian
 
 	@Override
 	public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance instance, MobSpawnType spawnType, @Nullable SpawnGroupData data, @Nullable CompoundTag tag) {
+		SpawnGroupData spawnGroupData = super.finalizeSpawn(level, instance, spawnType, data, tag);
 		setVariant(SeekerVariant.getSpawnVariant(level.registryAccess(), level.getBiome(blockPosition())));
-		return super.finalizeSpawn(level, instance, spawnType, data, tag);
+
+		this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(ESConfig.seeker.maxHealth.get());
+		this.getAttribute(Attributes.ARMOR).setBaseValue(ESConfig.seeker.armor.get());
+		this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ESConfig.seeker.attackDamage.get());
+		this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(ESConfig.seeker.followRange.get());
+
+		this.setHealth(this.getMaxHealth());
+
+		return data;
 	}
 
 	@Override
@@ -306,6 +315,6 @@ public class Seeker extends Monster implements VariantHolder<Holder<SeekerVarian
 	}
 
 	public static boolean checkSeekerSpawnRules(EntityType<? extends Seeker> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random) {
-		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.INSTANCE.mobsConfig.seeker.canSpawn();
+		return checkAnyLightMonsterSpawnRules(type, level, spawnType, pos, random) && ESConfig.seeker.canSpawn.get();
 	}
 }

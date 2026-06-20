@@ -103,7 +103,7 @@ public class FrozenTube extends ThrowableProjectile implements TrailOwner {
 				damage = 6f;
 
 			} else if (shooter instanceof Freeze) {
-				damage = (float) ESConfig.INSTANCE.mobsConfig.freeze.attackDamage();
+				damage = ESConfig.freeze.attackDamage.get().floatValue();
 
 			} else if (shooter instanceof Permafrost permafrost) {
 				double base = permafrost.getAttribute(Attributes.ATTACK_DAMAGE) != null
