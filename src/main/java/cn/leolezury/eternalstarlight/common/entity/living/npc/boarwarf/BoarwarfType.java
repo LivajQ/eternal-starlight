@@ -12,6 +12,15 @@ public record BoarwarfType(Holder<Biome> biome, ResourceLocation texture, Resour
 		ResourceLocation.CODEC.fieldOf("texture").forGetter(BoarwarfType::texture)
 	).apply(instance, BoarwarfType::new));
 
+	public static final Codec<BoarwarfType> NETWORK_CODEC =
+		RecordCodecBuilder.create(instance -> instance.group(
+			ResourceLocation.CODEC.fieldOf("texture").forGetter(BoarwarfType::texture),
+			ResourceLocation.CODEC.fieldOf("texture_full").forGetter(BoarwarfType::textureFull)
+		).apply(instance, (texture, textureFull) ->
+			new BoarwarfType(null, texture, textureFull)
+		));
+
+
 	public BoarwarfType(Holder<Biome> biome, ResourceLocation texture) {
 		this(biome, texture, fullTextureId(texture));
 	}

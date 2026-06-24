@@ -19,6 +19,17 @@ public record ShimmerLacewingVariant(ResourceLocation texture, ResourceLocation 
 		RegistryCodecs.homogeneousList(Registries.BIOME).fieldOf("biomes").forGetter(ShimmerLacewingVariant::biomes)
 	).apply(instance, ShimmerLacewingVariant::new));
 
+	public static final Codec<ShimmerLacewingVariant> NETWORK_CODEC =
+		RecordCodecBuilder.create(instance -> instance.group(
+			ResourceLocation.CODEC.fieldOf("texture").forGetter(ShimmerLacewingVariant::texture),
+			ResourceLocation.CODEC.fieldOf("texture_full").forGetter(ShimmerLacewingVariant::textureFull),
+			ResourceLocation.CODEC.fieldOf("glow_texture").forGetter(ShimmerLacewingVariant::glowTexture),
+			ResourceLocation.CODEC.fieldOf("glow_texture_full").forGetter(ShimmerLacewingVariant::glowTextureFull)
+		).apply(instance, (texture, textureFull, glow, glowFull) ->
+			new ShimmerLacewingVariant(texture, textureFull, glow, glowFull, HolderSet.direct())
+		));
+
+
 	public ShimmerLacewingVariant(ResourceLocation texture, ResourceLocation glowTexture, HolderSet<Biome> biomes) {
 		this(texture, fullTextureId(texture), glowTexture, fullTextureId(glowTexture), biomes);
 	}

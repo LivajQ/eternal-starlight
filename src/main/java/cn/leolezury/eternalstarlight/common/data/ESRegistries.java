@@ -24,12 +24,12 @@ public class ESRegistries {
 	public static final ResourceKey<Registry<SeedsLauncherAmmoType>> SEEDS_LAUNCHER_AMMO_TYPE = ResourceKey.createRegistryKey(EternalStarlight.id("seeds_launcher_ammo_type"));
 
 	static {
-		ESPlatform.INSTANCE.registerDatapackRegistry(BIOME_DATA, BiomeData.CODEC, BiomeData.CODEC);
-		ESPlatform.INSTANCE.registerDatapackRegistry(BOARWARF_TYPE, BoarwarfType.CODEC, BoarwarfType.CODEC);
+		ESPlatform.INSTANCE.registerDatapackRegistry(BIOME_DATA, BiomeData.CODEC, BiomeData.NETWORK_CODEC);
+		ESPlatform.INSTANCE.registerDatapackRegistry(BOARWARF_TYPE, BoarwarfType.CODEC, BoarwarfType.NETWORK_CODEC);
 		ESPlatform.INSTANCE.registerDatapackRegistry(ASTRAL_GOLEM_MATERIAL, AstralGolemMaterial.CODEC, AstralGolemMaterial.CODEC);
-		ESPlatform.INSTANCE.registerDatapackRegistry(ENT_VARIANT, EntVariant.CODEC, EntVariant.CODEC);
-		ESPlatform.INSTANCE.registerDatapackRegistry(SHIMMER_LACEWING_VARIANT, ShimmerLacewingVariant.CODEC, ShimmerLacewingVariant.CODEC);
-		ESPlatform.INSTANCE.registerDatapackRegistry(SEEKER_VARIANT, SeekerVariant.CODEC, SeekerVariant.CODEC);
+		ESPlatform.INSTANCE.registerDatapackRegistry(ENT_VARIANT, EntVariant.CODEC, EntVariant.NETWORK_CODEC);
+		ESPlatform.INSTANCE.registerDatapackRegistry(SHIMMER_LACEWING_VARIANT, ShimmerLacewingVariant.CODEC, ShimmerLacewingVariant.NETWORK_CODEC);
+		ESPlatform.INSTANCE.registerDatapackRegistry(SEEKER_VARIANT, SeekerVariant.CODEC, SeekerVariant.NETWORK_CODEC);
 		ESPlatform.INSTANCE.registerDatapackRegistry(CREST, Crest.CODEC, Crest.CODEC);
 		ESPlatform.INSTANCE.registerDatapackRegistry(SEEDS_LAUNCHER_AMMO_TYPE, SeedsLauncherAmmoType.CODEC, SeedsLauncherAmmoType.CODEC);
 	}

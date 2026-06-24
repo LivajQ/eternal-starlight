@@ -18,6 +18,18 @@ public record BiomeData(Holder<Biome> biome, Holder<Block> fluidBlock, int heigh
 		Codec.BOOL.fieldOf("is_ocean").forGetter(BiomeData::isOcean)
 	).apply(instance, BiomeData::new));
 
+	public static final Codec<BiomeData> NETWORK_CODEC =
+		RecordCodecBuilder.create(instance -> instance.group(
+			BuiltInRegistries.BLOCK.holderByNameCodec().fieldOf("fluid").forGetter(BiomeData::fluidBlock),
+			Codec.INT.fieldOf("height").forGetter(BiomeData::height),
+			Codec.INT.fieldOf("variance").forGetter(BiomeData::variance),
+			Codec.BOOL.fieldOf("has_rivers").forGetter(BiomeData::hasRivers),
+			Codec.BOOL.fieldOf("is_ocean").forGetter(BiomeData::isOcean)
+		).apply(instance, (fluid, height, variance, hasRivers, isOcean) ->
+			new BiomeData(null, fluid, height, variance, hasRivers, isOcean)
+		));
+
+
 	public static class Builder {
 		private final Holder<Biome> biome;
 		private Holder<Block> fluidBlock = Blocks.WATER.builtInRegistryHolder();

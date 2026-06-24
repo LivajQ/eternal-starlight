@@ -21,6 +21,14 @@ public record EntVariant(Holder<Item> leaves, ResourceLocation texture, Resource
 		RegistryCodecs.homogeneousList(Registries.BIOME).fieldOf("biomes").forGetter(EntVariant::biomes)
 	).apply(instance, EntVariant::new));
 
+	public static final Codec<EntVariant> NETWORK_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+		BuiltInRegistries.ITEM.holderByNameCodec().fieldOf("leaves").forGetter(EntVariant::leaves),
+		ResourceLocation.CODEC.fieldOf("texture").forGetter(EntVariant::texture),
+		ResourceLocation.CODEC.fieldOf("texture_full").forGetter(EntVariant::textureFull)
+	).apply(instance, (leaves, texture, textureFull) ->
+		new EntVariant(leaves, texture, textureFull, HolderSet.direct())
+	));
+
 	public EntVariant(Holder<Item> leaves, ResourceLocation texture, HolderSet<Biome> biomes) {
 		this(leaves, texture, fullTextureId(texture), biomes);
 	}
