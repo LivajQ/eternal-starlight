@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
-public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> ingredients, int burnTime) implements Recipe<Container> {
+public record AlloyRecipe(ResourceLocation id, NonNullList<Result> results, NonNullList<Ingredient> ingredients, int burnTime) implements Recipe<Container> {
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
@@ -49,7 +49,7 @@ public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> i
 
 	@Override
 	public ResourceLocation getId() {
-		return ESRecipes.ALLOY.getId();
+		return id;
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> i
 
 			int burnTime = GsonHelper.getAsInt(json, "burn_time");
 
-			return new AlloyRecipe(results, ingredients, burnTime);
+			return new AlloyRecipe(id, results, ingredients, burnTime);
 		}
 
 		@Override
@@ -150,7 +150,7 @@ public record AlloyRecipe(NonNullList<Result> results, NonNullList<Ingredient> i
 			}
 
 			int burnTime = buf.readInt();
-			return new AlloyRecipe(results, ingredients, burnTime);
+			return new AlloyRecipe(id, results, ingredients, burnTime);
 		}
 
 		@Override

@@ -133,7 +133,7 @@ public class AlloyRecipeBuilder {
 			)
 		);
 
-		AlloyRecipe recipe = new AlloyRecipe(this.results, this.ingredients, this.burnTime);
+		AlloyRecipe recipe = new AlloyRecipe(null, this.results, this.ingredients, this.burnTime);
 
 		consumer.accept(new FinishedRecipe() {
 

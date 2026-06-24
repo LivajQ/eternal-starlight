@@ -23,12 +23,14 @@ public class DryingRecipe implements Recipe<Container> {
 	private final ItemStack output;
 	private final int durationTicks;
 	private final boolean fireBelow;
+	private final ResourceLocation id;
 
-	public DryingRecipe(Ingredient input, ItemStack output, int durationTicks, boolean fireBelow) {
+	public DryingRecipe(ResourceLocation id, Ingredient input, ItemStack output, int durationTicks, boolean fireBelow) {
 		this.input = input;
 		this.output = output;
 		this.durationTicks = durationTicks;
 		this.fireBelow = fireBelow;
+		this.id = id;
 	}
 
 	public Ingredient input() {
@@ -70,7 +72,7 @@ public class DryingRecipe implements Recipe<Container> {
 
 	@Override
 	public ResourceLocation getId() {
-		return ESRecipes.DRYING.getId();
+		return id;
 	}
 
 	@Override
@@ -100,7 +102,7 @@ public class DryingRecipe implements Recipe<Container> {
 			ItemStack output = ShapedRecipe.itemStackFromJson(json.getAsJsonObject("output"));
 			int duration = GsonHelper.getAsInt(json, "duration_ticks");
 			boolean fireBelow = GsonHelper.getAsBoolean(json, "fire_below");
-			return new DryingRecipe(input, output, duration, fireBelow);
+			return new DryingRecipe(id, input, output, duration, fireBelow);
 		}
 
 		@Override
@@ -109,7 +111,7 @@ public class DryingRecipe implements Recipe<Container> {
 			ItemStack output = buf.readItem();
 			int duration = buf.readInt();
 			boolean fireBelow = buf.readBoolean();
-			return new DryingRecipe(input, output, duration, fireBelow);
+			return new DryingRecipe(id, input, output, duration, fireBelow);
 		}
 
 		@Override

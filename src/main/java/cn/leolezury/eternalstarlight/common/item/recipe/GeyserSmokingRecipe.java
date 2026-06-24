@@ -21,7 +21,7 @@ import net.minecraft.world.level.Level;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-public record GeyserSmokingRecipe(Item input, int inputCount, ItemStack output) implements Recipe<Container> {
+public record GeyserSmokingRecipe(ResourceLocation id, Item input, int inputCount, ItemStack output) implements Recipe<Container> {
 
 	@Override
 	public boolean matches(Container container, Level level) {
@@ -45,7 +45,7 @@ public record GeyserSmokingRecipe(Item input, int inputCount, ItemStack output) 
 
 	@Override
 	public ResourceLocation getId() {
-		return ESRecipes.GEYSER_SMOKING.getId();
+		return id;
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public record GeyserSmokingRecipe(Item input, int inputCount, ItemStack output) 
 			Item input = BuiltInRegistries.ITEM.get(new ResourceLocation(json.get("input").getAsString()));
 			int inputCount = json.get("input_count").getAsInt();
 			ItemStack output = ShapedRecipe.itemStackFromJson(json.getAsJsonObject("output"));
-			return new GeyserSmokingRecipe(input, inputCount, output);
+			return new GeyserSmokingRecipe(id, input, inputCount, output);
 		}
 
 		@Override
@@ -82,7 +82,7 @@ public record GeyserSmokingRecipe(Item input, int inputCount, ItemStack output) 
 			Item input = buf.readById(BuiltInRegistries.ITEM);
 			int inputCount = buf.readInt();
 			ItemStack output = buf.readItem();
-			return new GeyserSmokingRecipe(input, inputCount, output);
+			return new GeyserSmokingRecipe(id, input, inputCount, output);
 		}
 
 		@Override

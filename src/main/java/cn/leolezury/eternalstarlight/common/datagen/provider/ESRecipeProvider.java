@@ -547,16 +547,16 @@ public class ESRecipeProvider extends RecipeProvider {
 			.save(recipeOutput, EternalStarlight.id("comparator_from_cinder_brick_and_nightfall_spider_eye"));
 
 		// geyser smoking
-		new GeyserSmokingRecipe(Items.SKELETON_SKULL, 1, Items.WITHER_SKELETON_SKULL.getDefaultInstance()).save(recipeOutput, EternalStarlight.id("geyser_smoking/wither_skeleton_skull_from_skeleton_skull"));
-		new GeyserSmokingRecipe(Items.WHITE_DYE, 1, Items.BLACK_DYE.getDefaultInstance()).save(recipeOutput, EternalStarlight.id("geyser_smoking/back_dye_from_white_dye"));
-		new GeyserSmokingRecipe(ESItems.GRIMSTONE.get(), 3, new ItemStack(ESItems.VOIDSTONE.get(), 2)).save(recipeOutput, EternalStarlight.id("geyser_smoking/voidstone_from_grimstone"));
+		new GeyserSmokingRecipe(null, Items.SKELETON_SKULL, 1, Items.WITHER_SKELETON_SKULL.getDefaultInstance()).save(recipeOutput, EternalStarlight.id("geyser_smoking/wither_skeleton_skull_from_skeleton_skull"));
+		new GeyserSmokingRecipe(null, Items.WHITE_DYE, 1, Items.BLACK_DYE.getDefaultInstance()).save(recipeOutput, EternalStarlight.id("geyser_smoking/back_dye_from_white_dye"));
+		new GeyserSmokingRecipe(null, ESItems.GRIMSTONE.get(), 3, new ItemStack(ESItems.VOIDSTONE.get(), 2)).save(recipeOutput, EternalStarlight.id("geyser_smoking/voidstone_from_grimstone"));
 
 		//drying
-		new DryingRecipe(Ingredient.of(Items.ROTTEN_FLESH), ESItems.ROTTEN_FLESH_JERKY.get().getDefaultInstance(), 600, true).save(recipeOutput, EternalStarlight.id("drying/rotten_flesh_jerky"));
-		new DryingRecipe(Ingredient.of(Items.ROTTEN_FLESH), Items.LEATHER.getDefaultInstance(), 2400, false).save(recipeOutput, EternalStarlight.id("drying/leather_from_rotten_flesh"));
-		new DryingRecipe(Ingredient.of(Items.WET_SPONGE), Items.SPONGE.getDefaultInstance(), 100, true).save(recipeOutput, EternalStarlight.id("drying/sponge"));
-		new DryingRecipe(Ingredient.of(Items.KELP), Items.DRIED_KELP.getDefaultInstance(), 100, true).save(recipeOutput, EternalStarlight.id("drying/dried_kelp"));
-		new DryingRecipe(Ingredient.of(Items.CLAY_BALL), Items.BRICK.getDefaultInstance(), 150, true).save(recipeOutput, EternalStarlight.id("drying/brick"));
+		new DryingRecipe(null, Ingredient.of(Items.ROTTEN_FLESH), ESItems.ROTTEN_FLESH_JERKY.get().getDefaultInstance(), 600, true).save(recipeOutput, EternalStarlight.id("drying/rotten_flesh_jerky"));
+		new DryingRecipe(null, Ingredient.of(Items.ROTTEN_FLESH), Items.LEATHER.getDefaultInstance(), 2400, false).save(recipeOutput, EternalStarlight.id("drying/leather_from_rotten_flesh"));
+		new DryingRecipe(null, Ingredient.of(Items.WET_SPONGE), Items.SPONGE.getDefaultInstance(), 100, true).save(recipeOutput, EternalStarlight.id("drying/sponge"));
+		new DryingRecipe(null, Ingredient.of(Items.KELP), Items.DRIED_KELP.getDefaultInstance(), 100, true).save(recipeOutput, EternalStarlight.id("drying/dried_kelp"));
+		new DryingRecipe(null, Ingredient.of(Items.CLAY_BALL), Items.BRICK.getDefaultInstance(), 150, true).save(recipeOutput, EternalStarlight.id("drying/brick"));
 
 		// alloy furnace
 		AlloyRecipeBuilder.alloy(Items.IRON_INGOT.getDefaultInstance(), 2, 400)
