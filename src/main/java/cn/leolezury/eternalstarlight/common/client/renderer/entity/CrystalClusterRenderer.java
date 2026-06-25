@@ -5,6 +5,7 @@ import cn.leolezury.eternalstarlight.common.platform.ESClientPlatform;
 import cn.leolezury.eternalstarlight.common.registry.ESBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -38,7 +39,7 @@ public class CrystalClusterRenderer extends EntityRenderer<CrystalCluster> {
 				stack.mulPose(new Quaternionf().rotateY(-yaw * Mth.DEG_TO_RAD));
 				stack.translate(-0.5 * scale, 0.0, -0.5 * scale);
 				stack.scale(scale, scale, scale);
-				ESClientPlatform.INSTANCE.renderBlock(dispatcher, stack, bufferSource, level, state, pos, state.getSeed(cluster.blockPosition()));
+				ESClientPlatform.INSTANCE.renderBlock(dispatcher, stack, bufferSource, level, state, pos, state.getSeed(cluster.blockPosition()), RenderType.cutout());
 				stack.popPose();
 				super.render(cluster, yaw, delta, stack, bufferSource, packedLight);
 			}
