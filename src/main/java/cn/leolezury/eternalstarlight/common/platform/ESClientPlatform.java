@@ -5,8 +5,8 @@ import cn.leolezury.eternalstarlight.common.client.resource.BookLoader;
 import cn.leolezury.eternalstarlight.common.network.ESPacket;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
@@ -14,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.RenderTypeHelper;
 
 public interface ESClientPlatform {
 	ESClientPlatform INSTANCE = new ESForgeClientPlatform(); //loom architectury remnant
@@ -33,7 +34,11 @@ public interface ESClientPlatform {
 	BakedModel getGlowingBakedModel(BakedModel origin);
 
 	default void renderBlock(BlockRenderDispatcher dispatcher, PoseStack stack, MultiBufferSource multiBufferSource, Level level, BlockState state, BlockPos pos, long seed) {
-		dispatcher.getModelRenderer().tesselateBlock(level, dispatcher.getBlockModel(state), state, pos, stack, multiBufferSource.getBuffer(ItemBlockRenderTypes.getMovingBlockRenderType(state)), false, RandomSource.create(), seed, OverlayTexture.NO_OVERLAY);
+		dispatcher.getModelRenderer().tesselateBlock(level, dispatcher.getBlockModel(state), state, pos, stack, multiBufferSource.getBuffer(RenderTypeHelper.getMovingBlockRenderType(RenderType.solid())), false, RandomSource.create(), seed, OverlayTexture.NO_OVERLAY);
+	}
+
+	default void renderBlock(BlockRenderDispatcher dispatcher, PoseStack stack, MultiBufferSource multiBufferSource, Level level, BlockState state, BlockPos pos, long seed, RenderType renderType) {
+		dispatcher.getModelRenderer().tesselateBlock(level, dispatcher.getBlockModel(state), state, pos, stack, multiBufferSource.getBuffer(RenderTypeHelper.getMovingBlockRenderType(renderType)), false, RandomSource.create(), seed, OverlayTexture.NO_OVERLAY);
 	}
 
 	void sendToServer(ESPacket packet);
