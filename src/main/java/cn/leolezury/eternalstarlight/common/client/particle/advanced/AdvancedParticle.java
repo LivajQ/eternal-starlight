@@ -39,12 +39,13 @@ public class AdvancedParticle extends TextureSheetParticle implements ParticleOp
 	@Override
 	public void render(VertexConsumer vertexConsumer, Camera camera, float f) {
 		this.options.operateRender(this);
-		super.render(ESClientHandler.DELAYED_BUFFER_SOURCE.getBuffer(this.options.getRenderType()), camera, f);
+		//super.render(ESClientHandler.DELAYED_BUFFER_SOURCE.getBuffer(this.options.getRenderType()), camera, f);
+		super.render(vertexConsumer, camera, f);
 	}
 
 	@Override
 	public ParticleRenderType getRenderType() {
-		return ParticleRenderType.CUSTOM;
+		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
 	}
 
 	@Override

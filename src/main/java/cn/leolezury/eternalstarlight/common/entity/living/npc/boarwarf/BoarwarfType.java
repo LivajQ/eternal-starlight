@@ -20,7 +20,6 @@ public record BoarwarfType(Holder<Biome> biome, ResourceLocation texture, Resour
 			new BoarwarfType(null, texture, textureFull)
 		));
 
-
 	public BoarwarfType(Holder<Biome> biome, ResourceLocation texture) {
 		this(biome, texture, fullTextureId(texture));
 	}

@@ -45,12 +45,13 @@ public class ESSmokeParticle extends SimpleAnimatedParticle {
 	public void render(VertexConsumer vertexConsumer, Camera camera, float partialTicks) {
 		float progress = Math.min(age + partialTicks, lifetime) / lifetime;
 		this.alpha = Mth.lerp((float) Math.pow((Math.abs(progress - 0.5) * 2), 5), initialAlpha, 0);
-		super.render(ESClientHandler.DELAYED_BUFFER_SOURCE.getBuffer(ESRenderType.PARTICLE_NO_DEPTH), camera, partialTicks);
+		//super.render(ESClientHandler.DELAYED_BUFFER_SOURCE.getBuffer(ESRenderType.PARTICLE_NO_DEPTH), camera, partialTicks);
+		super.render(vertexConsumer, camera, partialTicks);
 	}
 
 	@Override
 	public ParticleRenderType getRenderType() {
-		return ParticleRenderType.CUSTOM;
+		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
 	}
 
 	public static class Provider implements ParticleProvider<ESSmokeParticleOptions> {

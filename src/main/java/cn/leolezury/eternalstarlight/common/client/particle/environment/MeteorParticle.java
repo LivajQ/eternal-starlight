@@ -52,13 +52,14 @@ public class MeteorParticle extends TextureSheetParticle {
 		stack.pushPose();
 		stack.translate(-camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
 		this.effect.prepareRender(new Vec3(x, y, z), partialTicks);
-		TrailRenderer.render(this.effect, ESClientHandler.DELAYED_BUFFER_SOURCE.getBuffer(ESRenderType.PARTICLE_ADDITIVE_GLOW), stack, TrailEffect.TrailOffsetFunction.FACE_CAMERA, false, true, 144 / 255f, 94 / 255f, 168 / 255f, 2f, getU0(), getU1(), getV0(), getV1(), LightTexture.FULL_BRIGHT);
+		//TrailRenderer.render(this.effect, ESClientHandler.DELAYED_BUFFER_SOURCE.getBuffer(ESRenderType.PARTICLE_ADDITIVE_GLOW), stack, TrailEffect.TrailOffsetFunction.FACE_CAMERA, false, true, 144 / 255f, 94 / 255f, 168 / 255f, 2f, getU0(), getU1(), getV0(), getV1(), LightTexture.FULL_BRIGHT);
+		TrailRenderer.render(this.effect, consumer, stack, TrailEffect.TrailOffsetFunction.FACE_CAMERA, false, true, 144 / 255f, 94 / 255f, 168 / 255f, 2f, getU0(), getU1(), getV0(), getV1(), LightTexture.FULL_BRIGHT);
 		stack.popPose();
 	}
 
 	@Override
 	public ParticleRenderType getRenderType() {
-		return ParticleRenderType.CUSTOM;
+		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
 	}
 
 	public static class Provider implements ParticleProvider<SimpleParticleType> {
